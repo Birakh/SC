@@ -258,6 +258,7 @@ body.dark .icon-btn{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
 body.dark .icon-btn:hover{background:#333336}
 body.dark .rate-table th{color:#666;border-bottom-color:#3a3a3e}
 body.dark .rate-table td{border-bottom-color:#2e2e32}
+body.dark{--bracket-active:#1e2d3d}
 body.dark .bracket-bar{background:#3a3a3e}
 body.dark .tax-field label{color:#888}
 body.dark .tax-field input{background:#2e2e32;border-color:#4a4a4e;color:#e2e2dc}
@@ -306,7 +307,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
     <span class="lpill lp-normal">Early 07–15</span>
     <span class="lpill lp-middle">Middle 11:30–20 <b style="color:#0f6e56">+€35.50</b></span>
     <span class="lpill lp-late">Late 14–22:30 <b style="color:#3c3489">+€50</b></span>
-    <span class="lpill lp-latenight">Late+Night 14–22:30 <b style="color:#26215c">+€50+8%</b></span>
+    <span class="lpill lp-latenight">Late+Night 14–22:30 <b style="color:#26215c">+8% only</b></span>
     <span class="lpill lp-holiday">Public holiday <b style="color:#854f0b">+200%</b></span>
     <span class="lpill lp-leave">Urlaub</span>
     <span class="lpill lp-ruf">On-call</span>
@@ -346,7 +347,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
       <div class="rrow"><span class="rl">Night allowance 8% (early shifts)</span><span class="rv" id="r-shift">—</span></div>
       <div class="rrow"><span class="rl">Middle shift supplement (×days × €35.50)</span><span class="rv" id="r-middle">—</span></div>
       <div class="rrow"><span class="rl">Late shift supplement (×days × €50)</span><span class="rv" id="r-late">—</span></div>
-      <div class="rrow"><span class="rl">Late+Night 8% supplement</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
+      <div class="rrow"><span class="rl">Late+Night 8% supplement (no €50, 14–22:30)</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
       <div class="rrow"><span class="rl">Public holiday pay (base rate + 200% extra, prev month)</span><span class="rv" id="r-hol">—</span></div>
       <div class="rrow"><span class="rl">Annual leave (Urlaub)</span><span class="rv" id="r-leave">—</span></div>
       <div class="rrow"><span class="rl">Rufbereitschaft standby</span><span class="rv" id="r-ruf">—</span></div>
@@ -401,7 +402,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
       </div>
       <div style="font-size:10px;color:#bbb;margin-top:5px" id="diff-note"></div>
     </div>
-    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Middle shift supplement €35.50 and late shift €50 are taxable. Rufbereitschaft standby may be partially SV-exempt — confirm with HR. Max 10 on-call days/month (AZG §20a).</p>
+    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Middle shift supplement €35.50 and late shift €50 are taxable. Late+Night (8% only) earns night hours with no fixed supplement. Rufbereitschaft standby may be partially SV-exempt — confirm with HR. Max 10 on-call days/month (AZG §20a).</p>
   </div>
 
   <!-- ── TAX CALC ── -->
@@ -624,7 +625,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
     <button class="preset-btn" onclick="applyPreset('normal','07:00','15:00',this)">☀️ Early<br><span>07:00–15:00</span></button>
     <button class="preset-btn" onclick="applyPreset('middle','11:30','20:00',this)">🌤 Middle<br><span>11:30–20 +€35.50</span></button>
     <button class="preset-btn" onclick="applyPreset('late','14:00','22:30',this)">🌙 Late<br><span>14:00–22:30 +€50</span></button>
-    <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙🌟 Late+8%<br><span>14–22:30 +€50+8%</span></button>
+    <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙 Late 8%<br><span>14–22:30 8% only</span></button>
     <button class="preset-btn" onclick="applyPreset('normal','22:00','06:00',this)">🌑 Night<br><span>22:00–06:00</span></button>
     <button class="preset-btn" onclick="applyPreset('normal','07:00','19:00',this)">⏳ Long<br><span>07:00–19:00</span></button>
     <button class="preset-btn" onclick="applyPreset('ruf','06:30','11:00',this)">📱 On-call 1<br><span>06:30–11:00</span></button>
@@ -640,7 +641,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
       <option value="normal">Normal shift (8% night hours)</option>
       <option value="middle">Middle shift — 11:30–20:00 (+€35.50 fixed)</option>
       <option value="late">Late shift — 14:00–22:30 (+€50 fixed)</option>
-      <option value="latenight">Late+Night — 14:00–22:30 (+€50 fixed + 8% after 20:00)</option>
+      <option value="latenight">Late+Night — 14:00–22:30 (8% night hours only, no €50)</option>
       <option value="holiday">Public holiday worked (+100%)</option>
       <option value="leave">Annual leave (Urlaub)</option>
       <option value="ruf">Rufbereitschaft (standby)</option>
@@ -799,7 +800,7 @@ function calcEarnedSupplements(year,month){
     if(sh.type==='holiday')     holH+=h.total;
     else if(sh.type==='middle') middleDays++;
     else if(sh.type==='late')   lateDays++;
-    else if(sh.type==='latenight'){ lateDays++; lateNightH+=h.night; }
+    else if(sh.type==='latenight'){ lateNightH+=h.night; } // 8% night hours only — no €50 late supplement
     else if(sh.type==='normal'||sh.type==='callin') nightH+=h.night;
   });
   return {
@@ -1094,15 +1095,16 @@ function renderTaxCalc(){
     return '<div class="tscard"><div class="tsl">'+c.l+'</div><div class="tsv">'+c.v+'</div><div class="tss">'+c.s+'</div></div>';
   }).join('');
 
-  // Bracket bar
   var annualAfterSV=annual-Math.min(annual/12,SV_CAP_MONTHLY)*12*SV_TOTAL;
+  // Bracket bar — use actual BRACKETS thresholds (0, 13539, 21992, 36458, 70365, 104859)
+  var b0e=BRACKETS[1].from,b20e=BRACKETS[2].from,b30e=BRACKETS[3].from,b40e=BRACKETS[4].from,b48e=BRACKETS[5].from;
   var segments=[
-    {cls:'b0', width:Math.min(100,12816/annualAfterSV*100)},
-    {cls:'b20',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,20818)-12816)/annualAfterSV*100))},
-    {cls:'b30',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,34513)-20818)/annualAfterSV*100))},
-    {cls:'b40',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,66612)-34513)/annualAfterSV*100))},
-    {cls:'b48',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,99266)-66612)/annualAfterSV*100))},
-    {cls:'b50',width:Math.max(0,(annualAfterSV-99266)/annualAfterSV*100)},
+    {cls:'b0', width:annualAfterSV>0?Math.min(100,b0e/annualAfterSV*100):100},
+    {cls:'b20',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,b20e)-b0e)/annualAfterSV*100))},
+    {cls:'b30',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,b30e)-b20e)/annualAfterSV*100))},
+    {cls:'b40',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,b40e)-b30e)/annualAfterSV*100))},
+    {cls:'b48',width:Math.max(0,Math.min(100,(Math.min(annualAfterSV,b48e)-b40e)/annualAfterSV*100))},
+    {cls:'b50',width:Math.max(0,(annualAfterSV-b48e)/annualAfterSV*100)},
   ];
   document.getElementById('tc-bar').innerHTML=segments.map(function(s){
     return s.width>0?'<div class="bracket-seg '+s.cls+'" style="width:'+s.width.toFixed(1)+'%"></div>':'';
@@ -1139,8 +1141,7 @@ function renderTaxCalc(){
   // Brackets table
   var tbody='';
   BRACKETS.forEach(function(b){
-    var inBracket=annualAfterSV>b.from&&(b.to===Infinity||annualAfterSV>b.from);
-    var active=marginal===b.rate?'style="font-weight:600;background:#f0f7ff"':'';
+    var active=marginal===b.rate?'style="font-weight:600;background:var(--bracket-active,#f0f7ff)"':'';
     tbody+='<tr '+active+'><td>'+fmtN(b.from)+' – '+(b.to===Infinity?'∞':fmtN(b.to))+'</td>'+
       '<td>'+(b.rate*100).toFixed(0)+'%</td>'+
       '<td>'+(annualAfterSV>b.from?'✓ applies':'—')+'</td></tr>';
@@ -1150,7 +1151,6 @@ function renderTaxCalc(){
   // Supplement impact
   var rows='';
   if(suppl>0){
-    var extra=suppl-calcMonthlyLSt(monthlyGross)+calcMonthlyLSt(monthlyGross-suppl)-(suppl*SV_TOTAL);
     rows+='<div class="rrow"><span class="rl">Supplements (€'+suppl.toFixed(2)+'/month)</span><span class="rv pos">+€'+(suppl-suppl*SV_TOTAL-calcMonthlyLSt(monthlyGross)+calcMonthlyLSt(monthlyGross-suppl)).toFixed(2)+' net impact</span></div>';
   }
   if(oncallM>0){
@@ -1199,7 +1199,7 @@ function renderCalendar(){
     if(sh){
       var pill=document.createElement('span');
       pill.className='shift-pill sp-'+sh.type;
-      var labels={normal:'Shift',middle:'Middle',late:'Late',latenight:'Late+🌙',holiday:'Holiday',leave:'Urlaub',ruf:'On-call',callin:'Rufeinsatz'};
+      var labels={normal:'Shift',middle:'Middle',late:'Late',latenight:'Late 8%',holiday:'Holiday',leave:'Urlaub',ruf:'On-call',callin:'Rufeinsatz'};
       pill.textContent=(labels[sh.type]||sh.type)+' '+sh.start+'–'+sh.end;
       cell.appendChild(pill);
     } else if(!weekend){
@@ -1211,24 +1211,7 @@ function renderCalendar(){
 }
 
 // ═══ WEEK HOURS & BAR ═══
-function getWeekHours(){
-  var weeks={};
-  var days=daysInMonth(currentYear,currentMonth);
-  var s=getSettings();
-  for(var d=1;d<=days;d++){
-    var k=dateKey(currentYear,currentMonth,d);
-    var sh=shifts[k];
-    if(!sh||sh.type==='ruf'||sh.type==='leave') continue;
-    var h=calcHours(sh.start,sh.end,s.thresh);
-    var date=new Date(currentYear,currentMonth,d);
-    var tmp=new Date(date);tmp.setHours(0,0,0,0);
-    tmp.setDate(tmp.getDate()+4-(tmp.getDay()||7));
-    var jan1=new Date(tmp.getFullYear(),0,1);
-    var wn=Math.ceil((((tmp-jan1)/86400000)+1)/7);
-    weeks[wn]=(weeks[wn]||0)+h.total;
-  }
-  return weeks;
-}
+function getWeekHours(){ return getWeekHoursForMonth(currentYear,currentMonth); }
 
 function renderWeekBar(){
   var bar=document.getElementById('week-bar');bar.innerHTML='';
@@ -1247,14 +1230,14 @@ function renderYear(){
   var tbody=document.getElementById('year-tbody');tbody.innerHTML='';
   var tg=0,tn=0,totalOT=0;
   var s=getSettings();
-  // Compute all nets for color thresholds
-  var nets=[];
-  for(var m=0;m<12;m++){var r=calcSalary(currentYear,m);nets.push(r.net);}
-  var sortedNets=nets.slice().sort(function(a,b){return a-b;});
+  // Single pass: compute all months once, derive color thresholds, then render
+  var allResults=[];
+  for(var m=0;m<12;m++) allResults.push(calcSalary(currentYear,m));
+  var sortedNets=allResults.map(function(r){return r.net;}).slice().sort(function(a,b){return a-b;});
   var lo=sortedNets[2],hi=sortedNets[9]; // bottom/top quartile-ish thresholds
   for(var m=0;m<12;m++){
-    var r=calcSalary(currentYear,m);
-    var isSZ=(m===s.szMonth1||m===s.szMonth2)&&s.szMonth1>=0;
+    var r=allResults[m];
+    var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
     var szData=isSZ?calcSonderzahlung(s.base):null;
     var monthOT=getOTAccrued(currentYear,m);
     tg+=r.gross+(szData?szData.gross:0);
@@ -1325,7 +1308,7 @@ function renderCompare(){
     '<div style="color:#185fa5">'+MONTH_NAMES[mb].substring(0,3)+' '+currentYear+'</div></div>'+
     row('Base',ra.base,rb.base)+row('Night 8%',ra.shiftA,rb.shiftA)+
     row('Middle suppl.',ra.middleP,rb.middleP)+row('Late suppl.',ra.lateP,rb.lateP)+
-    row('Holiday pay',ra.holPay,rb.holPay)+row('Rufbereitschaft',ra.rufPay,rb.rufPay)+
+    row('Holiday pay',ra.holBasePay+ra.holExtra,rb.holBasePay+rb.holExtra)+row('Rufbereitschaft',ra.rufPay,rb.rufPay)+
     row('Total gross',ra.gross,rb.gross)+
     row('SV total',ra.svM.total,rb.svM.total,function(n){return '− '+fmt(n);})+
     row('Lohnsteuer',ra.lst,rb.lst,function(n){return '− '+fmt(n);})+
@@ -1446,7 +1429,7 @@ function loadData(){
   }catch(e){}
 }
 function clearMonth(){if(!confirm('Clear '+MONTH_NAMES[currentMonth]+' '+currentYear+'?'))return;var pfx=monthKey(currentYear,currentMonth);Object.keys(shifts).forEach(function(k){if(k.substring(0,7)===pfx)delete shifts[k];});saveData();renderAll();}
-function clearAll(){if(!confirm('Clear ALL data?'))return;shifts={};actuals={};saveData();renderAll();}
+function clearAll(){if(!confirm('Clear ALL data?'))return;shifts={};actuals={};otData={};saveData();try{localStorage.setItem('med_ot2','{}');}catch(e){}renderAll();}
 
 
 // ═══ DARK MODE ═══
@@ -1459,8 +1442,6 @@ function toggleDark(){
 // ═══ SWIPE NAVIGATION ═══
 (function(){
   var tx=0;
-  var cal=document.getElementById('cal-grid');
-  // attach to the whole left panel so swiping anywhere on calendar works
   document.querySelector('.left').addEventListener('touchstart',function(e){
     tx=e.changedTouches[0].clientX;
   },{passive:true});
