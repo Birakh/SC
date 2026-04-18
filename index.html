@@ -151,11 +151,17 @@ select,input[type=number],input[type=text]{width:100%;padding:5px 7px;border:.5p
 .supplement-tag{font-size:10px;background:#eeedfe;color:#3c3489;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:500}
 
 @media print{
-  .right,.modal-overlay{display:none!important}
+  .modal-overlay{display:none!important}
   .layout{display:block}
-  .left{padding:.5rem}
-  .icon-btn,.month-nav button{display:none}
+  .left{display:none}
+  .right{position:static;height:auto;border:none;overflow:visible}
+  .rtabs{display:none}
+  #tab-taxcalc,#tab-settings,#tab-year,#tab-compare{display:none!important}
+  #tab-report{display:block!important}
+  .icon-btn,.month-nav button,.payslip-box,.marginal-box,.ot-box,.actual-box{display:none}
   body{background:#fff;font-size:12px}
+  .net-box{background:#185fa5!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .hourly-strip,.forecast-strip{break-inside:avoid}
 }
 @media(max-width:720px){
   .layout{grid-template-columns:1fr}
@@ -239,17 +245,10 @@ body.dark .compare-row .cl{color:#777}
 body.dark .better{color:#6abf6a}
 body.dark .worse{color:#e06c6c}
 body.dark #tax-breakdown{background:#2a2a2e}
-body.dark .modal{background:#2a2a2e;color:#e2e2dc}
-body.dark .mfield label{color:#888}
-body.dark .mfield select,body.dark .mfield input{background:#333336;border-color:#4a4a4e;color:#e2e2dc}
 body.dark .preset-btn{background:#333336;border-color:#4a4a4e;color:#ccc}
 body.dark .preset-btn:hover{background:#3e3e42}
 body.dark .preset-btn.active{background:#1e2d3d;border-color:#6fa8dc;color:#6fa8dc}
 body.dark .preset-btn span{color:#666}
-body.dark .pattern-box{background:#2e2e32}
-body.dark .pattern-box p{color:#777}
-body.dark .pat-btn{background:#333336;border-color:#4a4a4e;color:#ccc}
-body.dark .pat-btn:hover{background:#3e3e42}
 body.dark .app-title{color:#e2e2dc}
 body.dark .app-sub{color:#666}
 body.dark .month-nav button{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
@@ -262,6 +261,40 @@ body.dark{--bracket-active:#1e2d3d}
 body.dark .bracket-bar{background:#3a3a3e}
 body.dark .tax-field label{color:#888}
 body.dark .tax-field input{background:#2e2e32;border-color:#4a4a4e;color:#e2e2dc}
+/* Dark — modal */
+body.dark .modal-overlay{background:rgba(0,0,0,.65)}
+body.dark .modal{background:#242428;color:#e2e2dc;border:.5px solid #3a3a3e}
+body.dark .modal-title{color:#e2e2dc}
+body.dark .mfield label{color:#888}
+body.dark .mfield select,body.dark .mfield input,body.dark .mfield input[type=time]{background:#333336;border-color:#4a4a4e;color:#e2e2dc}
+body.dark input[type=time],body.dark input[type=month]{background:#2e2e32;border-color:#4a4a4e;color:#e2e2dc}
+body.dark .modal-actions .mbtn{background:#2e2e32;border-color:#4a4a4e;color:#e2e2dc}
+body.dark .modal-actions .mbtn:hover{background:#3a3a3e}
+body.dark .modal-actions .mbtn.primary{background:#2a4a6e;border-color:#3a6a9e;color:#c8dff5}
+body.dark .modal-actions .mbtn.primary:hover{background:#1e3a5a}
+body.dark .modal-actions .mbtn.danger{color:#e06c6c;border-color:#5a2a2a}
+body.dark .modal-actions .mbtn.danger:hover{background:#2e1e1e}
+body.dark .pattern-box{background:#2e2e32}
+body.dark .pattern-box p{color:#777}
+body.dark .pat-btn{background:#2a2a2e;border-color:#4a4a4e;color:#ccc}
+body.dark .pat-btn:hover{background:#3a3a3e}
+/* Dark — settings elements */
+body.dark .gh-del{color:#e06c6c}
+body.dark .sz-warn{background:#3a1e18;border-color:#6a3020;color:#e0826a}
+body.dark .payslip-box{background:#2a2a2e}
+body.dark .payslip-box textarea{background:#333336;border-color:#4a4a4e;color:#e2e2dc}
+body.dark .ps-row{border-bottom-color:#2e2e32}
+/* Dark — hourly cards */
+body.dark .hcard{background:#2a2a2e}
+body.dark .hcard .hl{color:#666}
+body.dark .hcard .hv{color:#e2e2dc}
+/* Dark — year nav */
+body.dark .year-nav button{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
+body.dark .year-nav button:hover{background:#333336}
+/* Dark — tc-cap-notice */
+body.dark #tc-cap-notice{background:#1a2e1a;color:#7aaa4a}
+/* Dark — code tags in settings */
+body.dark code{background:#333336;color:#b0a4e8}
 /* Year row color coding */
 .yr-high td{background:#f0faf0!important}
 .yr-mid  td{background:#fff!important}
@@ -308,6 +341,60 @@ body.dark .hcard{background:#2a2a2e}
 body.dark .year-nav button{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
 .year-table tr.today-month td{background:#fff8e8!important}
 body.dark .year-table tr.today-month td{background:#2e2a18!important}
+/* Pension tracker */
+.pension-box{background:#f0f7ff;border:.5px solid #b8cfe8;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.pension-box .pension-title{font-size:10px;color:#185fa5;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px}
+.pension-bar-wrap{background:#dce8f5;border-radius:4px;height:8px;overflow:hidden;margin:5px 0 3px}
+.pension-bar-fill{height:100%;border-radius:4px;background:#185fa5;transition:width .4s}
+body.dark .pension-box{background:#1a2535;border-color:#2a4a6e}
+body.dark .pension-box .pension-title{color:#6fa8dc}
+body.dark .pension-bar-wrap{background:#2a3a4a}
+body.dark .pension-bar-fill{background:#6fa8dc}
+/* Shift note */
+.shift-note{font-size:8px;color:#999;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;font-style:italic}
+body.dark .shift-note{color:#666}
+/* Week number badge on calendar */
+.wnum{font-size:8px;color:#ccc;font-weight:400;margin-left:3px;letter-spacing:0}
+body.dark .wnum{color:#555}
+/* 3-month forecast */
+.forecast-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.fcard{background:#f5f5f0;border-radius:7px;padding:8px 10px;text-align:center}
+.fcard .fm{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.04em}
+.fcard .fv{font-size:13px;font-weight:500;margin-top:2px}
+.fcard .fs{font-size:9px;color:#aaa;margin-top:1px}
+.fcard.fc-cur{border:.5px solid #b8cfe8}
+body.dark .fcard{background:#2a2a2e}
+body.dark .fcard .fm{color:#666}
+body.dark .fcard .fs{color:#555}
+body.dark .fcard.fc-cur{border-color:#3a5570}
+/* Urlaub tracker */
+.leave-bar-wrap{background:#e8f3de;border-radius:4px;height:6px;overflow:hidden;margin:4px 0 2px;flex:1}
+.leave-bar-fill{height:100%;border-radius:4px;background:#3b6d11;transition:width .4s}
+.leave-bar-over .leave-bar-fill{background:#c0392b}
+body.dark .leave-bar-wrap{background:#1e2e18}
+body.dark .leave-bar-fill{background:#7aaa4a}
+body.dark .leave-bar-over .leave-bar-fill{background:#e06c6c}
+/* Marginal rate box */
+.marginal-box{background:#f5f5f0;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+body.dark .marginal-box{background:#2a2a2e}
+.marginal-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.marginal-row select{flex:1;padding:5px 7px;font-size:12px}
+.marginal-result{font-size:12px;line-height:1.6}
+.marginal-gain{color:#27ae60;font-weight:500}
+.marginal-loss{color:#c0392b;font-weight:500}
+body.dark .marginal-gain{color:#6abf6a}
+body.dark .marginal-loss{color:#e06c6c}
+/* AV summary (Arbeitnehmerveranlagung) */
+.av-box{background:#fff8ee;border:.5px solid #fac775;border-radius:8px;padding:10px 12px;margin-top:10px}
+.av-box .av-title{font-size:10px;color:#854f0b;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px}
+.av-field{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:.5px solid #f5ead0}
+.av-field:last-child{border-bottom:none}
+.av-field .ak{color:#777;flex:1}
+.av-field .av{font-weight:500}
+body.dark .av-box{background:#2e2318;border-color:#6a4a20}
+body.dark .av-box .av-title{color:#c8943a}
+body.dark .av-field{border-bottom-color:#3a2e18}
+body.dark .av-field .ak{color:#999}
 </style>
 </head>
 <body>
@@ -327,7 +414,9 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
         <button onclick="changeMonth(1)">›</button>
         <button onclick="goToToday()" title="Jump to today" style="font-size:11px;padding:4px 8px">Today</button>
       </div>
-      <button class="icon-btn" onclick="window.print()">🖨 Print / PDF</button>
+      <button class="icon-btn" onclick="window.print()">🖨 Print</button>
+      <button class="icon-btn" onclick="exportICal()" title="Export shifts to .ics for Google / Apple Calendar">📅 iCal</button>
+      <button class="icon-btn" onclick="copyPrevMonth()" title="Copy previous month's shifts into this month">📋 Copy prev</button>
       <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
     </div>
   </div>
@@ -374,6 +463,8 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
       <div class="hcard"><div class="hl">Effective hourly (net)</div><div class="hv" id="r-hourly-net">—</div></div>
       <div class="hcard"><div class="hl">Annual gross est.</div><div class="hv" id="r-annual-est">—</div></div>
     </div>
+    <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:5px">3-month net forecast</div>
+    <div class="forecast-strip" id="forecast-strip"></div>
     <div class="panel-section">
       <div class="panel-label">Gross breakdown</div>
       <div class="rrow"><span class="rl">Base salary</span><span class="rv" id="r-base">—</span></div>
@@ -406,8 +497,16 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
       <div class="rrow"><span class="rl">Night hours (8% qualifying)</span><span class="rv" id="r-nighth">—</span></div>
       <div class="rrow"><span class="rl">Middle shift days</span><span class="rv" id="r-middled">—</span></div>
       <div class="rrow"><span class="rl">Late shift days</span><span class="rv" id="r-lated">—</span></div>
-      <div class="rrow"><span class="rl">On-call days</span><span class="rv" id="r-oncall">—</span></div>
+      <div class="rrow"><span class="rl">Rufbereitschaft standby hours</span><span class="rv" id="r-rufh">—</span></div>
+      <div class="rrow"><span class="rl">Rufeinsatz call-in hours</span><span class="rv" id="r-callinh">—</span></div>
       <div class="rrow"><span class="rl">Holiday hours worked</span><span class="rv" id="r-holh">—</span></div>
+      <div class="rrow" id="r-leave-row">
+        <span class="rl">Urlaub taken this year</span>
+        <span class="rv" style="display:flex;align-items:center;gap:6px;min-width:140px">
+          <span id="r-leave-count" style="white-space:nowrap">—</span>
+          <span class="leave-bar-wrap" id="r-leave-bar-wrap"><span class="leave-bar-fill" id="r-leave-bar" style="width:0%"></span></span>
+        </span>
+      </div>
     </div>
     <div id="tax-breakdown" style="background:#f5f5f0;border-radius:8px;padding:10px 12px;margin-bottom:10px"></div>
 
@@ -427,6 +526,33 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
       <div style="font-size:10px;color:#aaa;margin-top:6px" id="ot-ytd"></div>
     </div>
 
+    <div class="pension-box">
+      <div class="pension-title">🏦 Pension contributions (PV) — YTD</div>
+      <div class="rrow"><span class="rl">PV paid this month</span><span class="rv info" id="pv-month">—</span></div>
+      <div class="rrow"><span class="rl">YTD total paid (est.)</span><span class="rv" id="pv-ytd">—</span></div>
+      <div class="rrow"><span class="rl">Annual cap (Höchstbeitragsgrundlage)</span><span class="rv" id="pv-cap-annual">—</span></div>
+      <div style="font-size:10px;color:#aaa;margin-top:4px;margin-bottom:2px" id="pv-cap-label">Progress to annual ceiling</div>
+      <div class="pension-bar-wrap"><div class="pension-bar-fill" id="pv-bar" style="width:0%"></div></div>
+      <div style="font-size:10px;color:#aaa" id="pv-cap-note"></div>
+    </div>
+
+    <div class="marginal-box">
+      <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px">📐 Marginal shift value — net gain from one extra shift</div>
+      <div class="marginal-row">
+        <select id="marginal-type" onchange="renderMarginal()">
+          <option value="normal_night">Early/Normal (8h, night hours after 20:00)</option>
+          <option value="middle">Middle shift (+€35.50 supplement)</option>
+          <option value="late">Late shift (+€50 supplement)</option>
+          <option value="latenight">Late 8% (8h, night hours only)</option>
+          <option value="ruf_weekday">Rufbereitschaft weekday (4.5h)</option>
+          <option value="ruf_wknd">Rufbereitschaft weekend (4.5h)</option>
+          <option value="callin">Rufeinsatz call-in (1h)</option>
+          <option value="holiday">Public holiday worked (8h)</option>
+        </select>
+      </div>
+      <div class="marginal-result" id="marginal-result">—</div>
+    </div>
+
     <div class="actual-box">
       <label>Compare with actual payslip net (€)</label>
       <div class="actual-row">
@@ -438,8 +564,14 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
 
     <div class="payslip-box">
       <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px">🔍 Payslip Reconciler (AI)</div>
-      <textarea id="payslip-text" placeholder="Paste your payslip text here (copy from PDF or photo OCR) — AI will extract and compare every line against the estimate…"></textarea>
-      <button class="mbtn primary" style="width:100%;margin-top:6px" onclick="analysePayslip()">Analyse Payslip</button>
+      <textarea id="payslip-text" placeholder="Paste payslip text here (copy from PDF)… or upload a photo below."></textarea>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button class="mbtn primary" style="flex:2" onclick="analysePayslip()">Analyse text</button>
+        <label class="mbtn" style="flex:1;text-align:center;cursor:pointer;margin:0" title="Upload a photo of your payslip">
+          📷 Photo
+          <input type="file" id="payslip-photo" accept="image/*" style="display:none" onchange="analysePayslipPhoto(this)">
+        </label>
+      </div>
       <div id="payslip-result" style="margin-top:8px"></div>
     </div>
     <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Middle shift supplement €35.50 and late shift €50 are taxable. Late+Night (8% only) earns night hours with no fixed supplement. Rufbereitschaft standby may be partially SV-exempt — confirm with HR. Max 10 on-call days/month (AZG §20a).</p>
@@ -539,6 +671,8 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
         </select></div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Erschwerniszulage — Hazard allowance (€/month, tax-free)</label>
         <input type="number" id="hazard-allow" value="230.43" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual Urlaub entitlement (days)</label>
+        <input type="number" id="urlaub-days" value="25" step="1" min="0" max="60" onchange="saveSettings();renderAll()"></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -660,6 +794,11 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
       <tfoot><tr id="year-tfoot"></tr></tfoot>
     </table>
     <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Click month to navigate. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Amber</span> = today's month · <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low · <span style="color:#9b8fd8">●</span> SZ month.</p>
+    <div class="av-box" id="av-summary">
+      <div class="av-title">📋 Arbeitnehmerveranlagung helper — <span id="av-year-label"></span></div>
+      <div id="av-fields"></div>
+      <p style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.5">Estimated values based on planned shifts. Use actual payslips for the official L1 form. Not legal/tax advice.</p>
+    </div>
   </div>
 
   <!-- ── COMPARE ── -->
@@ -711,6 +850,10 @@ body.dark .year-table tr.today-month td{background:#2e2a18!important}
   <div class="time-grid">
     <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00"></div>
     <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00"></div>
+  </div>
+  <div class="mfield">
+    <label>Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span></label>
+    <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px">
   </div>
   <div class="pattern-box">
     <p>Apply this shift pattern to:</p>
@@ -879,6 +1022,7 @@ function getSettings(){
     hazard:    parseFloat(document.getElementById('hazard-allow').value)||230.43,
     szMonth1:  parseInt(document.getElementById('sz-month1').value),
     szMonth2:  parseInt(document.getElementById('sz-month2').value),
+    urlaubDays:parseInt(document.getElementById('urlaub-days').value)||25,
   };
 }
 
@@ -979,7 +1123,7 @@ function calcSalary(year,month){
     taxable,br,gross,svM,lst,net,hazard:s.hazard,
     // Hours for display:
     nightH:prevSuppl.nightH, holH, leaveH,
-    rufH:rufH+rufWH, callinH,
+    rufH:rufH+rufWH, rufH_raw:rufH, rufWH:rufWH, callinH,
     middleDays:prevSuppl.middleDays, lateDays:prevSuppl.lateDays,
     oncallDays:Math.round(rufH+rufWH),
     // Earned this month (paid next month):
@@ -1041,8 +1185,21 @@ function renderReport(){
   document.getElementById('r-nighth').textContent=r.nightH.toFixed(2)+' h (prev month)';
   document.getElementById('r-middled').textContent=r.middleDays+' days (prev month)';
   document.getElementById('r-lated').textContent=r.lateDays+' days (prev month)';
-  document.getElementById('r-oncall').textContent=r.oncallDays+' days';
+  document.getElementById('r-rufh').textContent=
+    r.rufH.toFixed(2)+' h'+(r.rufWH>0?' ('+r.rufH_raw.toFixed(1)+'h weekday + '+r.rufWH.toFixed(1)+'h wknd/hol)':'');
+  document.getElementById('r-callinh').textContent=r.callinH.toFixed(2)+' h';
   document.getElementById('r-holh').textContent=r.holH.toFixed(2)+' h';
+  // Pension YTD
+  var pvMonth=r.svM.pv;
+  var pvYTD=0;
+  for(var pm=0;pm<=currentMonth;pm++) pvYTD+=calcSalary(currentYear,pm).svM.pv;
+  var pvAnnualCap=SV_CAP_MONTHLY*SV_PV*12;
+  var pvPct=Math.min(100,(pvYTD/pvAnnualCap*100));
+  document.getElementById('pv-month').textContent=fmt(pvMonth);
+  document.getElementById('pv-ytd').textContent=fmt(pvYTD);
+  document.getElementById('pv-cap-annual').textContent=fmt(pvAnnualCap);
+  document.getElementById('pv-bar').style.width=pvPct.toFixed(1)+'%';
+  document.getElementById('pv-cap-note').textContent=pvPct.toFixed(1)+'% of annual ceiling reached (Jan–'+MONTH_NAMES[currentMonth].substring(0,3)+')';
   renderTaxBreakdown(r);
   var enEl=document.getElementById('r-earned-next');
   if(enEl){
@@ -1062,6 +1219,9 @@ function renderReport(){
   document.getElementById('actual-net').value=actuals[mk]||'';
   updateActualDiff();
   renderOT();
+  renderMarginal();
+  renderForecast();
+  renderUrlaubTracker();
 }
 
 function renderTaxBreakdown(r){
@@ -1303,13 +1463,17 @@ function renderCalendar(){
     num.className='dnum'+(weekend?' wknd-num':'');
     if(isToday){var dot=document.createElement('span');dot.className='today-dot';dot.textContent=d;num.appendChild(dot);}
     else num.textContent=d;
-    // OT dot on Monday
+    // OT dot + week number on Monday
     if(new Date(currentYear,currentMonth,d).getDay()===1){
       var tmp=new Date(currentYear,currentMonth,d);
       tmp.setDate(tmp.getDate()+4-(tmp.getDay()||7));
       var jan1=new Date(tmp.getFullYear(),0,1);
       var wn=Math.ceil((((tmp-jan1)/86400000)+1)/7);
       var wh=getWeekHours()[wn];
+      // week number label
+      var wnLabel=document.createElement('span');
+      wnLabel.className='wnum';wnLabel.textContent='W'+wn;
+      num.appendChild(wnLabel);
       if(wh&&wh>48){var od=document.createElement('span');od.className='ot-dot '+(wh>60?'ot-over':'ot-warn');num.appendChild(od);}
     }
     cell.appendChild(num);
@@ -1320,6 +1484,7 @@ function renderCalendar(){
       var labels={normal:'Shift',middle:'Middle',late:'Late',latenight:'Late 8%',holiday:'Holiday',leave:'Urlaub',ruf:'On-call',callin:'Rufeinsatz'};
       pill.textContent=(labels[sh.type]||sh.type)+' '+sh.start+'–'+sh.end;
       cell.appendChild(pill);
+      if(sh.note){var noteEl=document.createElement('span');noteEl.className='shift-note';noteEl.textContent=sh.note;cell.appendChild(noteEl);}
     } else if(!weekend){
       var hint=document.createElement('span');hint.className='add-hint';hint.textContent='+ add';cell.appendChild(hint);
     }
@@ -1399,6 +1564,7 @@ function renderYear(){
   document.getElementById('year-tfoot').innerHTML=
     '<td>Total</td><td>'+fmtN(tg)+'</td><td>'+fmtN(tn)+'</td>'+
     '<td style="'+(totalOT>0?'color:#ef9f27;font-weight:500':'')+'">'+(totalOT>0?totalOT.toFixed(1)+'h':'—')+'</td><td colspan="2"></td>';
+  renderAVSummary();
 }
 
 function saveActual(inp){
@@ -1458,6 +1624,7 @@ function openModal(k){
   document.getElementById('m-type').value=sh?sh.type:(hol?'holiday':'normal');
   document.getElementById('m-start').value=sh?sh.start:'07:00';
   document.getElementById('m-end').value=sh?sh.end:'15:00';
+  document.getElementById('m-note').value=sh&&sh.note?sh.note:'';
   document.getElementById('m-delete').style.display=sh?'':'none';
   document.getElementById('pat-weekday').textContent=dow;
   document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
@@ -1473,7 +1640,10 @@ function applyPreset(type,start,end,btn){
 }
 function saveShift(){
   if(!editingDate)return;
-  shifts[editingDate]={type:document.getElementById('m-type').value,start:document.getElementById('m-start').value,end:document.getElementById('m-end').value};
+  var note=document.getElementById('m-note').value.trim();
+  var obj={type:document.getElementById('m-type').value,start:document.getElementById('m-start').value,end:document.getElementById('m-end').value};
+  if(note) obj.note=note;
+  shifts[editingDate]=obj;
   saveData();closeModal();renderAll();
 }
 function deleteShift(){
@@ -1484,7 +1654,9 @@ function deleteShift(){
 // ═══ PATTERNS ═══
 function applyPattern(mode){
   if(!editingDate)return;
+  var note=document.getElementById('m-note').value.trim();
   var sd={type:document.getElementById('m-type').value,start:document.getElementById('m-start').value,end:document.getElementById('m-end').value};
+  if(note) sd.note=note;
   var base=new Date(editingDate+'T12:00:00');
   var targetDow=base.getDay();
   if(mode==='week'){
@@ -1520,7 +1692,7 @@ function showTab(name,btn){
 
 // ═══ PERSIST ═══
 function saveData(){try{localStorage.setItem('med_shifts2',JSON.stringify(shifts));localStorage.setItem('med_actuals2',JSON.stringify(actuals));}catch(e){}}
-function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value}));}catch(e){}}
+function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value}));}catch(e){}}
 function loadData(){
   try{
     var s=localStorage.getItem('med_shifts2'),a=localStorage.getItem('med_actuals2'),cfg=localStorage.getItem('med_settings2');
@@ -1541,6 +1713,7 @@ function loadData(){
       if(c.hazard)document.getElementById('hazard-allow').value=c.hazard;
       if(c.szMonth1!=null)document.getElementById('sz-month1').value=c.szMonth1;
       if(c.szMonth2!=null)document.getElementById('sz-month2').value=c.szMonth2;
+      if(c.urlaubDays)document.getElementById('urlaub-days').value=c.urlaubDays;
     }
     var pat=sessionStorage.getItem('med_sync_pat');
     if(pat)document.getElementById('sync-pat').value=pat;
@@ -1554,7 +1727,13 @@ function loadData(){
   }catch(e){}
 }
 function clearMonth(){if(!confirm('Clear '+MONTH_NAMES[currentMonth]+' '+currentYear+'?'))return;var pfx=monthKey(currentYear,currentMonth);Object.keys(shifts).forEach(function(k){if(k.substring(0,7)===pfx)delete shifts[k];});saveData();renderAll();}
-function clearAll(){if(!confirm('Clear ALL data?'))return;shifts={};actuals={};otData={};saveData();try{localStorage.setItem('med_ot2','{}');}catch(e){}renderAll();}
+function clearAll(){
+  if(!confirm('Clear ALL data? This includes shifts, actuals, OT log, and grade history.'))return;
+  shifts={};actuals={};otData={};gradeHistory=[];
+  saveData();saveGradeHistory();
+  try{localStorage.setItem('med_ot2','{}');}catch(e){}
+  renderAll();renderGradeHistory();
+}
 
 
 // ═══ DARK MODE ═══
@@ -1772,6 +1951,12 @@ function importJSON(input){
 
 // ═══ KEYBOARD SHORTCUTS ═══
 document.addEventListener('keydown',function(e){
+  // Enter in modal saves; Escape closes
+  if(e.key==='Enter'&&document.getElementById('modal').classList.contains('open')){
+    // Only save if focus isn't on a button (let buttons handle their own Enter)
+    if(document.activeElement&&document.activeElement.tagName==='BUTTON')return;
+    e.preventDefault();saveShift();return;
+  }
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
   if(e.key==='ArrowLeft')changeMonth(-1);
   if(e.key==='ArrowRight')changeMonth(1);
@@ -1850,6 +2035,307 @@ async function analysePayslip(){
   }catch(err){
     resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Analysis failed: '+err.message+'. Paste cleaner text or check network.</div>';
   }
+}
+
+// ═══ COPY PREVIOUS MONTH ═══
+function copyPrevMonth(){
+  var prevM=currentMonth-1, prevY=currentYear;
+  if(prevM<0){prevM=11;prevY--;}
+  var pfxPrev=monthKey(prevY,prevM);
+  var pfxCur=monthKey(currentYear,currentMonth);
+  var toCopy=Object.keys(shifts).filter(function(k){return k.substring(0,7)===pfxPrev;});
+  if(!toCopy.length){alert('No shifts in '+MONTH_NAMES[prevM]+' '+prevY+' to copy.');return;}
+  var daysThis=daysInMonth(currentYear,currentMonth);
+  var copied=0,skipped=0;
+  toCopy.forEach(function(k){
+    var d=parseInt(k.split('-')[2]);
+    if(d>daysThis){skipped++;return;} // e.g. 31st when current month has 30
+    var newKey=pfxCur+'-'+pad(d);
+    if(shifts[newKey]){skipped++;return;} // don't overwrite existing
+    shifts[newKey]=Object.assign({},shifts[k]);
+    copied++;
+  });
+  saveData();renderAll();
+  var msg='Copied '+copied+' shift'+(copied!==1?'s':'')+' from '+MONTH_NAMES[prevM]+' '+prevY+'.';
+  if(skipped) msg+=' Skipped '+skipped+' (day doesn\'t exist or already has a shift).';
+  // brief toast instead of blocking alert
+  var toast=document.createElement('div');
+  toast.textContent=msg;
+  toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;z-index:999;opacity:1;transition:opacity .5s';
+  document.body.appendChild(toast);
+  setTimeout(function(){toast.style.opacity='0';setTimeout(function(){toast.remove();},500);},2500);
+}
+
+// ═══ MARGINAL RATE CALCULATOR ═══
+function renderMarginal(){
+  var el=document.getElementById('marginal-result');
+  if(!el) return;
+  var type=document.getElementById('marginal-type').value;
+  var s=getSettings();
+  var r=calcSalary(currentYear,currentMonth);
+  var hourly=r.base/173.33;
+  // What extra gross does one more shift of this type add?
+  var extraGross=0, extraLabel='';
+  if(type==='normal_night'){
+    // 8h shift, threshold 20:00 → 2h night
+    var nightH=2;
+    extraGross=hourly*0.08*nightH;
+    extraLabel='8h early shift · '+nightH+'h after 20:00';
+  } else if(type==='middle'){
+    extraGross=s.middleS;
+    extraLabel='middle supplement €'+s.middleS.toFixed(2);
+  } else if(type==='late'){
+    extraGross=s.lateS;
+    extraLabel='late supplement €'+s.lateS.toFixed(2);
+  } else if(type==='latenight'){
+    // 14–22:30 → 2.5h after 20:00
+    var nightH2=2.5;
+    extraGross=hourly*0.08*nightH2;
+    extraLabel='8h late+night · '+nightH2+'h after 20:00';
+  } else if(type==='ruf_weekday'){
+    extraGross=s.rufRate*4.5;
+    extraLabel='4.5h weekday standby @ €'+s.rufRate.toFixed(2)+'/h';
+  } else if(type==='ruf_wknd'){
+    extraGross=s.rufRate*s.rufWknd*4.5;
+    extraLabel='4.5h wknd standby @ €'+(s.rufRate*s.rufWknd).toFixed(2)+'/h (×'+s.rufWknd+')';
+  } else if(type==='callin'){
+    extraGross=hourly*s.callinM*1;
+    extraLabel='1h call-in @ '+s.callinM+'× hourly';
+  } else if(type==='holiday'){
+    // holiday: base rate + 200% extra for 8h
+    extraGross=hourly*2*8;
+    extraLabel='8h holiday · base + 200% extra';
+  }
+  // Marginal tax: difference in LSt between (taxable + extra) and taxable
+  // Ruf/standby pay is added outside taxable base — approximate with marginal on taxable
+  var isRuf=(type==='ruf_weekday'||type==='ruf_wknd');
+  var lstBase=calcMonthlyLSt(r.taxable);
+  var lstWith=calcMonthlyLSt(r.taxable+(isRuf?0:extraGross));
+  var svBase=calcSVMonthly(r.taxable).total;
+  var svWith=calcSVMonthly(r.taxable+(isRuf?0:extraGross)).total;
+  var marginalTax=(lstWith-lstBase)+(svWith-svBase);
+  var netGain=extraGross-marginalTax;
+  var effectiveRate=extraGross>0?(marginalTax/extraGross*100):0;
+  el.innerHTML=
+    '<div style="color:#aaa;font-size:10px;margin-bottom:4px">'+extraLabel+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">'+
+      '<div><div style="font-size:9px;color:#aaa">Extra gross</div><div style="font-weight:500">'+fmt(extraGross)+'</div></div>'+
+      '<div><div style="font-size:9px;color:#aaa">Tax+SV</div><div class="marginal-loss">−'+fmt(marginalTax)+'</div></div>'+
+      '<div><div style="font-size:9px;color:#aaa">Net gain</div><div class="marginal-gain">'+fmt(netGain)+'</div></div>'+
+    '</div>'+
+    '<div style="font-size:10px;color:#aaa;margin-top:4px">Effective marginal rate: <strong>'+effectiveRate.toFixed(1)+'%</strong>'+(isRuf?' (ruf pay outside SV base — LSt only)':'')+'</div>';
+}
+
+// ═══ 3-MONTH FORECAST ═══
+function renderForecast(){
+  var el=document.getElementById('forecast-strip');
+  if(!el)return;
+  var s=getSettings(); // hoisted — same settings for all 3 months
+  var html='';
+  for(var i=0;i<3;i++){
+    var m=currentMonth+i, y=currentYear;
+    if(m>11){m-=12;y++;}
+    var r=calcSalary(y,m);
+    var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+    var szNet=isSZ?calcSonderzahlung(r.base).net:0;
+    var totalNet=r.net+szNet;
+    var hasShifts=Object.keys(shifts).some(function(k){return k.substring(0,7)===monthKey(y,m);});
+    html+='<div class="fcard'+(i===0?' fc-cur':'')+'">'+
+      '<div class="fm">'+MONTH_NAMES[m].substring(0,3)+' '+y+(isSZ?' 🎁':'')+'</div>'+
+      '<div class="fv">'+fmt(totalNet)+'</div>'+
+      '<div class="fs">'+(i===0?'current':(hasShifts?'planned':'est. same'))+'</div>'+
+    '</div>';
+  }
+  el.innerHTML=html;
+}
+
+// ═══ URLAUB TRACKER ═══
+function renderUrlaubTracker(){
+  var s=getSettings();
+  var entitlement=s.urlaubDays||25;
+  // Count leave days taken in currentYear across all months
+  var taken=0;
+  Object.keys(shifts).forEach(function(k){
+    if(k.substring(0,4)!==String(currentYear))return;
+    if(shifts[k].type==='leave') taken++;
+  });
+  var remaining=entitlement-taken;
+  var pct=Math.min(100,(taken/entitlement)*100);
+  var isOver=taken>entitlement;
+  var el=document.getElementById('r-leave-count');
+  var barWrap=document.getElementById('r-leave-bar-wrap');
+  var bar=document.getElementById('r-leave-bar');
+  if(!el||!bar)return;
+  el.textContent=taken+' / '+entitlement+' days'+(remaining>=0?' ('+remaining+' left)':' ('+Math.abs(remaining)+' over!)');
+  bar.style.width=pct.toFixed(1)+'%';
+  if(isOver){barWrap.classList.add('leave-bar-over');}
+  else{barWrap.classList.remove('leave-bar-over');}
+}
+
+// ═══ ICAL EXPORT ═══
+function exportICal(){
+  var typeLabels={normal:'Early shift',middle:'Middle shift',late:'Late shift',latenight:'Late shift (8%)',holiday:'Holiday shift',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ShiftPlanner MedAustron//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Shifts '+currentYear];
+  var keys=Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);});
+  keys.sort().forEach(function(k){
+    var sh=shifts[k];
+    var parts=k.split('-');
+    var y=parts[0],mo=parts[1],dy=parts[2];
+    var sp=sh.start.split(':'),ep=sh.end.split(':');
+    var startM=parseInt(sp[0])*60+parseInt(sp[1]);
+    var endM=parseInt(ep[0])*60+parseInt(ep[1]);
+    if(endM<=startM)endM+=1440; // crosses midnight
+    var endH=Math.floor(endM/60)%24,endMin=endM%60;
+    var dtStart=y+mo+dy+'T'+pad(parseInt(sp[0]))+pad(parseInt(sp[1]))+'00';
+    var dtEnd=y+mo+(endM>=1440?pad(parseInt(dy)+1):dy)+'T'+pad(endH)+pad(endMin)+'00';
+    var summary=(typeLabels[sh.type]||sh.type)+(sh.note?' — '+sh.note:'');
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:shift-'+k+'@medaustron-planner');
+    lines.push('DTSTART;TZID=Europe/Vienna:'+dtStart);
+    lines.push('DTEND;TZID=Europe/Vienna:'+dtEnd);
+    lines.push('SUMMARY:'+summary);
+    if(sh.note)lines.push('DESCRIPTION:'+sh.note);
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  var blob=new Blob([lines.join('\r\n')],{type:'text/calendar'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='shifts-'+currentYear+'.ics';a.click();URL.revokeObjectURL(url);
+}
+
+// ═══ ARBEITNEHMERVERANLAGUNG SUMMARY ═══
+function renderAVSummary(){
+  var el=document.getElementById('av-fields');
+  var lbl=document.getElementById('av-year-label');
+  if(!el)return;
+  if(lbl) lbl.textContent=yearTabYear;
+  var s=getSettings();
+  var totalGross=0,totalSV=0,totalLSt=0;
+  var totalKV=0,totalPV=0,totalAV=0,totalAK=0,totalWBF=0;
+  var szMonths=0,szGross=0,szSV=0,szLSt=0;
+  for(var m=0;m<12;m++){
+    var r=calcSalary(yearTabYear,m);
+    totalGross+=r.gross;
+    totalSV+=r.svM.total;
+    totalLSt+=r.lst;
+    totalKV+=r.svM.kv;
+    totalPV+=r.svM.pv;
+    totalAV+=r.svM.av;
+    totalAK+=r.svM.ak;
+    totalWBF+=r.svM.wbf;
+    var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+    if(isSZ){
+      var sz=calcSonderzahlung(r.base);
+      szMonths++;
+      szGross+=sz.gross; szSV+=sz.sv; szLSt+=sz.lst;
+      totalGross+=sz.gross; totalSV+=sz.sv; totalLSt+=sz.lst;
+      // Distribute SZ social insurance proportionally across components
+      var szBase=Math.min(sz.gross, SV_CAP_MONTHLY);
+      totalKV+=szBase*SV_KV; totalPV+=szBase*SV_PV; totalAV+=szBase*SV_AV;
+      totalAK+=szBase*SV_AK; totalWBF+=szBase*SV_WBF;
+    }
+  }
+  var totalNet=totalGross-totalSV-totalLSt;
+  var effRate=totalGross>0?(totalLSt/totalGross*100):0;
+  var fields=[
+    {k:'Gesamtbezüge (Brutto inkl. SZ)',  v:fmt(totalGross)},
+    {k:'Sozialversicherung gesamt',         v:'− '+fmt(totalSV)},
+    {k:'  KV Krankenversicherung 3.87%',   v:fmt(totalKV)},
+    {k:'  PV Pensionsversicherung 10.25%', v:fmt(totalPV)},
+    {k:'  AV Arbeitslosenversicherung 2.95%', v:fmt(totalAV)},
+    {k:'  AK-Umlage 0.5%',                v:fmt(totalAK)},
+    {k:'  Wohnbauförderung NÖ 0.5%',       v:fmt(totalWBF)},
+    {k:'Einbehaltene Lohnsteuer (LSt)',     v:'− '+fmt(totalLSt)},
+    {k:'Netto gesamt (geschätzt)',          v:fmt(totalNet), bold:true},
+    {k:'Effektiver Steuersatz',            v:effRate.toFixed(2)+'%', bold:true},
+  ];
+  if(szMonths>0){
+    fields.splice(1,0,{k:'  davon Sonderzahlungen §67 ('+szMonths+'×)',
+      v:fmt(szGross)+' · SV: '+fmt(szSV)+' · LSt 6%: '+fmt(szLSt)});
+  }
+  el.innerHTML=fields.map(function(f){
+    return '<div class="av-field"><span class="ak">'+f.k+'</span>'+
+      '<span class="av" style="'+(f.bold?'font-weight:600':'')+'">'+f.v+'</span></div>';
+  }).join('');
+}
+
+// ═══ PAYSLIP PHOTO ANALYSIS ═══
+async function analysePayslipPhoto(input){
+  var file=input&&input.files&&input.files[0];
+  if(!file)return;
+  var resultEl=document.getElementById('payslip-result');
+  resultEl.innerHTML='<div style="font-size:11px;color:#aaa">📷 Reading photo…</div>';
+  // Read as base64
+  var b64=await new Promise(function(res,rej){
+    var reader=new FileReader();
+    reader.onload=function(e){res(e.target.result.split(',')[1]);};
+    reader.onerror=rej;
+    reader.readAsDataURL(file);
+  });
+  var mediaType=file.type||'image/jpeg';
+  var r=calcSalary(currentYear,currentMonth);
+  var context=JSON.stringify({
+    month:MONTH_NAMES[currentMonth]+' '+currentYear,
+    estimated:{
+      base:r.base.toFixed(2),nightAllowance:r.shiftA.toFixed(2),
+      middleSuppl:r.middleP.toFixed(2),lateSuppl:r.lateP.toFixed(2),
+      lateNight8pct:r.lateNightA.toFixed(2),
+      holidayPay:(r.holBasePay+r.holExtra).toFixed(2),
+      rufbereitschaft:r.rufPay.toFixed(2),rufeinsatz:r.callinP.toFixed(2),
+      hazard:r.hazard.toFixed(2),worksBR:r.br.toFixed(2),
+      totalGross:r.gross.toFixed(2),kv:r.svM.kv.toFixed(2),
+      pv:r.svM.pv.toFixed(2),av:r.svM.av.toFixed(2),
+      ak:r.svM.ak.toFixed(2),wbf:r.svM.wbf.toFixed(2),
+      lohnsteuer:r.lst.toFixed(2),netPayout:r.net.toFixed(2)
+    }
+  });
+  var sysPrompt='You are an Austrian payroll reconciliation assistant. The user has uploaded a photo of their payslip. '+
+    'Extract every monetary line item visible (label + amount in EUR). '+
+    'Then compare each against the estimated values. '+
+    'Return a JSON array where each element is {label,payslip,estimated,match} — '+
+    'match is "ok" (within €1), "off" (differs more), or "na" (no estimate). '+
+    'Return ONLY valid JSON, no markdown, no preamble.\n\nESTIMATED VALUES:\n'+context;
+  resultEl.innerHTML='<div style="font-size:11px;color:#aaa">🤖 Analysing photo…</div>';
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:sysPrompt,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:b64}},
+          {type:'text',text:'Please extract and reconcile all monetary line items from this payslip image.'}
+        ]}]
+      })
+    });
+    var data=await resp.json();
+    var raw=(data.content&&data.content[0]&&data.content[0].text)||'';
+    var rows=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    var html='<div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px">Photo reconciliation — '+MONTH_NAMES[currentMonth]+' '+currentYear+'</div>';
+    rows.forEach(function(row){
+      var cls=row.match==='ok'?'ps-match':row.match==='off'?'ps-off':'ps-na';
+      var icon=row.match==='ok'?'✓':row.match==='off'?'✗':'—';
+      var estStr=row.estimated!=null?'€ '+parseFloat(row.estimated).toFixed(2):'—';
+      html+='<div class="ps-row">'+
+        '<span style="flex:2;color:#555">'+row.label+'</span>'+
+        '<span style="flex:1;text-align:right">€ '+parseFloat(row.payslip).toFixed(2)+'</span>'+
+        '<span style="flex:1;text-align:right;color:#aaa">'+estStr+'</span>'+
+        '<span class="'+cls+'" style="flex:0 0 20px;text-align:center;font-weight:600">'+icon+'</span>'+
+      '</div>';
+    });
+    var netRow=rows.find(function(r){return r.label&&r.label.toLowerCase().includes('net');});
+    if(netRow&&netRow.payslip){
+      var netVal=parseFloat(netRow.payslip);
+      if(!isNaN(netVal)){document.getElementById('actual-net').value=netVal.toFixed(2);updateActualDiff();}
+    }
+    html+='<div style="font-size:10px;color:#bbb;margin-top:6px">✓ within €1 · ✗ differs · net auto-filled if found</div>';
+    resultEl.innerHTML=html;
+  }catch(err){
+    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Photo analysis failed: '+err.message+'</div>';
+  }
+  input.value='';
 }
 
 // ═══ BOOT ═══
