@@ -281,6 +281,33 @@ body.dark .ot-box .ot-title{color:#c8943a}
 /* Sonderzahlung */
 .sz-box{background:#f0eeff;border:.5px solid #c5bff5;border-radius:8px;padding:10px 12px;margin-bottom:10px}
 body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
+/* SZ conflict warning */
+.sz-warn{font-size:10px;color:#993c1d;background:#faece7;border:.5px solid #f5c4b0;border-radius:5px;padding:4px 8px;margin-top:6px;display:none}
+/* Grade history */
+.gh-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:.5px solid #f5f5f5;font-size:11px}
+.gh-row:last-child{border-bottom:none}
+.gh-del{background:none;border:none;color:#c0392b;cursor:pointer;font-size:13px;padding:0 4px;flex-shrink:0}
+body.dark .gh-row{border-bottom-color:#2e2e32}
+/* Payslip reconciler */
+.payslip-box{background:#f5f5f0;border-radius:8px;padding:10px 12px;margin-top:10px}
+body.dark .payslip-box{background:#2a2a2e}
+.payslip-box textarea{width:100%;height:90px;padding:6px 8px;border:.5px solid #ccc;border-radius:6px;font-size:11px;font-family:monospace;resize:vertical;background:#fff;color:#1a1a1a}
+body.dark .payslip-box textarea{background:#333336;border-color:#4a4a4e;color:#e2e2dc}
+.ps-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0;border-bottom:.5px solid #f0f0f0}
+body.dark .ps-row{border-bottom-color:#2e2e32}
+.ps-match{color:#27ae60}.ps-off{color:#c0392b}.ps-na{color:#aaa}
+/* Hourly rate card */
+.hourly-strip{display:flex;gap:8px;margin-bottom:10px}
+.hcard{flex:1;background:#f5f5f0;border-radius:7px;padding:8px 10px}
+.hcard .hl{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.04em}
+.hcard .hv{font-size:14px;font-weight:500;margin-top:2px}
+body.dark .hcard{background:#2a2a2e}
+/* Year tab nav */
+.year-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.year-nav button{background:#fff;border:.5px solid #ccc;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
+body.dark .year-nav button{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
+.year-table tr.today-month td{background:#fff8e8!important}
+body.dark .year-table tr.today-month td{background:#2e2a18!important}
 </style>
 </head>
 <body>
@@ -298,6 +325,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
         <button onclick="changeMonth(-1)">‹</button>
         <div class="month-label" id="month-label"></div>
         <button onclick="changeMonth(1)">›</button>
+        <button onclick="goToToday()" title="Jump to today" style="font-size:11px;padding:4px 8px">Today</button>
       </div>
       <button class="icon-btn" onclick="window.print()">🖨 Print / PDF</button>
       <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
@@ -340,6 +368,11 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
       <div class="net-label">Estimated net payout</div>
       <div class="net-val" id="net-out">—</div>
       <div class="net-sub" id="net-month-lbl"></div>
+    </div>
+    <div class="hourly-strip">
+      <div class="hcard"><div class="hl">Base hourly (gross)</div><div class="hv" id="r-hourly-base">—</div></div>
+      <div class="hcard"><div class="hl">Effective hourly (net)</div><div class="hv" id="r-hourly-net">—</div></div>
+      <div class="hcard"><div class="hl">Annual gross est.</div><div class="hv" id="r-annual-est">—</div></div>
     </div>
     <div class="panel-section">
       <div class="panel-label">Gross breakdown</div>
@@ -401,6 +434,13 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
         <span class="diff-badge diff-zero" id="diff-badge">enter actual →</span>
       </div>
       <div style="font-size:10px;color:#bbb;margin-top:5px" id="diff-note"></div>
+    </div>
+
+    <div class="payslip-box">
+      <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px">🔍 Payslip Reconciler (AI)</div>
+      <textarea id="payslip-text" placeholder="Paste your payslip text here (copy from PDF or photo OCR) — AI will extract and compare every line against the estimate…"></textarea>
+      <button class="mbtn primary" style="width:100%;margin-top:6px" onclick="analysePayslip()">Analyse Payslip</button>
+      <div id="payslip-result" style="margin-top:8px"></div>
     </div>
     <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Middle shift supplement €35.50 and late shift €50 are taxable. Late+Night (8% only) earns night hours with no fixed supplement. Rufbereitschaft standby may be partially SV-exempt — confirm with HR. Max 10 on-call days/month (AZG §20a).</p>
   </div>
@@ -486,7 +526,7 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
   <div class="rpanel" id="tab-settings" style="display:none">
     <div class="panel-section">
       <div class="panel-label">Grade & pay</div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Grade</label>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Current grade (sets active base salary)</label>
         <select id="grade" onchange="saveSettings();renderAll()">
           <option value="4097.71">RT / 1 — €4,097.71</option>
           <option value="4376.33" selected>RT / 9 — €4,376.33</option>
@@ -502,6 +542,18 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
     </div>
     <hr class="divider">
     <div class="panel-section">
+      <div class="panel-label">📋 Grade history <span style="font-weight:400;color:#bbb;font-size:9px;text-transform:none;letter-spacing:0">— past salary calc uses correct base per month</span></div>
+      <div id="grade-history-list"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:8px;align-items:end">
+        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px">From month</label>
+          <input type="month" id="gh-from" style="font-size:11px;padding:4px 6px"></div>
+        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px">Base salary (€)</label>
+          <input type="number" id="gh-base" step="0.01" placeholder="4376.33" style="font-size:11px;padding:4px 6px"></div>
+        <button class="mbtn primary" style="padding:5px 10px;flex:none;white-space:nowrap" onclick="addGradeEntry()">Add</button>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="panel-section">
       <div class="panel-label">Fixed shift supplements</div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Middle shift supplement (€/day) — 11:30–20:00</label>
         <input type="number" id="middle-suppl" value="35.50" step="0.10" min="0" onchange="saveSettings();renderAll()"></div>
@@ -512,9 +564,9 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
     <div class="panel-section">
       <div class="panel-label">Sonderzahlungen (13th / 14th month)</div>
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
         <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">13th month (Urlaubsgeld)</label>
-          <select id="sz-month1" onchange="saveSettings();renderYear()">
+          <select id="sz-month1" onchange="saveSettings();renderYear();checkSZConflict()">
             <option value="-1">— disabled —</option>
             <option value="5" selected>June</option>
             <option value="6">July</option>
@@ -522,15 +574,19 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
             <option value="3">April</option>
           </select></div>
         <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">14th month (Weihnachtsgeld)</label>
-          <select id="sz-month2" onchange="saveSettings();renderYear()">
+          <select id="sz-month2" onchange="saveSettings();renderYear();checkSZConflict()">
             <option value="-1">— disabled —</option>
             <option value="11" selected>December</option>
             <option value="10">November</option>
             <option value="9">October</option>
           </select></div>
       </div>
-      <div style="font-size:10px;color:#aaa">Amount = 1× base salary each. First ~€620 tax-free; remainder at 6% flat (Austrian Sonderzahlungsbesteuerung).</div>
+      <div class="sz-warn" id="sz-warn">⚠ Both Sonderzahlung months are set to the same month — one will be ignored.</div>
+      <div style="font-size:10px;color:#aaa">Amount = 1× base salary each. First ~€620 tax-free; remainder at 6% flat.</div>
     </div>
+    <hr class="divider">
+    <div class="panel-section">
+      <div class="panel-label">Rufbereitschaft — confirm with HR</div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Standby flat rate (€/hour)</label>
         <input type="number" id="ruf-rate" value="3.91" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Rufeinsatz call-in rate</label>
@@ -593,13 +649,17 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
 
   <!-- ── YEAR ── -->
   <div class="rpanel" id="tab-year" style="display:none">
-    <div class="panel-label" style="margin-bottom:8px">Annual overview — <span id="year-label-tab"></span></div>
+    <div class="year-nav">
+      <button onclick="changeYearTab(-1)">‹ prev</button>
+      <div style="font-weight:500;font-size:13px" id="year-label-tab"></div>
+      <button onclick="changeYearTab(1)">next ›</button>
+    </div>
     <table class="year-table">
       <thead><tr><th>Month</th><th>Gross</th><th>Net est.</th><th>OT h</th><th>Actual</th><th>Diff</th></tr></thead>
       <tbody id="year-tbody"></tbody>
       <tfoot><tr id="year-tfoot"></tr></tfoot>
     </table>
-    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Click month to navigate. Enter actual net per month to track differences. <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low net · <span style="color:#9b8fd8">●</span> Sonderzahlung month.</p>
+    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Click month to navigate. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Amber</span> = today's month · <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low · <span style="color:#9b8fd8">●</span> SZ month.</p>
   </div>
 
   <!-- ── COMPARE ── -->
@@ -671,7 +731,9 @@ body.dark .sz-box{background:#1e1e35;border-color:#4a3a7a}
 <script>
 // ═══ STATE ═══
 var currentYear=2026, currentMonth=4, editingDate=null;
+var yearTabYear=2026;
 var shifts={}, actuals={};
+var gradeHistory=[]; // [{ym:'YYYY-MM', base:4376.33}] sorted ascending
 var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
 var DOW_NAMES=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var HOLIDAYS={
@@ -699,7 +761,57 @@ function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function fmt(n){return '€ '+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 function fmtN(n){return Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
 
-// ═══ AUSTRIAN 2026 TAX ═══
+// ═══ GRADE HISTORY ═══
+function getBaseForMonth(year,month){
+  // Find the most recent gradeHistory entry on or before this month
+  var ym=year+'-'+pad(month+1);
+  var base=parseFloat(document.getElementById('grade').value)||4376.33;
+  for(var i=gradeHistory.length-1;i>=0;i--){
+    if(gradeHistory[i].ym<=ym){base=gradeHistory[i].base;break;}
+  }
+  return base;
+}
+
+function renderGradeHistory(){
+  var el=document.getElementById('grade-history-list');
+  if(!el)return;
+  if(!gradeHistory.length){el.innerHTML='<div style="font-size:11px;color:#aaa;padding:4px 0">No history entries — add a past grade change above to improve accuracy for past months.</div>';return;}
+  el.innerHTML=gradeHistory.slice().reverse().map(function(g){
+    return '<div class="gh-row">'+
+      '<span style="flex:1;font-weight:500">'+g.ym+'</span>'+
+      '<span style="flex:1">€ '+g.base.toFixed(2)+'</span>'+
+      '<button class="gh-del" onclick="removeGradeEntry(\''+g.ym+'\')" title="Remove">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+function addGradeEntry(){
+  var ym=document.getElementById('gh-from').value;
+  var base=parseFloat(document.getElementById('gh-base').value);
+  if(!ym||isNaN(base)||base<=0){alert('Enter a valid month and base salary.');return;}
+  gradeHistory=gradeHistory.filter(function(g){return g.ym!==ym;});
+  gradeHistory.push({ym:ym,base:base});
+  gradeHistory.sort(function(a,b){return a.ym<b.ym?-1:1;});
+  saveGradeHistory();renderGradeHistory();renderAll();
+}
+
+function removeGradeEntry(ym){
+  gradeHistory=gradeHistory.filter(function(g){return g.ym!==ym;});
+  saveGradeHistory();renderGradeHistory();renderAll();
+}
+
+function saveGradeHistory(){
+  try{localStorage.setItem('med_grade_hist',JSON.stringify(gradeHistory));}catch(e){}
+}
+
+function checkSZConflict(){
+  var m1=document.getElementById('sz-month1').value;
+  var m2=document.getElementById('sz-month2').value;
+  var warn=document.getElementById('sz-warn');
+  if(warn) warn.style.display=(m1!=='-1'&&m2!=='-1'&&m1===m2)?'block':'none';
+}
+
+
 // Lohnsteuer brackets 2026 (annual taxable income after SV deduction minus Werbungskostenpauschale €132/year)
 var BRACKETS=[
   {from:0,      to:13539,  rate:0.00},
@@ -789,7 +901,8 @@ function calcHours(s,e,thresh){
 // Returns supplements EARNED in a given month (paid in the following month)
 function calcEarnedSupplements(year,month){
   var s=getSettings();
-  var hourly=s.base/173.33;
+  var base=getBaseForMonth(year,month);
+  var hourly=base/173.33;
   var nightH=0,holH=0,lateNightH=0;
   var middleDays=0,lateDays=0;
   var pfx=monthKey(year,month);
@@ -815,7 +928,8 @@ function calcEarnedSupplements(year,month){
 
 function calcSalary(year,month){
   var s=getSettings();
-  var hourly=s.base/173.33;
+  var base=getBaseForMonth(year,month);
+  var hourly=base/173.33;
   var holH=0,leaveH=0,rufH=0,rufWH=0,callinH=0;
   var pfx=monthKey(year,month);
   Object.keys(shifts).forEach(function(k){
@@ -842,7 +956,7 @@ function calcSalary(year,month){
   var callinP    = hourly*s.callinM*callinH;
 
   // Taxable = base + prev month supplements + current base pays
-  var taxable = s.base
+  var taxable = base
     + prevSuppl.shiftA + prevSuppl.lateNightA
     + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
     + holBasePay + leavePay + callinP;
@@ -852,11 +966,10 @@ function calcSalary(year,month){
   var gross = taxable+rufPay+s.hazard-br;
   var net   = gross-svM.total-lst;
 
-  // Also compute what will be earned this month (for display)
   var earned = calcEarnedSupplements(year,month);
 
   return {
-    base:s.base,
+    base:base,
     // Received (from last month):
     shiftA:prevSuppl.shiftA, lateNightA:prevSuppl.lateNightA,
     middleP:prevSuppl.middleP, lateP:prevSuppl.lateP,
@@ -893,6 +1006,12 @@ function renderReport(){
   var r=calcSalary(currentYear,currentMonth);
   document.getElementById('net-out').textContent=fmt(r.net);
   document.getElementById('net-month-lbl').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
+  // Hourly strip
+  var baseHourly=r.base/173.33;
+  var netHourly=r.net/173.33;
+  document.getElementById('r-hourly-base').textContent='€ '+baseHourly.toFixed(2)+'/h';
+  document.getElementById('r-hourly-net').textContent='€ '+netHourly.toFixed(2)+'/h';
+  document.getElementById('r-annual-est').textContent=fmt(r.gross*12);
   document.getElementById('r-base').textContent=fmt(r.base);
   document.getElementById('r-shift').textContent=fmt(r.shiftA)+(r.shiftA>0?' ← prev month':'');
   document.getElementById('r-middle').textContent=fmt(r.middleP)+' ('+r.middleDays+'d prev month)';
@@ -1165,7 +1284,6 @@ function renderTaxCalc(){
 // ═══ CALENDAR ═══
 function renderCalendar(){
   document.getElementById('month-label').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
-  document.getElementById('year-label-tab').textContent=currentYear;
   var grid=document.getElementById('cal-grid');
   grid.innerHTML='';
   var firstDow=(new Date(currentYear,currentMonth,1).getDay()+6)%7;
@@ -1226,34 +1344,41 @@ function renderWeekBar(){
 }
 
 // ═══ YEAR TABLE ═══
+function changeYearTab(dir){
+  yearTabYear+=dir;
+  renderYear();
+}
+
 function renderYear(){
+  var todayD=new Date();
+  document.getElementById('year-label-tab').textContent=yearTabYear;
   var tbody=document.getElementById('year-tbody');tbody.innerHTML='';
   var tg=0,tn=0,totalOT=0;
   var s=getSettings();
-  // Single pass: compute all months once, derive color thresholds, then render
   var allResults=[];
-  for(var m=0;m<12;m++) allResults.push(calcSalary(currentYear,m));
+  for(var m=0;m<12;m++) allResults.push(calcSalary(yearTabYear,m));
   var sortedNets=allResults.map(function(r){return r.net;}).slice().sort(function(a,b){return a-b;});
-  var lo=sortedNets[2],hi=sortedNets[9]; // bottom/top quartile-ish thresholds
+  var lo=sortedNets[2],hi=sortedNets[9];
   for(var m=0;m<12;m++){
     var r=allResults[m];
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-    var szData=isSZ?calcSonderzahlung(s.base):null;
-    var monthOT=getOTAccrued(currentYear,m);
+    var szData=isSZ?calcSonderzahlung(r.base):null;
+    var monthOT=getOTAccrued(yearTabYear,m);
     tg+=r.gross+(szData?szData.gross:0);
     tn+=r.net+(szData?szData.net:0);
     totalOT+=monthOT;
-    var mk=monthKey(currentYear,m);
+    var mk=monthKey(yearTabYear,m);
     var act=actuals[mk];
     var estNet=r.net+(szData?szData.net:0);
     var diff=act!=null?act-estNet:null;
-    var isCur=m===currentMonth;
+    var isCur=(yearTabYear===currentYear&&m===currentMonth);
+    var isToday=(yearTabYear===todayD.getFullYear()&&m===todayD.getMonth());
     var tr=document.createElement('tr');
-    var rowClass=isCur?'cur-month':isSZ?'yr-sz':r.net>hi?'yr-high':r.net<lo?'yr-low':'yr-mid';
+    var rowClass=isCur?'cur-month':isToday?'today-month':isSZ?'yr-sz':r.net>hi?'yr-high':r.net<lo?'yr-low':'yr-mid';
     tr.className=rowClass;
-    var mn=m;
+    var mn=m;var yt=yearTabYear;
     var netDisplay=fmtN(r.net)+(szData?' <span style="font-size:9px;color:#9b8fd8">+SZ</span>':'');
-    tr.innerHTML='<td class="clickable" onclick="navToMonth('+mn+')">'+(isCur?'→ ':'')+MONTH_NAMES[m].substring(0,3)+(isSZ?' 🎁':'')+
+    tr.innerHTML='<td class="clickable" onclick="navToMonthYear('+mn+','+yt+')">'+(isCur?'→ ':isToday?'◉ ':'')+MONTH_NAMES[m].substring(0,3)+(isSZ?' 🎁':'')+
       '</td><td>'+fmtN(r.gross+(szData?szData.gross:0))+'</td>'+
       '<td>'+netDisplay+'</td>'+
       '<td style="'+(monthOT>0?'color:#ef9f27;font-weight:500':'color:#ccc')+'">'+
@@ -1261,7 +1386,6 @@ function renderYear(){
       '<td><input class="actual-input-sm" type="number" placeholder="—" value="'+(act||'')+'" data-mk="'+mk+'" onchange="saveActual(this)" step="0.01"></td>'+
       '<td style="'+(diff==null?'color:#ccc':diff>=0?'color:#27ae60':'color:#c0392b')+';font-weight:500">'+(diff==null?'—':(diff>=0?'+':'')+diff.toFixed(0))+'</td>';
     tbody.appendChild(tr);
-    // Sonderzahlung detail row
     if(szData){
       var szTr=document.createElement('tr');
       szTr.className='yr-sz';
@@ -1285,6 +1409,8 @@ function saveActual(inp){
 }
 
 function navToMonth(m){currentMonth=m;renderAll();showTab('report',null);}
+function navToMonthYear(m,y){currentMonth=m;currentYear=y;renderAll();showTab('report',null);}
+function goToToday(){var t=new Date();currentMonth=t.getMonth();currentYear=t.getFullYear();renderAll();}
 
 // ═══ COMPARE ═══
 function populateCompareSelects(){
@@ -1386,9 +1512,9 @@ function showTab(name,btn){
   document.querySelectorAll('.rtab').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
   else{var idx={report:0,taxcalc:1,settings:2,year:3,compare:4}[name];document.querySelectorAll('.rtab')[idx].classList.add('active');}
-  if(name==='year')renderYear();
+  if(name==='year'){yearTabYear=currentYear;renderYear();}
   if(name==='compare'){populateCompareSelects();renderCompare();}
-  if(name==='settings')renderLastSynced();
+  if(name==='settings'){renderLastSynced();renderGradeHistory();checkSZConflict();}
   if(name==='taxcalc'){var r=calcSalary(currentYear,currentMonth);document.getElementById('tc-annual').value=(r.base*12).toFixed(0);document.getElementById('tc-suppl').value=(r.middleP+r.lateP+r.shiftA).toFixed(2);document.getElementById('tc-oncall').value=r.rufPay.toFixed(2);renderTaxCalc();}
 }
 
@@ -1399,9 +1525,11 @@ function loadData(){
   try{
     var s=localStorage.getItem('med_shifts2'),a=localStorage.getItem('med_actuals2'),cfg=localStorage.getItem('med_settings2');
     var ot=localStorage.getItem('med_ot2');
+    var gh=localStorage.getItem('med_grade_hist');
     if(s)shifts=JSON.parse(s);
     if(a)actuals=JSON.parse(a);
     if(ot)otData=JSON.parse(ot);
+    if(gh)gradeHistory=JSON.parse(gh);
     if(cfg){var c=JSON.parse(cfg);
       if(c.grade)document.getElementById('grade').value=c.grade;
       if(c.thresh)document.getElementById('thresh').value=c.thresh;
@@ -1414,17 +1542,14 @@ function loadData(){
       if(c.szMonth1!=null)document.getElementById('sz-month1').value=c.szMonth1;
       if(c.szMonth2!=null)document.getElementById('sz-month2').value=c.szMonth2;
     }
-    // Restore sync config: PAT from sessionStorage, repo/branch from localStorage
-    var pat = sessionStorage.getItem('med_sync_pat');
-    if(pat) document.getElementById('sync-pat').value = pat;
+    var pat=sessionStorage.getItem('med_sync_pat');
+    if(pat)document.getElementById('sync-pat').value=pat;
     var sc=localStorage.getItem('med_sync_cfg2');
     if(sc){var scj=JSON.parse(sc);
       if(scj.repo)document.getElementById('sync-repo').value=scj.repo;
       if(scj.branch)document.getElementById('sync-branch').value=scj.branch;
     }
-    // Restore last synced timestamps
     renderLastSynced();
-    // Restore dark mode
     if(localStorage.getItem('med_dark2')==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
   }catch(e){}
 }
@@ -1558,7 +1683,7 @@ async function syncToRepo(){
   if(!password){setSyncStatus('⚠ Enter a Sync Password first.',true);return;}
   setSyncStatus('🔐 Encrypting…',false);
   try{
-    var payload=JSON.stringify({shifts:shifts,actuals:actuals,otData:otData});
+    var payload=JSON.stringify({shifts:shifts,actuals:actuals,otData:otData,gradeHistory:gradeHistory});
     var encrypted=await encryptPayload(payload,password);
     // GitHub API requires file content as base64 — our encrypted string is ASCII base64 itself
     var b64content=btoa(encrypted);
@@ -1599,10 +1724,9 @@ async function syncFromRepo(){
     var plain=await decryptPayload(encrypted,password);
     var parsed=JSON.parse(plain);
     if(!parsed.shifts)throw new Error('Decrypted data looks invalid — wrong password?');
-    shifts=parsed.shifts;
-    actuals=parsed.actuals||{};
-    otData=parsed.otData||{};
-    saveData();
+    shifts=parsed.shifts;actuals=parsed.actuals||{};otData=parsed.otData||{};
+    gradeHistory=parsed.gradeHistory||[];
+    saveData();saveGradeHistory();
     try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
     renderAll();
     var ts=new Date().toLocaleTimeString('de-AT');
@@ -1618,36 +1742,114 @@ async function syncFromRepo(){
 
 // ═══ LOCAL BACKUP ═══
 function exportJSON(){
-  var payload={version:3,exported:new Date().toISOString(),shifts:shifts,actuals:actuals,otData:otData};
+  var payload={version:4,exported:new Date().toISOString(),shifts:shifts,actuals:actuals,otData:otData,gradeHistory:gradeHistory};
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
-  a.href=url;
-  a.download='shiftplanner-backup-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  URL.revokeObjectURL(url);
+  a.href=url;a.download='shiftplanner-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();URL.revokeObjectURL(url);
 }
-
 function importJSON(input){
-  var file=input.files&&input.files[0];
-  if(!file)return;
+  var file=input.files&&input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
     try{
       var parsed=JSON.parse(e.target.result);
       if(!parsed.shifts)throw new Error('No shifts found.');
       if(!confirm('Replace ALL current data with the imported backup?'))return;
-      shifts=parsed.shifts;
-      actuals=parsed.actuals||{};
-      otData=parsed.otData||{};
+      shifts=parsed.shifts;actuals=parsed.actuals||{};otData=parsed.otData||{};
+      gradeHistory=parsed.gradeHistory||[];
       saveData();
+      saveGradeHistory();
       try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
-      renderAll();
+      renderAll();renderGradeHistory();
       alert('✓ Import successful!');
     }catch(err){alert('✗ Import failed: '+err.message);}
     input.value='';
   };
   reader.readAsText(file);
+}
+
+// ═══ KEYBOARD SHORTCUTS ═══
+document.addEventListener('keydown',function(e){
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  if(e.key==='ArrowLeft')changeMonth(-1);
+  if(e.key==='ArrowRight')changeMonth(1);
+  if(e.key==='Escape')closeModal();
+  if(e.key==='t'||e.key==='T')goToToday();
+});
+
+// ═══ PAYSLIP RECONCILER ═══
+async function analysePayslip(){
+  var text=document.getElementById('payslip-text').value.trim();
+  var resultEl=document.getElementById('payslip-result');
+  if(!text){resultEl.innerHTML='<div style="font-size:11px;color:#aaa">Paste payslip text above first.</div>';return;}
+  resultEl.innerHTML='<div style="font-size:11px;color:#aaa">🤖 Analysing…</div>';
+  var r=calcSalary(currentYear,currentMonth);
+  var context=JSON.stringify({
+    month:MONTH_NAMES[currentMonth]+' '+currentYear,
+    estimated:{
+      base:r.base.toFixed(2),
+      nightAllowance:r.shiftA.toFixed(2),
+      middleSuppl:r.middleP.toFixed(2),
+      lateSuppl:r.lateP.toFixed(2),
+      lateNight8pct:r.lateNightA.toFixed(2),
+      holidayPay:(r.holBasePay+r.holExtra).toFixed(2),
+      rufbereitschaft:r.rufPay.toFixed(2),
+      rufeinsatz:r.callinP.toFixed(2),
+      hazard:r.hazard.toFixed(2),
+      worksBR:r.br.toFixed(2),
+      totalGross:r.gross.toFixed(2),
+      kv:r.svM.kv.toFixed(2),
+      pv:r.svM.pv.toFixed(2),
+      av:r.svM.av.toFixed(2),
+      ak:r.svM.ak.toFixed(2),
+      wbf:r.svM.wbf.toFixed(2),
+      lohnsteuer:r.lst.toFixed(2),
+      netPayout:r.net.toFixed(2)
+    }
+  });
+  var prompt='You are an Austrian payroll reconciliation assistant. The user has pasted raw payslip text below. '+
+    'Extract every monetary line item from the payslip (label + amount). '+
+    'Then compare each extracted line against the estimated values provided. '+
+    'Return a JSON array where each element is: {label, payslip, estimated, match} '+
+    'where match is "ok" if within €1, "off" if differs by more, or "na" if no estimated equivalent exists. '+
+    'Include a final element {label:"Net payout",payslip:<net from slip>,estimated:<net from estimates>,match:<...>}. '+
+    'Return ONLY valid JSON, no markdown, no explanation.\n\n'+
+    'ESTIMATED VALUES:\n'+context+'\n\nPAYSLIP TEXT:\n'+text;
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    var data=await resp.json();
+    var raw=data.content&&data.content[0]&&data.content[0].text||'';
+    var clean=raw.replace(/```json|```/g,'').trim();
+    var rows=JSON.parse(clean);
+    var html='<div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:6px">Reconciliation — '+MONTH_NAMES[currentMonth]+' '+currentYear+'</div>';
+    rows.forEach(function(row){
+      var cls=row.match==='ok'?'ps-match':row.match==='off'?'ps-off':'ps-na';
+      var icon=row.match==='ok'?'✓':row.match==='off'?'✗':'—';
+      var estStr=row.estimated!=null?'€ '+parseFloat(row.estimated).toFixed(2):'—';
+      html+='<div class="ps-row">'+
+        '<span style="flex:2;color:#555">'+row.label+'</span>'+
+        '<span style="flex:1;text-align:right">€ '+parseFloat(row.payslip).toFixed(2)+'</span>'+
+        '<span style="flex:1;text-align:right;color:#aaa">'+estStr+'</span>'+
+        '<span class="'+cls+'" style="flex:0 0 20px;text-align:center;font-weight:600">'+icon+'</span>'+
+      '</div>';
+    });
+    // auto-fill actual net from payslip if net row found
+    var netRow=rows.find(function(r){return r.label&&r.label.toLowerCase().includes('net');});
+    if(netRow&&netRow.payslip){
+      var netVal=parseFloat(netRow.payslip);
+      if(!isNaN(netVal)){document.getElementById('actual-net').value=netVal.toFixed(2);updateActualDiff();}
+    }
+    html+='<div style="font-size:10px;color:#bbb;margin-top:6px">Net payout auto-filled if found · ✓ within €1 · ✗ differs</div>';
+    resultEl.innerHTML=html;
+  }catch(err){
+    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Analysis failed: '+err.message+'. Paste cleaner text or check network.</div>';
+  }
 }
 
 // ═══ BOOT ═══
