@@ -1028,7 +1028,7 @@ function checkSZConflict(){
   if(warn) warn.style.display=(m1!=='-1'&&m2!=='-1'&&m1===m2)?'block':'none';
 }
 
-
+// ═══ AUSTRIAN 2026 TAX ═══
 // Lohnsteuer brackets 2026 (annual taxable income after SV deduction minus Werbungskostenpauschale €132/year)
 var BRACKETS=[
   {from:0,      to:13539,  rate:0.00},
@@ -1209,33 +1209,24 @@ function calcSalary(year,month){
   };
 }
 
-// ═══ SONDERZAHLUNG ═══
-// Austrian §67 taxation: up to €620 tax-free (Freibetrag), remainder at fixed 6%
-// SV applies normally on full amount
 function calcSonderzahlung(base){
-  var szGross = base; // one month's base
-  var svAmount = Math.min(szGross, SV_CAP_MONTHLY) * SV_TOTAL;
-  var freibetrag = 620;
-  var taxable = Math.max(0, szGross - freibetrag);
-  var lst = taxable * 0.06;
-  var net = szGross - svAmount - lst;
-  return {gross: szGross, sv: svAmount, lst: lst, net: net};
+  // Austrian §67 taxation: up to €620 Freibetrag, remainder at fixed 6%; SV on full amount
+  var svAmount=Math.min(base,SV_CAP_MONTHLY)*SV_TOTAL;
+  var lst=Math.max(0,base-620)*0.06;
+  return {gross:base, sv:svAmount, lst:lst, net:base-svAmount-lst};
 }
+
 function renderReport(){
   var r=calcSalary(currentYear,currentMonth);
+  var s=getSettings(); // single settings read for the whole function
   document.getElementById('net-out').textContent=fmt(r.net);
   document.getElementById('net-month-lbl').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
-  // Hourly strip (4 cards: base gross, net, annual gross, SZ-adjusted true net hourly)
+  // Hourly strip — compute SZ net once, reuse for true hourly
   var baseHourly=r.base/173.33;
   var netHourly=r.net/173.33;
-  var szS=getSettings();
-  var szAdjNet=r.net;
-  if(szS.szMonth1>=0||szS.szMonth2>=0){
-    var sz1Net=(szS.szMonth1>=0)?calcSonderzahlung(r.base).net:0;
-    var sz2Net=(szS.szMonth2>=0&&szS.szMonth2!==szS.szMonth1)?calcSonderzahlung(r.base).net:0;
-    szAdjNet=(r.net*12+sz1Net+sz2Net)/(12); // annualised then /12 for comparison
-  }
-  var trueHourly=(r.net*12+(szS.szMonth1>=0?calcSonderzahlung(r.base).net:0)+(szS.szMonth2>=0&&szS.szMonth2!==szS.szMonth1?calcSonderzahlung(r.base).net:0))/(12*173.33);
+  var sz1Net=(s.szMonth1>=0)?calcSonderzahlung(r.base).net:0;
+  var sz2Net=(s.szMonth2>=0&&s.szMonth2!==s.szMonth1)?calcSonderzahlung(r.base).net:0;
+  var trueHourly=(r.net*12+sz1Net+sz2Net)/(12*173.33);
   document.getElementById('r-hourly-base').textContent='€ '+baseHourly.toFixed(2)+'/h';
   document.getElementById('r-hourly-net').textContent='€ '+netHourly.toFixed(2)+'/h';
   document.getElementById('r-annual-est').textContent=fmt(r.gross*12);
@@ -1279,7 +1270,6 @@ function renderReport(){
   document.getElementById('r-net').textContent=fmt(r.net);
   document.getElementById('r-hazard').textContent=fmt(r.hazard);
   // Employer costs (optional)
-  var s=getSettings();
   var empSec=document.getElementById('r-employer-section');
   if(empSec){
     empSec.style.display=s.showEmployerCosts?'':'none';
@@ -2304,27 +2294,25 @@ function renderUrlaubTracker(){
 // ═══ ICAL EXPORT ═══
 function exportICal(){
   var typeLabels={normal:'Early shift',middle:'Middle shift',late:'Late shift',latenight:'Late shift (8%)',holiday:'Holiday shift',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
+  var s2=getSettings(); // hoisted — same settings for all events
   var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ShiftPlanner MedAustron//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Shifts '+currentYear];
   var keys=Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);});
   keys.sort().forEach(function(k){
     var sh=shifts[k];
     var parts=k.split('-');
     var y=parts[0],mo=parts[1],dy=parts[2];
-    var sp=sh.start.split(':'),ep=sh.end.split(':');
+    var h=calcHours(sh.start,sh.end,s2.thresh); // reuse calcHours — handles midnight crossing correctly
+    var sp=sh.start.split(':');
     var startM=parseInt(sp[0])*60+parseInt(sp[1]);
-    var endM=parseInt(ep[0])*60+parseInt(ep[1]);
-    if(endM<=startM)endM+=1440; // crosses midnight
+    var endM=startM+Math.round(h.total*60);
     var endH=Math.floor(endM/60)%24,endMin=endM%60;
     var dtStart=y+mo+dy+'T'+pad(parseInt(sp[0]))+pad(parseInt(sp[1]))+'00';
     var dtEnd=y+mo+(endM>=1440?pad(parseInt(dy)+1):dy)+'T'+pad(endH)+pad(endMin)+'00';
-    var s2=getSettings();
     var desc=sh.note||'';
     if(sh.type==='ruf'){
-      var rufH2=(parseInt(ep[0])*60+parseInt(ep[1])-(parseInt(sp[0])*60+parseInt(sp[1])))/60;
-      if(rufH2<0)rufH2+=24;
-      var isWkndDay=(new Date(parseInt(y),parseInt(mo)-1,parseInt(dy)).getDay()===0||new Date(parseInt(y),parseInt(mo)-1,parseInt(dy)).getDay()===6);
-      var rufPay2=s2.rufRate*(isWkndDay?s2.rufWknd:1)*rufH2;
-      desc=(desc?desc+' · ':'')+rufH2.toFixed(1)+'h @ €'+s2.rufRate.toFixed(2)+'/h = '+fmt(rufPay2);
+      var isWkndDay=isWknd(parseInt(y),parseInt(mo)-1,parseInt(dy));
+      var rufPay2=s2.rufRate*(isWkndDay?s2.rufWknd:1)*h.total;
+      desc=(desc?desc+' · ':'')+h.total.toFixed(1)+'h @ €'+s2.rufRate.toFixed(2)+'/h = '+fmt(rufPay2);
     }
     var summary=(typeLabels[sh.type]||sh.type)+(sh.note?' — '+sh.note:'');
     lines.push('BEGIN:VEVENT');
@@ -2518,8 +2506,7 @@ function updateDuration(){
   var s=getSettings();
   var h=calcHours(start,end,s.thresh);
   if(h.total<=0){pill.className='duration-pill';return;}
-  var r=calcSalary(currentYear,currentMonth);
-  var hourly=r.base/173.33;
+  var hourly=getBaseForMonth(currentYear,currentMonth)/173.33; // cheaper than full calcSalary
   var parts=[];
   parts.push(h.total.toFixed(1)+'h total');
   if(h.night>0&&(type==='normal'||type==='latenight'))
