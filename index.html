@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#185fa5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ShiftPlanner">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23185fa5'/><text y='.9em' font-size='70' x='50%' text-anchor='middle'>📅</text></svg>">
 <title>Shift Salary Planner — MedAustron</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -291,6 +296,38 @@ body.dark .hcard .hv{color:#e2e2dc}
 /* Dark — year nav */
 body.dark .year-nav button{background:#2a2a2e;border-color:#4a4a4e;color:#e2e2dc}
 body.dark .year-nav button:hover{background:#333336}
+/* Month jump picker */
+.mjump-overlay{display:none;position:fixed;inset:0;z-index:300}
+.mjump-overlay.open{display:block}
+.mjump-popup{position:absolute;background:#fff;border:.5px solid #ddd;border-radius:12px;padding:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);width:260px;z-index:301}
+.mjump-year-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mjump-year-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:2px 8px;border-radius:5px;color:#555}
+.mjump-year-btn:hover{background:#f0f0f0}
+.mjump-year-lbl{font-size:13px;font-weight:500}
+.mjump-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.mjump-btn{background:none;border:.5px solid transparent;border-radius:7px;padding:6px 2px;font-size:11px;cursor:pointer;color:#333;text-align:center}
+.mjump-btn:hover{background:#f0f0f0;border-color:#ddd}
+.mjump-btn.mjump-cur{background:#185fa5;color:#fff;border-color:#185fa5}
+.mjump-btn.mjump-today{border-color:#185fa5;color:#185fa5}
+body.dark .mjump-popup{background:#242428;border-color:#3a3a3e;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+body.dark .mjump-year-btn{color:#aaa}
+body.dark .mjump-year-btn:hover{background:#333336}
+body.dark .mjump-year-lbl{color:#e2e2dc}
+body.dark .mjump-btn{color:#ccc}
+body.dark .mjump-btn:hover{background:#333336;border-color:#4a4a4e}
+body.dark .mjump-btn.mjump-cur{background:#2a4a6e;color:#c8dff5;border-color:#3a6a9e}
+body.dark .mjump-btn.mjump-today{border-color:#6fa8dc;color:#6fa8dc}
+/* Dirty sync badge */
+.sync-dirty-dot{width:7px;height:7px;background:#ef9f27;border-radius:50%;vertical-align:middle;margin-left:4px;display:none}
+.sync-dirty-dot.show{display:inline-block}
+/* Employer costs */
+.employer-box{background:#f5f5f0;border:.5px solid #e0e0e0;border-radius:8px;padding:10px 12px;margin-top:6px}
+.employer-box .eb-title{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:5px}
+body.dark .employer-box{background:#2a2a2e;border-color:#3a3a3e}
+body.dark .employer-box .eb-title{color:#666}
+/* Fix remaining dark inline-color gaps */
+body.dark #sync-last{color:#666!important}
+body.dark #sync-status{color:#888}
 /* Dark — tc-cap-notice */
 body.dark #tc-cap-notice{background:#1a2e1a;color:#7aaa4a}
 /* Dark — code tags in settings */
@@ -330,11 +367,19 @@ body.dark .payslip-box textarea{background:#333336;border-color:#4a4a4e;color:#e
 body.dark .ps-row{border-bottom-color:#2e2e32}
 .ps-match{color:#27ae60}.ps-off{color:#c0392b}.ps-na{color:#aaa}
 /* Hourly rate card */
-.hourly-strip{display:flex;gap:8px;margin-bottom:10px}
-.hcard{flex:1;background:#f5f5f0;border-radius:7px;padding:8px 10px}
+.hourly-strip{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.hcard{background:#f5f5f0;border-radius:7px;padding:8px 10px}
 .hcard .hl{font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:.04em}
-.hcard .hv{font-size:14px;font-weight:500;margin-top:2px}
+.hcard .hv{font-size:13px;font-weight:500;margin-top:2px}
 body.dark .hcard{background:#2a2a2e}
+body.dark .hcard .hl{color:#666}
+body.dark .hcard .hv{color:#e2e2dc}
+/* Shift duration preview in modal */
+.duration-pill{font-size:11px;color:#185fa5;background:#f0f7ff;border:.5px solid #b8cfe8;border-radius:6px;padding:5px 10px;margin-top:6px;display:none;line-height:1.5}
+.duration-pill.show{display:block}
+body.dark .duration-pill{background:#1a2535;border-color:#2a4a6e;color:#8bbde0}
+/* SV cap remaining inline note */
+.sv-remaining{font-size:10px;color:#888;margin-left:4px}
 /* Year tab nav */
 .year-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .year-nav button{background:#fff;border:.5px solid #ccc;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
@@ -410,7 +455,7 @@ body.dark .av-field .ak{color:#999}
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <div class="month-nav">
         <button onclick="changeMonth(-1)">‹</button>
-        <div class="month-label" id="month-label"></div>
+        <div class="month-label" id="month-label" onclick="openMonthJump(event)" style="cursor:pointer;user-select:none" title="Click to jump to any month"></div>
         <button onclick="changeMonth(1)">›</button>
         <button onclick="goToToday()" title="Jump to today" style="font-size:11px;padding:4px 8px">Today</button>
       </div>
@@ -462,6 +507,7 @@ body.dark .av-field .ak{color:#999}
       <div class="hcard"><div class="hl">Base hourly (gross)</div><div class="hv" id="r-hourly-base">—</div></div>
       <div class="hcard"><div class="hl">Effective hourly (net)</div><div class="hv" id="r-hourly-net">—</div></div>
       <div class="hcard"><div class="hl">Annual gross est.</div><div class="hv" id="r-annual-est">—</div></div>
+      <div class="hcard"><div class="hl">True hourly incl. SZ (net)</div><div class="hv" id="r-hourly-sz">—</div></div>
     </div>
     <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:5px">3-month net forecast</div>
     <div class="forecast-strip" id="forecast-strip"></div>
@@ -484,6 +530,7 @@ body.dark .av-field .ak{color:#999}
       <div class="panel-label">Deductions (Austrian 2026 rates)</div>
       <div class="rrow"><span class="rl">KV Krankenversicherung (3.87%)</span><span class="rv neg" id="r-kv">—</span></div>
       <div class="rrow" id="r-cap-row" style="display:none"><span class="rl" style="color:#27ae60">✓ SV cap reached (€6,930/mo max)</span><span class="rv pos" id="r-cap-save">—</span></div>
+      <div class="rrow" id="r-sv-remaining-row"><span class="rl">SV-pflichtiger Restbetrag bis Deckelung</span><span class="rv" id="r-sv-remaining">—</span></div>
       <div class="rrow"><span class="rl">PV Pensionsversicherung (10.25%)</span><span class="rv neg" id="r-pv">—</span></div>
       <div class="rrow"><span class="rl">AV Arbeitslosenversicherung (2.95%)</span><span class="rv neg" id="r-av">—</span></div>
       <div class="rrow"><span class="rl">AK-Umlage (0.5%)</span><span class="rv neg" id="r-ak">—</span></div>
@@ -491,6 +538,16 @@ body.dark .av-field .ak{color:#999}
       <div class="rrow"><span class="rl">UV Unfallversicherung (employer)</span><span class="rv" style="color:#aaa">—</span></div>
       <div class="rrow"><span class="rl">Lohnsteuer (progressive brackets)</span><span class="rv neg" id="r-lst">—</span></div>
       <div class="rrow total-row"><span class="rl">Net payout</span><span class="rv info" id="r-net">—</span></div>
+    </div>
+    <div id="r-employer-section" style="display:none">
+      <div class="employer-box">
+        <div class="eb-title">Employer-only costs (not deducted from your pay)</div>
+        <div class="rrow"><span class="rl">DB Dienstgeberbeitrag (4.55%)</span><span class="rv" id="r-db">—</span></div>
+        <div class="rrow"><span class="rl">DZ Dienstgeberzuschlag NÖ (0.36%)</span><span class="rv" id="r-dz">—</span></div>
+        <div class="rrow"><span class="rl">MV Mitarbeitervorsorgekasse (1.53%)</span><span class="rv" id="r-mv">—</span></div>
+        <div class="rrow"><span class="rl">UV Unfallversicherung (~1.2%)</span><span class="rv" id="r-uv">—</span></div>
+        <div class="rrow total-row"><span class="rl">Total employer cost (gross + above)</span><span class="rv" id="r-total-cost">—</span></div>
+      </div>
     </div>
     <div class="panel-section">
       <div class="panel-label">Hours summary</div>
@@ -673,6 +730,10 @@ body.dark .av-field .ak{color:#999}
         <input type="number" id="hazard-allow" value="230.43" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual Urlaub entitlement (days)</label>
         <input type="number" id="urlaub-days" value="25" step="1" min="0" max="60" onchange="saveSettings();renderAll()"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <input type="checkbox" id="show-employer-costs" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
+        <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer">Show employer-side costs in Report (DB+DZ+MV+UV)</label>
+      </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -758,7 +819,7 @@ body.dark .av-field .ak{color:#999}
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Sync Password <span style="color:#bbb">(in memory only)</span></label>
         <input type="password" id="sync-password" placeholder="encryption passphrase" autocomplete="new-password"></div>
       <div style="display:flex;gap:6px;margin-bottom:4px">
-        <button class="mbtn primary" style="flex:1" onclick="syncToRepo()">⬆ Push to Repo</button>
+        <button class="mbtn primary" style="flex:1" onclick="syncToRepo()">⬆ Push to Repo<span class="sync-dirty-dot" id="dirty-dot" title="Unsynced local changes"></span></button>
         <button class="mbtn" style="flex:1" onclick="syncFromRepo()">⬇ Pull from Repo</button>
       </div>
       <div id="sync-status" style="font-size:11px;color:#888;text-align:center;min-height:18px;margin-top:4px"></div>
@@ -815,6 +876,18 @@ body.dark .av-field .ak{color:#999}
 </div>
 </div>
 
+<!-- ═══ MONTH JUMP PICKER ═══ -->
+<div class="mjump-overlay" id="mjump-overlay" onclick="closeMonthJump()">
+  <div class="mjump-popup" id="mjump-popup" onclick="event.stopPropagation()">
+    <div class="mjump-year-row">
+      <button class="mjump-year-btn" onclick="mjumpYear(-1)">‹</button>
+      <span class="mjump-year-lbl" id="mjump-year-lbl"></span>
+      <button class="mjump-year-btn" onclick="mjumpYear(1)">›</button>
+    </div>
+    <div class="mjump-grid" id="mjump-grid"></div>
+  </div>
+</div>
+
 <!-- ═══ MODAL ═══ -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
 <div class="modal">
@@ -836,7 +909,7 @@ body.dark .av-field .ak{color:#999}
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Manual entry</div>
   <div class="mfield">
     <label>Type</label>
-    <select id="m-type">
+    <select id="m-type" onchange="updateDuration()">
       <option value="normal">Normal shift (8% night hours)</option>
       <option value="middle">Middle shift — 11:30–20:00 (+€35.50 fixed)</option>
       <option value="late">Late shift — 14:00–22:30 (+€50 fixed)</option>
@@ -848,9 +921,10 @@ body.dark .av-field .ak{color:#999}
     </select>
   </div>
   <div class="time-grid">
-    <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00"></div>
-    <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00"></div>
+    <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration()"></div>
+    <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration()"></div>
   </div>
+  <div class="duration-pill" id="m-duration"></div>
   <div class="mfield">
     <label>Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span></label>
     <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px">
@@ -1023,6 +1097,7 @@ function getSettings(){
     szMonth1:  parseInt(document.getElementById('sz-month1').value),
     szMonth2:  parseInt(document.getElementById('sz-month2').value),
     urlaubDays:parseInt(document.getElementById('urlaub-days').value)||25,
+    showEmployerCosts:document.getElementById('show-employer-costs').checked,
   };
 }
 
@@ -1083,7 +1158,7 @@ function calcSalary(year,month){
     var h=calcHours(sh.start,sh.end,s.thresh);
     var special=isHol(k)||isWknd(year,month,d);
     if(sh.type==='holiday')     holH+=h.total;
-    else if(sh.type==='leave')  leaveH+=h.total;
+    else if(sh.type==='leave')  leaveH+=8; // Urlaub is always paid as 8h standard day (AZG §2)
     else if(sh.type==='ruf')  { if(special) rufWH+=h.total; else rufH+=h.total; }
     else if(sh.type==='callin') callinH+=h.total;
   });
@@ -1150,12 +1225,21 @@ function renderReport(){
   var r=calcSalary(currentYear,currentMonth);
   document.getElementById('net-out').textContent=fmt(r.net);
   document.getElementById('net-month-lbl').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
-  // Hourly strip
+  // Hourly strip (4 cards: base gross, net, annual gross, SZ-adjusted true net hourly)
   var baseHourly=r.base/173.33;
   var netHourly=r.net/173.33;
+  var szS=getSettings();
+  var szAdjNet=r.net;
+  if(szS.szMonth1>=0||szS.szMonth2>=0){
+    var sz1Net=(szS.szMonth1>=0)?calcSonderzahlung(r.base).net:0;
+    var sz2Net=(szS.szMonth2>=0&&szS.szMonth2!==szS.szMonth1)?calcSonderzahlung(r.base).net:0;
+    szAdjNet=(r.net*12+sz1Net+sz2Net)/(12); // annualised then /12 for comparison
+  }
+  var trueHourly=(r.net*12+(szS.szMonth1>=0?calcSonderzahlung(r.base).net:0)+(szS.szMonth2>=0&&szS.szMonth2!==szS.szMonth1?calcSonderzahlung(r.base).net:0))/(12*173.33);
   document.getElementById('r-hourly-base').textContent='€ '+baseHourly.toFixed(2)+'/h';
   document.getElementById('r-hourly-net').textContent='€ '+netHourly.toFixed(2)+'/h';
   document.getElementById('r-annual-est').textContent=fmt(r.gross*12);
+  document.getElementById('r-hourly-sz').textContent='€ '+trueHourly.toFixed(2)+'/h';
   document.getElementById('r-base').textContent=fmt(r.base);
   document.getElementById('r-shift').textContent=fmt(r.shiftA)+(r.shiftA>0?' ← prev month':'');
   document.getElementById('r-middle').textContent=fmt(r.middleP)+' ('+r.middleDays+'d prev month)';
@@ -1174,6 +1258,18 @@ function renderReport(){
       document.getElementById('r-cap-save').textContent='saving '+fmt((r.taxable-SV_CAP_MONTHLY)*SV_TOTAL);
     }
   }
+  // SV remaining to cap
+  var svRemRow=document.getElementById('r-sv-remaining-row');
+  var svRemEl=document.getElementById('r-sv-remaining');
+  if(svRemEl){
+    var remaining=SV_CAP_MONTHLY-r.taxable;
+    if(r.svM.capped){
+      if(svRemRow) svRemRow.style.display='none';
+    } else {
+      if(svRemRow) svRemRow.style.display='';
+      svRemEl.textContent=remaining>0?fmt(remaining)+' more gross until cap':'Cap reached';
+    }
+  }
   document.getElementById('r-kv').textContent='− '+fmt(r.svM.kv);
   document.getElementById('r-pv').textContent='− '+fmt(r.svM.pv);
   document.getElementById('r-av').textContent='− '+fmt(r.svM.av);
@@ -1182,6 +1278,21 @@ function renderReport(){
   document.getElementById('r-lst').textContent='− '+fmt(r.lst);
   document.getElementById('r-net').textContent=fmt(r.net);
   document.getElementById('r-hazard').textContent=fmt(r.hazard);
+  // Employer costs (optional)
+  var s=getSettings();
+  var empSec=document.getElementById('r-employer-section');
+  if(empSec){
+    empSec.style.display=s.showEmployerCosts?'':'none';
+    if(s.showEmployerCosts){
+      var DB=0.0455,DZ=0.0036,MV=0.0153,UV=0.012;
+      var base=r.gross; // employer costs on taxable gross
+      document.getElementById('r-db').textContent=fmt(base*DB);
+      document.getElementById('r-dz').textContent=fmt(base*DZ);
+      document.getElementById('r-mv').textContent=fmt(base*MV);
+      document.getElementById('r-uv').textContent=fmt(base*UV);
+      document.getElementById('r-total-cost').textContent=fmt(base*(1+DB+DZ+MV+UV));
+    }
+  }
   document.getElementById('r-nighth').textContent=r.nightH.toFixed(2)+' h (prev month)';
   document.getElementById('r-middled').textContent=r.middleDays+' days (prev month)';
   document.getElementById('r-lated').textContent=r.lateDays+' days (prev month)';
@@ -1629,6 +1740,7 @@ function openModal(k){
   document.getElementById('pat-weekday').textContent=dow;
   document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('modal').classList.add('open');
+  updateDuration();
 }
 function closeModal(){document.getElementById('modal').classList.remove('open');editingDate=null;}
 function applyPreset(type,start,end,btn){
@@ -1637,6 +1749,7 @@ function applyPreset(type,start,end,btn){
   document.getElementById('m-end').value=end;
   document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
+  updateDuration();
 }
 function saveShift(){
   if(!editingDate)return;
@@ -1691,8 +1804,19 @@ function showTab(name,btn){
 }
 
 // ═══ PERSIST ═══
-function saveData(){try{localStorage.setItem('med_shifts2',JSON.stringify(shifts));localStorage.setItem('med_actuals2',JSON.stringify(actuals));}catch(e){}}
-function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value}));}catch(e){}}
+function saveData(){
+  try{
+    localStorage.setItem('med_shifts2',JSON.stringify(shifts));
+    localStorage.setItem('med_actuals2',JSON.stringify(actuals));
+    markDirty(true);
+  }catch(e){}
+}
+function markDirty(isDirty){
+  try{localStorage.setItem('med_sync_dirty',isDirty?'1':'0');}catch(e){}
+  var dot=document.getElementById('dirty-dot');
+  if(dot) dot.className='sync-dirty-dot'+(isDirty?' show':'');
+}
+function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value,showEmployerCosts:document.getElementById('show-employer-costs').checked}));}catch(e){}}
 function loadData(){
   try{
     var s=localStorage.getItem('med_shifts2'),a=localStorage.getItem('med_actuals2'),cfg=localStorage.getItem('med_settings2');
@@ -1714,6 +1838,7 @@ function loadData(){
       if(c.szMonth1!=null)document.getElementById('sz-month1').value=c.szMonth1;
       if(c.szMonth2!=null)document.getElementById('sz-month2').value=c.szMonth2;
       if(c.urlaubDays)document.getElementById('urlaub-days').value=c.urlaubDays;
+      if(c.showEmployerCosts)document.getElementById('show-employer-costs').checked=c.showEmployerCosts;
     }
     var pat=sessionStorage.getItem('med_sync_pat');
     if(pat)document.getElementById('sync-pat').value=pat;
@@ -1723,6 +1848,7 @@ function loadData(){
       if(scj.branch)document.getElementById('sync-branch').value=scj.branch;
     }
     renderLastSynced();
+    markDirty(localStorage.getItem('med_sync_dirty')==='1');
     if(localStorage.getItem('med_dark2')==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
   }catch(e){}
 }
@@ -1879,6 +2005,7 @@ async function syncToRepo(){
     if(!resp.ok){var err=await resp.json();throw new Error(err.message||resp.status);}
     setSyncStatus('✓ Pushed — commit: '+commitMsg,false);
     try{localStorage.setItem('med_sync_pushed',new Date().toLocaleString('de-AT')+' · '+commitMsg);}catch(e){}
+    markDirty(false);
     renderLastSynced();
   }catch(e){
     setSyncStatus('✗ Push failed: '+e.message,true);
@@ -1953,15 +2080,17 @@ function importJSON(input){
 document.addEventListener('keydown',function(e){
   // Enter in modal saves; Escape closes
   if(e.key==='Enter'&&document.getElementById('modal').classList.contains('open')){
-    // Only save if focus isn't on a button (let buttons handle their own Enter)
     if(document.activeElement&&document.activeElement.tagName==='BUTTON')return;
     e.preventDefault();saveShift();return;
   }
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
   if(e.key==='ArrowLeft')changeMonth(-1);
   if(e.key==='ArrowRight')changeMonth(1);
-  if(e.key==='Escape')closeModal();
+  if(e.key==='Escape'){closeModal();closeMonthJump();}
   if(e.key==='t'||e.key==='T')goToToday();
+  if(e.key==='r'||e.key==='R')showTab('report',null);
+  if(e.key==='s'||e.key==='S')showTab('settings',null);
+  if(e.key==='y'||e.key==='Y')showTab('year',null);
 });
 
 // ═══ PAYSLIP RECONCILER ═══
@@ -2143,7 +2272,7 @@ function renderForecast(){
     html+='<div class="fcard'+(i===0?' fc-cur':'')+'">'+
       '<div class="fm">'+MONTH_NAMES[m].substring(0,3)+' '+y+(isSZ?' 🎁':'')+'</div>'+
       '<div class="fv">'+fmt(totalNet)+'</div>'+
-      '<div class="fs">'+(i===0?'current':(hasShifts?'planned':'est. same'))+'</div>'+
+      '<div class="fs">'+(i===0?'current':(hasShifts?'planned':'base only'))+'</div>'+
     '</div>';
   }
   el.innerHTML=html;
@@ -2188,13 +2317,22 @@ function exportICal(){
     var endH=Math.floor(endM/60)%24,endMin=endM%60;
     var dtStart=y+mo+dy+'T'+pad(parseInt(sp[0]))+pad(parseInt(sp[1]))+'00';
     var dtEnd=y+mo+(endM>=1440?pad(parseInt(dy)+1):dy)+'T'+pad(endH)+pad(endMin)+'00';
+    var s2=getSettings();
+    var desc=sh.note||'';
+    if(sh.type==='ruf'){
+      var rufH2=(parseInt(ep[0])*60+parseInt(ep[1])-(parseInt(sp[0])*60+parseInt(sp[1])))/60;
+      if(rufH2<0)rufH2+=24;
+      var isWkndDay=(new Date(parseInt(y),parseInt(mo)-1,parseInt(dy)).getDay()===0||new Date(parseInt(y),parseInt(mo)-1,parseInt(dy)).getDay()===6);
+      var rufPay2=s2.rufRate*(isWkndDay?s2.rufWknd:1)*rufH2;
+      desc=(desc?desc+' · ':'')+rufH2.toFixed(1)+'h @ €'+s2.rufRate.toFixed(2)+'/h = '+fmt(rufPay2);
+    }
     var summary=(typeLabels[sh.type]||sh.type)+(sh.note?' — '+sh.note:'');
     lines.push('BEGIN:VEVENT');
     lines.push('UID:shift-'+k+'@medaustron-planner');
     lines.push('DTSTART;TZID=Europe/Vienna:'+dtStart);
     lines.push('DTEND;TZID=Europe/Vienna:'+dtEnd);
     lines.push('SUMMARY:'+summary);
-    if(sh.note)lines.push('DESCRIPTION:'+sh.note);
+    if(desc)lines.push('DESCRIPTION:'+desc);
     lines.push('END:VEVENT');
   });
   lines.push('END:VCALENDAR');
@@ -2336,6 +2474,81 @@ async function analysePayslipPhoto(input){
     resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Photo analysis failed: '+err.message+'</div>';
   }
   input.value='';
+}
+
+// ═══ MONTH JUMP PICKER ═══
+var mjumpY=currentYear;
+function openMonthJump(evt){
+  mjumpY=currentYear;
+  renderMJump();
+  var popup=document.getElementById('mjump-popup');
+  var overlay=document.getElementById('mjump-overlay');
+  // Position below the month label
+  var rect=evt.target.getBoundingClientRect();
+  popup.style.top=(rect.bottom+8)+'px';
+  popup.style.left=Math.max(8,rect.left-80)+'px';
+  overlay.classList.add('open');
+}
+function closeMonthJump(){document.getElementById('mjump-overlay').classList.remove('open');}
+function mjumpYear(dir){mjumpY+=dir;renderMJump();}
+function renderMJump(){
+  var today=new Date();
+  document.getElementById('mjump-year-lbl').textContent=mjumpY;
+  var grid=document.getElementById('mjump-grid');
+  grid.innerHTML=MONTH_NAMES.map(function(name,m){
+    var isCur=(mjumpY===currentYear&&m===currentMonth);
+    var isToday=(mjumpY===today.getFullYear()&&m===today.getMonth());
+    var cls='mjump-btn'+(isCur?' mjump-cur':isToday?' mjump-today':'');
+    return '<button class="'+cls+'" onclick="jumpToMonth('+m+','+mjumpY+')">'+name.substring(0,3)+'</button>';
+  }).join('');
+}
+function jumpToMonth(m,y){
+  currentMonth=m;currentYear=y;
+  closeMonthJump();renderAll();
+}
+
+// ═══ SHIFT DURATION PREVIEW ═══
+function updateDuration(){
+  var pill=document.getElementById('m-duration');
+  if(!pill)return;
+  var type=document.getElementById('m-type').value;
+  var start=document.getElementById('m-start').value;
+  var end=document.getElementById('m-end').value;
+  if(!start||!end){pill.className='duration-pill';return;}
+  var s=getSettings();
+  var h=calcHours(start,end,s.thresh);
+  if(h.total<=0){pill.className='duration-pill';return;}
+  var r=calcSalary(currentYear,currentMonth);
+  var hourly=r.base/173.33;
+  var parts=[];
+  parts.push(h.total.toFixed(1)+'h total');
+  if(h.night>0&&(type==='normal'||type==='latenight'))
+    parts.push(h.night.toFixed(1)+'h night pay → '+fmt(hourly*0.08*h.night)+' next month');
+  if(type==='middle')   parts.push('+'+fmt(s.middleS)+' supplement (paid next month)');
+  if(type==='late')     parts.push('+'+fmt(s.lateS)+' supplement (paid next month)');
+  if(type==='ruf')      parts.push(fmt(s.rufRate*h.total)+' standby pay');
+  if(type==='callin')   parts.push(fmt(hourly*s.callinM*h.total)+' call-in pay');
+  if(type==='holiday')  parts.push(fmt(hourly*2*h.total)+' extra (paid next month)');
+  if(type==='leave')    parts.push('8h paid (standard day)');
+  pill.className='duration-pill show';
+  pill.textContent=parts.join(' · ');
+}
+
+// ═══ PWA SERVICE WORKER ═══
+if('serviceWorker' in navigator){
+  // Inline service worker: caches the page for offline use
+  var swCode=[
+    'var CACHE="shiftplanner-v1";',
+    'self.addEventListener("install",function(e){',
+    '  e.waitUntil(caches.open(CACHE).then(function(c){return c.add(location.pathname);}));',
+    '});',
+    'self.addEventListener("fetch",function(e){',
+    '  e.respondWith(caches.match(e.request).then(function(r){return r||fetch(e.request);}));',
+    '});'
+  ].join('\n');
+  var swBlob=new Blob([swCode],{type:'application/javascript'});
+  var swUrl=URL.createObjectURL(swBlob);
+  navigator.serviceWorker.register(swUrl).catch(function(){});
 }
 
 // ═══ BOOT ═══
