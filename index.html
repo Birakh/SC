@@ -514,11 +514,11 @@ body.dark .av-field .ak{color:#999}
     <div class="panel-section">
       <div class="panel-label">Gross breakdown</div>
       <div class="rrow"><span class="rl">Base salary</span><span class="rv" id="r-base">—</span></div>
-      <div class="rrow"><span class="rl">Night allowance 8% (early shifts)</span><span class="rv" id="r-shift">—</span></div>
-      <div class="rrow"><span class="rl">Middle shift supplement (×days × €35.50)</span><span class="rv" id="r-middle">—</span></div>
-      <div class="rrow"><span class="rl">Late shift supplement (×days × €50)</span><span class="rv" id="r-late">—</span></div>
-      <div class="rrow"><span class="rl">Late+Night 8% supplement (no €50, 14–22:30)</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
-      <div class="rrow"><span class="rl">Public holiday pay (base rate + 200% extra, prev month)</span><span class="rv" id="r-hol">—</span></div>
+      <div class="rrow"><span class="rl">Night allowance 8% (this month's shifts)</span><span class="rv" id="r-shift">—</span></div>
+      <div class="rrow"><span class="rl">Middle shift supplement (×days, prev month)</span><span class="rv" id="r-middle">—</span></div>
+      <div class="rrow"><span class="rl">Late shift supplement (×days, prev month)</span><span class="rv" id="r-late">—</span></div>
+      <div class="rrow"><span class="rl">Late+Night 8% supplement (this month)</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
+      <div class="rrow"><span class="rl">Public holiday extra (200%, prev month)</span><span class="rv" id="r-hol">—</span></div>
       <div class="rrow"><span class="rl">Annual leave (Urlaub)</span><span class="rv" id="r-leave">—</span></div>
       <div class="rrow"><span class="rl">Rufbereitschaft standby</span><span class="rv" id="r-ruf">—</span></div>
       <div class="rrow"><span class="rl">Rufeinsatz call-in</span><span class="rv" id="r-callin">—</span></div>
@@ -531,6 +531,12 @@ body.dark .av-field .ak{color:#999}
       <div class="rrow"><span class="rl">KV Krankenversicherung (3.87%)</span><span class="rv neg" id="r-kv">—</span></div>
       <div class="rrow" id="r-cap-row" style="display:none"><span class="rl" style="color:#27ae60">✓ SV cap reached (€6,930/mo max)</span><span class="rv pos" id="r-cap-save">—</span></div>
       <div class="rrow" id="r-sv-remaining-row"><span class="rl">SV-pflichtiger Restbetrag bis Deckelung</span><span class="rv" id="r-sv-remaining">—</span></div>
+      <div style="margin:-2px 0 6px" id="r-sv-bar-wrap" style="display:none">
+        <div style="background:#dce8f5;border-radius:3px;height:5px;overflow:hidden">
+          <div id="r-sv-bar" style="height:100%;border-radius:3px;background:#185fa5;transition:width .4s;width:0%"></div>
+        </div>
+        <div id="r-sv-bar-note" style="font-size:9px;color:#aaa;margin-top:2px"></div>
+      </div>
       <div class="rrow"><span class="rl">PV Pensionsversicherung (10.25%)</span><span class="rv neg" id="r-pv">—</span></div>
       <div class="rrow"><span class="rl">AV Arbeitslosenversicherung (2.95%)</span><span class="rv neg" id="r-av">—</span></div>
       <div class="rrow"><span class="rl">AK-Umlage (0.5%)</span><span class="rv neg" id="r-ak">—</span></div>
@@ -1117,32 +1123,45 @@ function calcHours(s,e,thresh){
   return {total:total,night:Math.max(0,nightMins)/60};
 }
 
-// Returns supplements EARNED in a given month (paid in the following month)
+// Returns fixed supplements EARNED this month, paid next month (middle/late/holiday extra).
+// Night 8% is paid in the SAME month it is earned (not deferred).
 function calcEarnedSupplements(year,month){
   var s=getSettings();
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
-  var nightH=0,holH=0,lateNightH=0;
+  var holH=0;
   var middleDays=0,lateDays=0;
   var pfx=monthKey(year,month);
   Object.keys(shifts).forEach(function(k){
     if(k.substring(0,7)!==pfx) return;
     var sh=shifts[k];
-    var h=calcHours(sh.start,sh.end,s.thresh);
-    if(sh.type==='holiday')     holH+=h.total;
+    if(sh.type==='holiday')     { var h=calcHours(sh.start,sh.end,s.thresh); holH+=h.total; }
     else if(sh.type==='middle') middleDays++;
     else if(sh.type==='late')   lateDays++;
-    else if(sh.type==='latenight'){ lateNightH+=h.night; } // 8% night hours only — no €50 late supplement
-    else if(sh.type==='normal'||sh.type==='callin') nightH+=h.night;
   });
   return {
-    shiftA:     hourly*0.08*nightH,
-    lateNightA: hourly*0.08*lateNightH,
-    middleP:    s.middleS*middleDays,
-    lateP:      s.lateS*lateDays,
-    holExtra:   hourly*2*holH,   // the 200% extra only (base pay handled separately)
-    middleDays, lateDays, nightH, holH
+    middleP:  s.middleS*middleDays,
+    lateP:    s.lateS*lateDays,
+    holExtra: hourly*2*holH,
+    middleDays, lateDays, holH
   };
+}
+
+// Compute night hours (8%) for a given month — paid SAME month
+function calcNightAllowance(year,month){
+  var s=getSettings();
+  var base=getBaseForMonth(year,month);
+  var hourly=base/173.33;
+  var nightH=0,lateNightH=0;
+  var pfx=monthKey(year,month);
+  Object.keys(shifts).forEach(function(k){
+    if(k.substring(0,7)!==pfx) return;
+    var sh=shifts[k];
+    var h=calcHours(sh.start,sh.end,s.thresh);
+    if(sh.type==='latenight') lateNightH+=h.night;
+    else if(sh.type==='normal'||sh.type==='callin') nightH+=h.night;
+  });
+  return {shiftA:hourly*0.08*nightH, lateNightA:hourly*0.08*lateNightH, nightH, lateNightH};
 }
 
 function calcSalary(year,month){
@@ -1158,25 +1177,25 @@ function calcSalary(year,month){
     var h=calcHours(sh.start,sh.end,s.thresh);
     var special=isHol(k)||isWknd(year,month,d);
     if(sh.type==='holiday')     holH+=h.total;
-    else if(sh.type==='leave')  leaveH+=8; // Urlaub is always paid as 8h standard day (AZG §2)
+    else if(sh.type==='leave')  leaveH+=8; // Urlaub always paid as 8h standard day (AZG §2)
     else if(sh.type==='ruf')  { if(special) rufWH+=h.total; else rufH+=h.total; }
     else if(sh.type==='callin') callinH+=h.total;
   });
 
-  // Supplements paid this month = earned last month
+  // Night 8% paid THIS month; fixed supplements (middle/late/holiday extra) paid next month
+  var night    = calcNightAllowance(year,month);  // same month
   var prevM=month-1, prevY=year;
   if(prevM<0){prevM=11;prevY--;}
-  var prevSuppl=calcEarnedSupplements(prevY,prevM);
+  var prevSuppl= calcEarnedSupplements(prevY,prevM); // prev month's deferred supplements
 
-  // Current month base holiday hours get base rate (not the extra)
-  var holBasePay = hourly*holH;   // just base rate for hours on holiday (worked)
+  var holBasePay = hourly*holH;
   var leavePay   = hourly*leaveH;
   var rufPay     = s.rufRate*rufH + s.rufRate*s.rufWknd*rufWH;
   var callinP    = hourly*s.callinM*callinH;
 
-  // Taxable = base + prev month supplements + current base pays
+  // Taxable: base + current night 8% + prev month fixed supplements + current base pays
   var taxable = base
-    + prevSuppl.shiftA + prevSuppl.lateNightA
+    + night.shiftA + night.lateNightA
     + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
     + holBasePay + leavePay + callinP;
   var br  = taxable*0.003;
@@ -1185,24 +1204,24 @@ function calcSalary(year,month){
   var gross = taxable+rufPay+s.hazard-br;
   var net   = gross-svM.total-lst;
 
-  var earned = calcEarnedSupplements(year,month);
+  var earned = calcEarnedSupplements(year,month); // this month's deferred (for display)
 
   return {
-    base:base,
-    // Received (from last month):
-    shiftA:prevSuppl.shiftA, lateNightA:prevSuppl.lateNightA,
+    base,
+    // Current month night 8% (paid now):
+    shiftA:night.shiftA, lateNightA:night.lateNightA,
+    // Prev month fixed supplements (received this month):
     middleP:prevSuppl.middleP, lateP:prevSuppl.lateP,
     holExtra:prevSuppl.holExtra,
     // Current month base pays:
     holBasePay, leavePay, rufPay, callinP,
     taxable,br,gross,svM,lst,net,hazard:s.hazard,
     // Hours for display:
-    nightH:prevSuppl.nightH, holH, leaveH,
+    nightH:night.nightH, lateNightH:night.lateNightH, holH, leaveH,
     rufH:rufH+rufWH, rufH_raw:rufH, rufWH:rufWH, callinH,
     middleDays:prevSuppl.middleDays, lateDays:prevSuppl.lateDays,
     oncallDays:Math.round(rufH+rufWH),
-    // Earned this month (paid next month):
-    earnedShiftA:earned.shiftA, earnedLateNightA:earned.lateNightA,
+    // Earned this month — deferred to next month (middle/late/hol extra only):
     earnedMiddleP:earned.middleP, earnedLateP:earned.lateP,
     earnedHolExtra:earned.holExtra,
     earnedMiddleDays:earned.middleDays, earnedLateDays:earned.lateDays,
@@ -1232,11 +1251,11 @@ function renderReport(){
   document.getElementById('r-annual-est').textContent=fmt(r.gross*12);
   document.getElementById('r-hourly-sz').textContent='€ '+trueHourly.toFixed(2)+'/h';
   document.getElementById('r-base').textContent=fmt(r.base);
-  document.getElementById('r-shift').textContent=fmt(r.shiftA)+(r.shiftA>0?' ← prev month':'');
+  document.getElementById('r-shift').textContent=fmt(r.shiftA)+(r.shiftA>0?' ('+r.nightH.toFixed(1)+'h)':'');
   document.getElementById('r-middle').textContent=fmt(r.middleP)+' ('+r.middleDays+'d prev month)';
   document.getElementById('r-late').textContent=fmt(r.lateP)+' ('+r.lateDays+'d prev month)';
-  document.getElementById('r-latenightA').textContent=r.lateNightA>0?fmt(r.lateNightA)+' ← prev month':'€ 0,00';
-  document.getElementById('r-hol').textContent=fmt(r.holBasePay+r.holExtra)+(r.holExtra>0?' (base+200% extra)':'');
+  document.getElementById('r-latenightA').textContent=r.lateNightA>0?fmt(r.lateNightA)+' ('+r.lateNightH.toFixed(1)+'h)':'€ 0,00';
+  document.getElementById('r-hol').textContent=fmt(r.holBasePay+r.holExtra)+(r.holExtra>0?' (base+200% extra, prev month)':'');
   document.getElementById('r-leave').textContent=fmt(r.leavePay);
   document.getElementById('r-ruf').textContent=fmt(r.rufPay);
   document.getElementById('r-callin').textContent=fmt(r.callinP);
@@ -1249,16 +1268,24 @@ function renderReport(){
       document.getElementById('r-cap-save').textContent='saving '+fmt((r.taxable-SV_CAP_MONTHLY)*SV_TOTAL);
     }
   }
-  // SV remaining to cap
+  // SV remaining to monthly cap + progress bar
   var svRemRow=document.getElementById('r-sv-remaining-row');
   var svRemEl=document.getElementById('r-sv-remaining');
-  if(svRemEl){
-    var remaining=SV_CAP_MONTHLY-r.taxable;
+  var svBar=document.getElementById('r-sv-bar');
+  var svBarWrap=document.getElementById('r-sv-bar-wrap');
+  var svBarNote=document.getElementById('r-sv-bar-note');
+  if(svRemEl&&svBar){
+    var svPct=Math.min(100,(r.taxable/SV_CAP_MONTHLY*100));
+    svBar.style.width=svPct.toFixed(1)+'%';
+    svBar.style.background=r.svM.capped?'#27ae60':'#185fa5';
+    if(svBarNote) svBarNote.textContent=svPct.toFixed(1)+'% of monthly SV ceiling (€'+SV_CAP_MONTHLY.toLocaleString('de-AT')+')';
     if(r.svM.capped){
       if(svRemRow) svRemRow.style.display='none';
+      if(svBarWrap) svBarWrap.style.display='';
     } else {
       if(svRemRow) svRemRow.style.display='';
-      svRemEl.textContent=remaining>0?fmt(remaining)+' more gross until cap':'Cap reached';
+      if(svBarWrap) svBarWrap.style.display='';
+      svRemEl.textContent=fmt(SV_CAP_MONTHLY-r.taxable)+' more until cap';
     }
   }
   document.getElementById('r-kv').textContent='− '+fmt(r.svM.kv);
@@ -1283,7 +1310,7 @@ function renderReport(){
       document.getElementById('r-total-cost').textContent=fmt(base*(1+DB+DZ+MV+UV));
     }
   }
-  document.getElementById('r-nighth').textContent=r.nightH.toFixed(2)+' h (prev month)';
+  document.getElementById('r-nighth').textContent=r.nightH.toFixed(2)+' h'+(r.lateNightH>0?' + '+r.lateNightH.toFixed(2)+'h late+night':'');
   document.getElementById('r-middled').textContent=r.middleDays+' days (prev month)';
   document.getElementById('r-lated').textContent=r.lateDays+' days (prev month)';
   document.getElementById('r-rufh').textContent=
@@ -1304,17 +1331,15 @@ function renderReport(){
   renderTaxBreakdown(r);
   var enEl=document.getElementById('r-earned-next');
   if(enEl){
-    var total=r.earnedShiftA+r.earnedMiddleP+r.earnedLateP+r.earnedLateNightA+r.earnedHolExtra;
     var parts=[];
-    if(r.earnedShiftA>0.01)    parts.push('Night 8%: '+fmt(r.earnedShiftA));
     if(r.earnedMiddleP>0.01)   parts.push('Middle ('+r.earnedMiddleDays+'d): '+fmt(r.earnedMiddleP));
     if(r.earnedLateP>0.01)     parts.push('Late ('+r.earnedLateDays+'d): '+fmt(r.earnedLateP));
-    if(r.earnedLateNightA>0.01)parts.push('Late+8%: '+fmt(r.earnedLateNightA));
     if(r.earnedHolExtra>0.01)  parts.push('Holiday extra: '+fmt(r.earnedHolExtra));
+    var total=r.earnedMiddleP+r.earnedLateP+r.earnedHolExtra;
     enEl.innerHTML=parts.length?
       '<div style="font-size:11px;color:#555">'+parts.join(' &nbsp;·&nbsp; ')+'</div>'+
       '<div style="font-size:12px;font-weight:500;margin-top:3px;color:#3c3489">Total → next month: '+fmt(total)+'</div>':
-      '<span style="color:#bbb;font-size:11px">No supplements earned this month yet</span>';
+      '<span style="color:#bbb;font-size:11px">No deferred supplements this month</span>';
   }
   var mk=monthKey(currentYear,currentMonth);
   document.getElementById('actual-net').value=actuals[mk]||'';
