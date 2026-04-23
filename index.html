@@ -477,6 +477,7 @@ body.dark .av-field .ak{color:#999}
     <span style="font-size:10px;color:#aaa;margin-left:2px">OT: <span style="color:#ef9f27">●</span>&gt;48h <span style="color:#e24b4a">●</span>&gt;60h</span>
   </div>
   <div class="week-bar" id="week-bar"></div>
+  <div id="past-month-banner" style="display:none;font-size:10px;color:#854f0b;background:#fff8e8;border:.5px solid #fac775;border-radius:6px;padding:4px 10px;margin-bottom:6px">📅 Viewing past month — figures are historical estimates</div>
   <div class="cal-dow-row">
     <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
     <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div>
@@ -740,6 +741,8 @@ body.dark .av-field .ak{color:#999}
         <input type="checkbox" id="show-employer-costs" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
         <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer">Show employer-side costs in Report (DB+DZ+MV+UV)</label>
       </div>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Betriebsratsumlage — Works council deduction (%)</label>
+        <input type="number" id="br-rate" value="0.3" step="0.05" min="0" max="2" onchange="saveSettings();renderAll()"></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -796,7 +799,10 @@ body.dark .av-field .ak{color:#999}
           <option value="2.0">+100% overtime</option>
           <option value="1.0">Normal rate</option>
         </select></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Weekend/holiday standby multiplier</label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <input type="checkbox" id="ruf-sv-base" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
+        <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer">Include Ruf pay in SV base (confirm with HR — §49 ASVG)</label>
+      </div>
         <select id="ruf-wknd" onchange="saveSettings();renderAll()">
           <option value="1">× 1 same</option>
           <option value="2">× 2 double</option>
@@ -915,7 +921,7 @@ body.dark .av-field .ak{color:#999}
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Manual entry</div>
   <div class="mfield">
     <label>Type</label>
-    <select id="m-type" onchange="updateDuration()">
+    <select id="m-type" onchange="updateDuration();_markModalDirty()">
       <option value="normal">Normal shift (8% night hours)</option>
       <option value="middle">Middle shift — 11:30–20:00 (+€35.50 fixed)</option>
       <option value="late">Late shift — 14:00–22:30 (+€50 fixed)</option>
@@ -927,13 +933,13 @@ body.dark .av-field .ak{color:#999}
     </select>
   </div>
   <div class="time-grid">
-    <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration()"></div>
-    <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration()"></div>
+    <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration();_markModalDirty()"></div>
+    <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration();_markModalDirty()"></div>
   </div>
   <div class="duration-pill" id="m-duration"></div>
   <div class="mfield">
     <label>Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span></label>
-    <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px">
+    <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px" oninput="_markModalDirty()">
   </div>
   <div class="pattern-box">
     <p>Apply this shift pattern to:</p>
@@ -1025,6 +1031,7 @@ function removeGradeEntry(ym){
 
 function saveGradeHistory(){
   try{localStorage.setItem('med_grade_hist',JSON.stringify(gradeHistory));}catch(e){}
+  markDirty(true);
 }
 
 function checkSZConflict(){
@@ -1067,23 +1074,26 @@ function calcLohnsteuerAnnual(annualTaxableAfterSV){
 }
 
 var SV_CAP_MONTHLY=6930; // 2026 Höchstbeitragsgrundlage (annual cap €97,020)
+var SV_AV_THRESHOLD=2630; // AV = 0% below this monthly gross (§2 AlVG 2026)
 function calcSVMonthly(monthlyGross){
   var capped=Math.min(monthlyGross,SV_CAP_MONTHLY);
+  var av=monthlyGross>=SV_AV_THRESHOLD?capped*SV_AV:0; // AV only applies above threshold
+  var total=capped*SV_KV+capped*SV_PV+av+capped*SV_AK+capped*SV_WBF;
   return {
     kv:  capped*SV_KV,
     pv:  capped*SV_PV,
-    av:  capped*SV_AV,
+    av:  av,
     ak:  capped*SV_AK,
     wbf: capped*SV_WBF,
-    total: capped*SV_TOTAL,
+    total: total,
     capped: monthlyGross>SV_CAP_MONTHLY
   };
 }
 
 function calcMonthlyLSt(monthlyTaxableGross){
-  // Annualize → apply brackets → monthly
+  // Annualize → deduct actual SV (respects AV threshold) → apply brackets → monthly
   var annual=monthlyTaxableGross*12;
-  var annualSV=Math.min(monthlyTaxableGross,SV_CAP_MONTHLY)*SV_TOTAL*12;
+  var annualSV=calcSVMonthly(monthlyTaxableGross).total*12; // uses real SV incl. AV threshold
   var annualAfterSV=annual-annualSV;
   var annualLSt=calcLohnsteuerAnnual(annualAfterSV);
   return annualLSt/12;
@@ -1104,6 +1114,8 @@ function getSettings(){
     szMonth2:  parseInt(document.getElementById('sz-month2').value),
     urlaubDays:parseInt(document.getElementById('urlaub-days').value)||25,
     showEmployerCosts:document.getElementById('show-employer-costs').checked,
+    brRate:(parseFloat(document.getElementById('br-rate').value)||0.3)/100,
+    rufSVBase:document.getElementById('ruf-sv-base').checked,
   };
 }
 
@@ -1197,8 +1209,9 @@ function calcSalary(year,month){
   var taxable = base
     + night.shiftA + night.lateNightA
     + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
-    + holBasePay + leavePay + callinP;
-  var br  = taxable*0.003;
+    + holBasePay + leavePay + callinP
+    + (s.rufSVBase?rufPay:0); // Ruf in SV base only if enabled in Settings
+  var br  = taxable*s.brRate;
   var svM = calcSVMonthly(taxable);
   var lst = calcMonthlyLSt(taxable);
   var gross = taxable+rufPay+s.hazard-br;
@@ -1230,7 +1243,7 @@ function calcSalary(year,month){
 
 function calcSonderzahlung(base){
   // Austrian §67 taxation: up to €620 Freibetrag, remainder at fixed 6%; SV on full amount
-  var svAmount=Math.min(base,SV_CAP_MONTHLY)*SV_TOTAL;
+  var svAmount=calcSVMonthly(base).total; // respects AV threshold and cap
   var lst=Math.max(0,base-620)*0.06;
   return {gross:base, sv:svAmount, lst:lst, net:base-svAmount-lst};
 }
@@ -1239,7 +1252,10 @@ function renderReport(){
   var r=calcSalary(currentYear,currentMonth);
   var s=getSettings(); // single settings read for the whole function
   document.getElementById('net-out').textContent=fmt(r.net);
-  document.getElementById('net-month-lbl').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
+  // Net-box subtitle: month label + SZ reminder if applicable
+  var isSZMonth=(s.szMonth1>=0&&currentMonth===s.szMonth1)||(s.szMonth2>=0&&currentMonth===s.szMonth2);
+  var subLabel=MONTH_NAMES[currentMonth]+' '+currentYear+(isSZMonth?' · 🎁 Sonderzahlung month':'');
+  document.getElementById('net-month-lbl').textContent=subLabel;
   // Hourly strip — compute SZ net once, reuse for true hourly
   var baseHourly=r.base/173.33;
   var netHourly=r.net/173.33;
@@ -1265,7 +1281,10 @@ function renderReport(){
   if(capRow){
     capRow.style.display=r.svM.capped?'':'none';
     if(r.svM.capped&&document.getElementById('r-cap-save')){
-      document.getElementById('r-cap-save').textContent='saving '+fmt((r.taxable-SV_CAP_MONTHLY)*SV_TOTAL);
+      // Actual saving = SV on full taxable minus SV on capped amount
+      var svUncapped=calcSVMonthly(r.taxable).total;
+      var svCapped=calcSVMonthly(SV_CAP_MONTHLY).total;
+      document.getElementById('r-cap-save').textContent='saving '+fmt(svUncapped-svCapped);
     }
   }
   // SV remaining to monthly cap + progress bar
@@ -1486,7 +1505,9 @@ function renderTaxCalc(){
   var effRate=annualLSt/(annual>0?annual:1)*100;
   var totRate=(annualSV+annualLSt)/(annual>0?annual:1)*100;
   var marginal=BRACKETS.reduce(function(acc,b){
-    return monthlyGross*12*(1-SV_TOTAL)>b.from?b.rate:acc;
+    // Use actual annual after-SV income to find the bracket
+    var annualAfterSVForMarginal=monthlyGross*12-sv.total*12;
+    return annualAfterSVForMarginal>b.from?b.rate:acc;
   },0);
 
   // Summary cards
@@ -1500,7 +1521,7 @@ function renderTaxCalc(){
     return '<div class="tscard"><div class="tsl">'+c.l+'</div><div class="tsv">'+c.v+'</div><div class="tss">'+c.s+'</div></div>';
   }).join('');
 
-  var annualAfterSV=annual-Math.min(annual/12,SV_CAP_MONTHLY)*12*SV_TOTAL;
+  var annualAfterSV=annual-sv.total*12; // use actual SV (respects AV threshold + cap)
   // Bracket bar — use actual BRACKETS thresholds (0, 13539, 21992, 36458, 70365, 104859)
   var b0e=BRACKETS[1].from,b20e=BRACKETS[2].from,b30e=BRACKETS[3].from,b40e=BRACKETS[4].from,b48e=BRACKETS[5].from;
   var segments=[
@@ -1556,13 +1577,13 @@ function renderTaxCalc(){
   // Supplement impact
   var rows='';
   if(suppl>0){
-    rows+='<div class="rrow"><span class="rl">Supplements (€'+suppl.toFixed(2)+'/month)</span><span class="rv pos">+€'+(suppl-suppl*SV_TOTAL-calcMonthlyLSt(monthlyGross)+calcMonthlyLSt(monthlyGross-suppl)).toFixed(2)+' net impact</span></div>';
+    rows+='<div class="rrow"><span class="rl">Supplements (€'+suppl.toFixed(2)+'/month)</span><span class="rv pos">+€'+(suppl-(calcSVMonthly(monthlyGross+suppl).total-sv.total)-calcMonthlyLSt(monthlyGross+suppl)+lst).toFixed(2)+' net impact</span></div>';
   }
   if(oncallM>0){
-    rows+='<div class="rrow"><span class="rl">On-call pay (€'+oncallM.toFixed(2)+'/month)</span><span class="rv pos">+€'+(oncallM-oncallM*SV_TOTAL-calcMonthlyLSt(monthlyGross)+calcMonthlyLSt(monthlyGross-oncallM)).toFixed(2)+' net impact</span></div>';
+    rows+='<div class="rrow"><span class="rl">On-call pay (€'+oncallM.toFixed(2)+'/month)</span><span class="rv pos">+€'+(oncallM-(calcSVMonthly(monthlyGross+oncallM).total-sv.total)-calcMonthlyLSt(monthlyGross+oncallM)+lst).toFixed(2)+' net impact</span></div>';
   }
   if(holhM>0){
-    rows+='<div class="rrow"><span class="rl">Holiday hours '+holhM+' × €'+(hourly*2).toFixed(2)+'/h</span><span class="rv pos">+€'+(holPayM*(1-SV_TOTAL)*0.825).toFixed(2)+' net (approx)</span></div>';
+    rows+='<div class="rrow"><span class="rl">Holiday hours '+holhM+' × €'+(hourly*2).toFixed(2)+'/h</span><span class="rv pos">+€'+(holPayM-(calcSVMonthly(monthlyGross+holPayM).total-sv.total)-calcMonthlyLSt(monthlyGross+holPayM)+lst).toFixed(2)+' net (approx)</span></div>';
   }
   document.getElementById('tc-supplement-rows').innerHTML=rows||'<div style="font-size:11px;color:#aaa">Enter supplements above to see impact</div>';
 }
@@ -1570,11 +1591,15 @@ function renderTaxCalc(){
 // ═══ CALENDAR ═══
 function renderCalendar(){
   document.getElementById('month-label').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
+  // Past month banner
+  var today=new Date();
+  var isPast=(currentYear<today.getFullYear())||(currentYear===today.getFullYear()&&currentMonth<today.getMonth());
+  var banner=document.getElementById('past-month-banner');
+  if(banner) banner.style.display=isPast?'':'none';
   var grid=document.getElementById('cal-grid');
   grid.innerHTML='';
   var firstDow=(new Date(currentYear,currentMonth,1).getDay()+6)%7;
   var numDays=daysInMonth(currentYear,currentMonth);
-  var today=new Date();
   for(var i=0;i<firstDow;i++){var e=document.createElement('div');e.className='day-cell empty';grid.appendChild(e);}
   for(var d=1;d<=numDays;d++){
     var k=dateKey(currentYear,currentMonth,d);
@@ -1696,13 +1721,32 @@ function renderYear(){
 function saveActual(inp){
   var v=parseFloat(inp.value);
   if(!isNaN(v))actuals[inp.dataset.mk]=v;else delete actuals[inp.dataset.mk];
-  saveData();renderYear();
-  if(inp.dataset.mk===monthKey(currentYear,currentMonth))updateActualDiff();
+  saveData();
+  // Update only the diff cell in the year table — avoids re-running calcSalary×12
+  var mk=inp.dataset.mk;
+  var parts=mk.split('-');
+  var m=parseInt(parts[1])-1;
+  var r=calcSalary(parseInt(parts[0]),m);
+  var s=getSettings();
+  var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+  var szData=isSZ?calcSonderzahlung(r.base):null;
+  var estNet=r.net+(szData?szData.net:0);
+  var diff=!isNaN(v)?v-estNet:null;
+  var row=inp.closest('tr');
+  if(row){
+    var diffCell=row.cells[5];
+    if(diffCell){
+      diffCell.style.color=diff==null?'#ccc':diff>=0?'#27ae60':'#c0392b';
+      diffCell.style.fontWeight=diff!=null?'500':'';
+      diffCell.textContent=diff==null?'—':(diff>=0?'+':'')+diff.toFixed(0);
+    }
+  }
+  if(mk===monthKey(currentYear,currentMonth))updateActualDiff();
 }
 
 function navToMonth(m){currentMonth=m;renderAll();showTab('report',null);}
 function navToMonthYear(m,y){currentMonth=m;currentYear=y;renderAll();showTab('report',null);}
-function goToToday(){var t=new Date();currentMonth=t.getMonth();currentYear=t.getFullYear();renderAll();}
+function goToToday(){_saveLastPos();var t=new Date();currentMonth=t.getMonth();currentYear=t.getFullYear();renderAll();}
 
 // ═══ COMPARE ═══
 function populateCompareSelects(){
@@ -1740,7 +1784,9 @@ function renderCompare(){
 }
 
 // ═══ MODAL ═══
+var _modalDirty=false;
 function openModal(k){
+  _modalDirty=false;
   editingDate=k;
   var parts=k.split('-'),d=parseInt(parts[2]);
   var mName=MONTH_NAMES[parseInt(parts[1])-1];
@@ -1757,7 +1803,12 @@ function openModal(k){
   document.getElementById('modal').classList.add('open');
   updateDuration();
 }
-function closeModal(){document.getElementById('modal').classList.remove('open');editingDate=null;}
+function closeModal(force){
+  if(!force&&_modalDirty&&!confirm('Discard unsaved changes?'))return;
+  _modalDirty=false;
+  document.getElementById('modal').classList.remove('open');editingDate=null;
+}
+function _markModalDirty(){_modalDirty=true;}
 function applyPreset(type,start,end,btn){
   document.getElementById('m-type').value=type;
   document.getElementById('m-start').value=start;
@@ -1772,11 +1823,11 @@ function saveShift(){
   var obj={type:document.getElementById('m-type').value,start:document.getElementById('m-start').value,end:document.getElementById('m-end').value};
   if(note) obj.note=note;
   shifts[editingDate]=obj;
-  saveData();closeModal();renderAll();
+  saveData();closeModal(true);renderAll();
 }
 function deleteShift(){
   if(editingDate&&shifts[editingDate])delete shifts[editingDate];
-  saveData();closeModal();renderAll();
+  saveData();closeModal(true);renderAll();
 }
 
 // ═══ PATTERNS ═══
@@ -1801,10 +1852,20 @@ function applyPattern(mode){
 }
 
 // ═══ NAV ═══
+var lastYear=null,lastMonth=null;
+function _saveLastPos(){lastYear=currentYear;lastMonth=currentMonth;}
 function changeMonth(dir){
+  _saveLastPos();
   currentMonth+=dir;
   if(currentMonth>11){currentMonth=0;currentYear++;}
   if(currentMonth<0){currentMonth=11;currentYear--;}
+  renderAll();
+}
+function goBack(){
+  if(lastYear===null)return;
+  var ty=currentYear,tm=currentMonth;
+  currentYear=lastYear;currentMonth=lastMonth;
+  lastYear=ty;lastMonth=tm;
   renderAll();
 }
 function showTab(name,btn){
@@ -1821,17 +1882,28 @@ function showTab(name,btn){
 // ═══ PERSIST ═══
 function saveData(){
   try{
+    var payload=JSON.stringify(shifts)+JSON.stringify(actuals);
+    if(payload.length>4000000){
+      var warn=document.getElementById('storage-warn');
+      if(warn) warn.style.display='';
+    } else {
+      var warn=document.getElementById('storage-warn');
+      if(warn) warn.style.display='none';
+    }
     localStorage.setItem('med_shifts2',JSON.stringify(shifts));
     localStorage.setItem('med_actuals2',JSON.stringify(actuals));
     markDirty(true);
-  }catch(e){}
+  }catch(e){
+    var warn=document.getElementById('storage-warn');
+    if(warn){warn.style.display='';warn.textContent='⚠️ Storage full — export a backup immediately!';}
+  }
 }
 function markDirty(isDirty){
   try{localStorage.setItem('med_sync_dirty',isDirty?'1':'0');}catch(e){}
   var dot=document.getElementById('dirty-dot');
   if(dot) dot.className='sync-dirty-dot'+(isDirty?' show':'');
 }
-function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value,showEmployerCosts:document.getElementById('show-employer-costs').checked}));}catch(e){}}
+function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value,showEmployerCosts:document.getElementById('show-employer-costs').checked,brRate:document.getElementById('br-rate').value,rufSVBase:document.getElementById('ruf-sv-base').checked}));}catch(e){}}
 function loadData(){
   try{
     var s=localStorage.getItem('med_shifts2'),a=localStorage.getItem('med_actuals2'),cfg=localStorage.getItem('med_settings2');
@@ -1854,6 +1926,8 @@ function loadData(){
       if(c.szMonth2!=null)document.getElementById('sz-month2').value=c.szMonth2;
       if(c.urlaubDays)document.getElementById('urlaub-days').value=c.urlaubDays;
       if(c.showEmployerCosts)document.getElementById('show-employer-costs').checked=c.showEmployerCosts;
+      if(c.brRate!=null)document.getElementById('br-rate').value=c.brRate;
+      if(c.rufSVBase)document.getElementById('ruf-sv-base').checked=c.rufSVBase;
     }
     var pat=sessionStorage.getItem('med_sync_pat');
     if(pat)document.getElementById('sync-pat').value=pat;
@@ -2076,15 +2150,25 @@ function importJSON(input){
   reader.onload=function(e){
     try{
       var parsed=JSON.parse(e.target.result);
-      if(!parsed.shifts)throw new Error('No shifts found.');
-      if(!confirm('Replace ALL current data with the imported backup?'))return;
+      // Shape validation
+      if(!parsed.shifts||typeof parsed.shifts!=='object')
+        throw new Error('Invalid file — no shifts data found.');
+      var keys=Object.keys(parsed.shifts);
+      if(keys.length>0){
+        var sample=parsed.shifts[keys[0]];
+        if(!sample.type||!sample.start||!sample.end)
+          throw new Error('Shift data looks malformed (missing type/start/end).');
+      }
+      // Version warning
+      var ver=parsed.version||0;
+      if(ver<4&&!confirm('This backup is version '+ver+' (current is 4). Some fields may be missing. Import anyway?'))return;
+      if(!confirm('Replace ALL current data with the imported backup?\n\n'+keys.length+' shifts, '+Object.keys(parsed.actuals||{}).length+' actuals.'))return;
       shifts=parsed.shifts;actuals=parsed.actuals||{};otData=parsed.otData||{};
       gradeHistory=parsed.gradeHistory||[];
-      saveData();
-      saveGradeHistory();
+      saveData();saveGradeHistory();
       try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
       renderAll();renderGradeHistory();
-      alert('✓ Import successful!');
+      alert('✓ Import successful — '+keys.length+' shifts loaded.');
     }catch(err){alert('✗ Import failed: '+err.message);}
     input.value='';
   };
@@ -2106,6 +2190,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='r'||e.key==='R')showTab('report',null);
   if(e.key==='s'||e.key==='S')showTab('settings',null);
   if(e.key==='y'||e.key==='Y')showTab('year',null);
+  if(e.key==='g'||e.key==='G')goBack();
 });
 
 // ═══ PAYSLIP RECONCILER ═══
@@ -2190,24 +2275,23 @@ function copyPrevMonth(){
   var toCopy=Object.keys(shifts).filter(function(k){return k.substring(0,7)===pfxPrev;});
   if(!toCopy.length){alert('No shifts in '+MONTH_NAMES[prevM]+' '+prevY+' to copy.');return;}
   var daysThis=daysInMonth(currentYear,currentMonth);
-  var copied=0,skipped=0;
+  var copied=0,skippedDays=[];
   toCopy.forEach(function(k){
     var d=parseInt(k.split('-')[2]);
-    if(d>daysThis){skipped++;return;} // e.g. 31st when current month has 30
+    if(d>daysThis){skippedDays.push(d+'th (no such date)');return;}
     var newKey=pfxCur+'-'+pad(d);
-    if(shifts[newKey]){skipped++;return;} // don't overwrite existing
+    if(shifts[newKey]){skippedDays.push(d+'.');return;}
     shifts[newKey]=Object.assign({},shifts[k]);
     copied++;
   });
   saveData();renderAll();
   var msg='Copied '+copied+' shift'+(copied!==1?'s':'')+' from '+MONTH_NAMES[prevM]+' '+prevY+'.';
-  if(skipped) msg+=' Skipped '+skipped+' (day doesn\'t exist or already has a shift).';
-  // brief toast instead of blocking alert
+  if(skippedDays.length) msg+=' Skipped: '+skippedDays.join(', ');
   var toast=document.createElement('div');
   toast.textContent=msg;
-  toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;z-index:999;opacity:1;transition:opacity .5s';
+  toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;z-index:999;max-width:90vw;text-align:center';
   document.body.appendChild(toast);
-  setTimeout(function(){toast.style.opacity='0';setTimeout(function(){toast.remove();},500);},2500);
+  setTimeout(function(){toast.style.transition='opacity .5s';toast.style.opacity='0';setTimeout(function(){toast.remove();},500);},3500);
 }
 
 // ═══ MARGINAL RATE CALCULATOR ═══
@@ -2516,12 +2600,18 @@ function renderMJump(){
   }).join('');
 }
 function jumpToMonth(m,y){
+  _saveLastPos();
   currentMonth=m;currentYear=y;
   closeMonthJump();renderAll();
 }
 
 // ═══ SHIFT DURATION PREVIEW ═══
+var _durationTimer=null;
 function updateDuration(){
+  clearTimeout(_durationTimer);
+  _durationTimer=setTimeout(_doUpdateDuration,150);
+}
+function _doUpdateDuration(){
   var pill=document.getElementById('m-duration');
   if(!pill)return;
   var type=document.getElementById('m-type').value;
@@ -2567,5 +2657,8 @@ if('serviceWorker' in navigator){
 function renderAll(){renderCalendar();renderWeekBar();renderReport();}
 loadData();renderAll();
 </script>
+<!-- Storage warning banner -->
+<div id="storage-warn" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#c0392b;color:#fff;font-size:12px;padding:8px 16px;text-align:center;z-index:500">⚠️ Storage approaching limit (4MB) — export a JSON backup and consider clearing old years.</div>
+
 </body>
 </html>
