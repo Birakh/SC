@@ -1128,7 +1128,7 @@ function calcHours(s,e,thresh){
   var ns=thresh*60,nightMins=0;
   if(em>1440){
     nightMins+=Math.max(0,Math.min(1440,em)-Math.max(ns,sm));
-    nightMins+=Math.max(0,Math.min(300,em-1440));
+    nightMins+=Math.max(0,Math.min(360,em-1440)); // after midnight, cap at 06:00
   } else {
     nightMins=Math.max(0,em-Math.max(ns,sm));
   }
