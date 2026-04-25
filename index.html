@@ -479,6 +479,7 @@ body.dark .av-box .av-title{color:#c8943a}
 body.dark .av-field{border-bottom-color:#3a2e18}
 body.dark .av-field .ak{color:#999}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -892,6 +893,7 @@ body.dark .av-field .ak{color:#999}
       <div class="panel-label">💾 Local Backup</div>
       <div style="display:flex;gap:6px;margin-bottom:6px">
         <button class="mbtn" style="flex:1" onclick="exportJSON()">📤 Export JSON</button>
+        <button class="mbtn" style="flex:1" onclick="exportXLSX()">📊 Export Excel</button>
         <button class="mbtn" style="flex:1" onclick="document.getElementById('import-file').click()">📥 Import JSON</button>
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
@@ -1067,9 +1069,11 @@ function fmtN(n){return Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\
 
 // ═══ GRADE HISTORY ═══
 function getBaseForMonth(year,month){
-  // Find the most recent gradeHistory entry on or before this month
+  // Find the most recent gradeHistory entry on or before this month.
+  // Falls back to the current grade selector value (no hardcoded salary).
   var ym=year+'-'+pad(month+1);
-  var base=parseFloat(document.getElementById('grade').value)||4376.33;
+  var gradeEl=document.getElementById('grade');
+  var base=gradeEl?parseFloat(gradeEl.value)||0:0;
   for(var i=gradeHistory.length-1;i>=0;i--){
     if(gradeHistory[i].ym<=ym){base=gradeHistory[i].base;break;}
   }
@@ -2423,25 +2427,27 @@ function renderMarginal(){
   if(!el) return;
   var type=document.getElementById('marginal-type').value;
   var s=getSettings();
-  var r=calcSalary(currentYear,currentMonth);
-  var hourly=r.base/173.33;
-  // What extra gross does one more shift of this type add?
+  // Compute taxable base directly — avoids full calcSalary shift-scan
+  var base=getBaseForMonth(currentYear,currentMonth);
+  var hourly=base/173.33;
+  // Previous month deferred supplements
+  var prevM=currentMonth-1<0?11:currentMonth-1;
+  var prevY=currentMonth-1<0?currentYear-1:currentYear;
+  var prevS=calcEarnedSupplements(prevY,prevM);
+  // Current month night allowance
+  var nightA=calcNightAllowance(currentYear,currentMonth);
+  var taxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+prevS.holExtra;
+
   var extraGross=0, extraLabel='';
   if(type==='normal_night'){
-    // 8h shift, threshold 20:00 → 2h night
-    var nightH=2;
-    extraGross=hourly*0.08*nightH;
+    var nightH=2; extraGross=hourly*0.08*nightH;
     extraLabel='8h early shift · '+nightH+'h after 20:00';
   } else if(type==='middle'){
-    extraGross=s.middleS;
-    extraLabel='middle supplement €'+s.middleS.toFixed(2);
+    extraGross=s.middleS; extraLabel='middle supplement €'+s.middleS.toFixed(2);
   } else if(type==='late'){
-    extraGross=s.lateS;
-    extraLabel='late supplement €'+s.lateS.toFixed(2);
+    extraGross=s.lateS; extraLabel='late supplement €'+s.lateS.toFixed(2);
   } else if(type==='latenight'){
-    // 14–22:30 → 2.5h after 20:00
-    var nightH2=2.5;
-    extraGross=hourly*0.08*nightH2;
+    var nightH2=2.5; extraGross=hourly*0.08*nightH2;
     extraLabel='8h late+night · '+nightH2+'h after 20:00';
   } else if(type==='ruf_weekday'){
     extraGross=s.rufRate*4.5;
@@ -2450,21 +2456,15 @@ function renderMarginal(){
     extraGross=s.rufRate*s.rufWknd*4.5;
     extraLabel='4.5h wknd standby @ €'+(s.rufRate*s.rufWknd).toFixed(2)+'/h (×'+s.rufWknd+')';
   } else if(type==='callin'){
-    extraGross=hourly*s.callinM*1;
-    extraLabel='1h call-in @ '+s.callinM+'× hourly';
+    extraGross=hourly*s.callinM; extraLabel='1h call-in @ '+s.callinM+'× hourly';
   } else if(type==='holiday'){
-    // holiday: base rate + 200% extra for 8h
-    extraGross=hourly*2*8;
-    extraLabel='8h holiday · base + 200% extra';
+    extraGross=hourly*2*8; extraLabel='8h holiday · base + 200% extra';
   }
-  // Marginal tax: difference in LSt between (taxable + extra) and taxable
-  // Ruf/standby pay is added outside taxable base — approximate with marginal on taxable
   var isRuf=(type==='ruf_weekday'||type==='ruf_wknd');
-  var lstBase=calcMonthlyLSt(r.taxable);
-  var lstWith=calcMonthlyLSt(r.taxable+(isRuf?0:extraGross));
-  var svBase=calcSVMonthly(r.taxable).total;
-  var svWith=calcSVMonthly(r.taxable+(isRuf?0:extraGross)).total;
-  var marginalTax=(lstWith-lstBase)+(svWith-svBase);
+  var taxableWith=taxable+(isRuf?0:extraGross);
+  var marginalSV=calcSVMonthly(taxableWith).total-calcSVMonthly(taxable).total;
+  var marginalLSt=calcMonthlyLSt(taxableWith)-calcMonthlyLSt(taxable);
+  var marginalTax=marginalSV+marginalLSt;
   var netGain=extraGross-marginalTax;
   var effectiveRate=extraGross>0?(marginalTax/extraGross*100):0;
   el.innerHTML=
@@ -2869,6 +2869,112 @@ function getForecastAccuracy(y,m){
   var szNet=isSZ?calcSonderzahlung(r.base).net:0;
   var est=r.net+szNet;
   return {diff:act-est,pct:est>0?((act-est)/est*100):0};
+}
+
+// ═══ EXCEL EXPORT ═══
+function exportXLSX(){
+  if(typeof XLSX==='undefined'){alert('Excel library not loaded — check your internet connection.');return;}
+  var s=getSettings();
+  var wb=XLSX.utils.book_new();
+
+  // ── Sheet 1: Monthly summary ──────────────────────────────────────────────
+  var MONTH_NAMES_DE=['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  var summaryRows=[['Monat','Brutto','Nacht 8%','Zulagen prev.','SV gesamt','LSt','Netto est.','SZ Netto','Netto inkl. SZ','Actual','Differenz','Nacht-h','Ruf-h','Urlaub-d','OT-h','Abrechnung']];
+  var ytdNet=0;
+  for(var m=0;m<12;m++){
+    var r=calcSalary(currentYear,m);
+    var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+    var szData=isSZ?calcSonderzahlung(r.base):null;
+    var szNet=szData?szData.net:0;
+    var estNet=r.net+szNet;
+    ytdNet+=estNet;
+    var mk=monthKey(currentYear,m);
+    var act=actuals[mk]!=null?actuals[mk]:'';
+    var diff=act!==''?act-estNet:'';
+    var ot=getOTAccrued(currentYear,m);
+    summaryRows.push([
+      MONTH_NAMES_DE[m],
+      +r.gross.toFixed(2),
+      +(r.shiftA+r.lateNightA).toFixed(2),
+      +(r.middleP+r.lateP+r.holExtra).toFixed(2),
+      +r.svM.total.toFixed(2),
+      +r.lst.toFixed(2),
+      +r.net.toFixed(2),
+      szNet>0?+szNet.toFixed(2):'',
+      +estNet.toFixed(2),
+      act!==''?+parseFloat(act).toFixed(2):'',
+      diff!==''?+diff.toFixed(2):'',
+      +r.nightH.toFixed(2),
+      +r.rufH.toFixed(2),
+      r.leaveH>0?Math.round(r.leaveH/8):'',
+      ot>0?+ot.toFixed(1):'',
+      isSZ?'SZ':'',
+    ]);
+  }
+  // Totals row
+  summaryRows.push(['GESAMT',
+    {f:'SUM(B2:B13)'},{f:'SUM(C2:C13)'},{f:'SUM(D2:D13)'},
+    {f:'SUM(E2:E13)'},{f:'SUM(F2:F13)'},{f:'SUM(G2:G13)'},
+    '','',{f:'IFERROR(SUM(J2:J13),"")'},'','',
+    {f:'SUM(M2:M13)'},{f:'SUM(N2:N13)'},{f:'SUM(O2:O13)'},'']);
+  var wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
+  // Column widths
+  wsSummary['!cols']=[{wch:12},{wch:10},{wch:10},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:12},{wch:10},{wch:10},{wch:9},{wch:9},{wch:9},{wch:9},{wch:12}];
+  XLSX.utils.book_append_sheet(wb,wsSummary,'Monatsübersicht '+currentYear);
+
+  // ── Sheet 2: Shifts detail ────────────────────────────────────────────────
+  var shiftRows=[['Datum','Wochentag','Typ','Start','Ende','Stunden','Nacht-h','Notiz']];
+  var DOW_DE=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  var typeDE={normal:'Frühdienst',middle:'Mitteldienst',late:'Spätdienst',latenight:'Spät+Nacht',holiday:'Feiertag',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
+  Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);})
+    .sort().forEach(function(k){
+      var sh=shifts[k];
+      var h=calcHours(sh.start,sh.end,s.thresh);
+      var dow=DOW_DE[new Date(k+'T12:00:00').getDay()];
+      shiftRows.push([k,dow,typeDE[sh.type]||sh.type,sh.start,sh.end,+h.total.toFixed(2),+h.night.toFixed(2),sh.note||'']);
+    });
+  var wsShifts=XLSX.utils.aoa_to_sheet(shiftRows);
+  wsShifts['!cols']=[{wch:12},{wch:10},{wch:16},{wch:8},{wch:8},{wch:9},{wch:9},{wch:30}];
+  XLSX.utils.book_append_sheet(wb,wsShifts,'Dienste '+currentYear);
+
+  // ── Sheet 3: Tax breakdown ────────────────────────────────────────────────
+  var r0=calcSalary(currentYear,new Date().getMonth());
+  var taxRows=[
+    ['Steuer & SV Aufschlüsselung (Mustermann '+currentYear+')',''],
+    ['Grundgehalt',+r0.base.toFixed(2)],
+    ['Stundenlohn (brutto)',+(r0.base/173.33).toFixed(4)],
+    ['',''],
+    ['SV Sätze 2026',''],
+    ['KV Krankenversicherung','3.87%'],
+    ['PV Pensionsversicherung','10.25%'],
+    ['AV Arbeitslosenversicherung','2.95%'],
+    ['AK-Umlage','0.50%'],
+    ['WBF NÖ','0.50%'],
+    ['SV gesamt','18.07%'],
+    ['Höchstbeitragsgrundlage','€ 6.930/Monat'],
+    ['',''],
+    ['Lohnsteuer Stufen 2026',''],
+    ['0 – 13.539','0%'],
+    ['13.539 – 21.992','20%'],
+    ['21.992 – 36.458','30%'],
+    ['36.458 – 70.365','40%'],
+    ['70.365 – 104.859','48%'],
+    ['104.859 – 1.000.000','50%'],
+    ['>1.000.000','55%'],
+    ['',''],
+    ['Verkehrsabsetzbetrag (VAB)','€ 496'],
+    ['Werbungskostenpauschale','€ 132'],
+    ['SZ Freibetrag (§67)','€ 620'],
+    ['SZ Pauschalsteuer','6%'],
+  ];
+  var wsTax=XLSX.utils.aoa_to_sheet(taxRows);
+  wsTax['!cols']=[{wch:32},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,wsTax,'Steuerinfo 2026');
+
+  // ── Write file ────────────────────────────────────────────────────────────
+  XLSX.writeFile(wb,'shiftplanner-'+currentYear+'.xlsx');
+  try{localStorage.setItem('med_last_export',new Date().toISOString());}catch(e){}
+  checkBackupReminder();
 }
 
 // ═══ BOOT ═══
