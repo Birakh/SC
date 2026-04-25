@@ -380,6 +380,44 @@ body.dark .hcard .hv{color:#e2e2dc}
 body.dark .duration-pill{background:#1a2535;border-color:#2a4a6e;color:#8bbde0}
 /* SV cap remaining inline note */
 .sv-remaining{font-size:10px;color:#888;margin-left:4px}
+/* Long-press delete popover */
+.lp-popover{position:absolute;background:#1a1a1a;color:#fff;border-radius:8px;padding:8px 12px;font-size:12px;z-index:200;display:none;box-shadow:0 4px 16px rgba(0,0,0,.25);white-space:nowrap}
+.lp-popover.show{display:block}
+.lp-popover button{background:#e24b4a;color:#fff;border:none;border-radius:5px;padding:4px 10px;font-size:11px;cursor:pointer;margin-left:8px}
+.lp-popover button.cancel{background:#555}
+/* Month summary tooltip */
+.mstt{position:fixed;background:#1a1a1a;color:#fff;border-radius:10px;padding:10px 14px;font-size:11px;z-index:400;pointer-events:none;display:none;box-shadow:0 6px 24px rgba(0,0,0,.3);min-width:180px;line-height:1.6}
+.mstt.show{display:block}
+.mstt-row{display:flex;justify-content:space-between;gap:16px}
+.mstt-row.mstt-total{border-top:.5px solid #444;margin-top:4px;padding-top:4px;font-weight:500}
+/* Cheat sheet overlay */
+.cs-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center}
+.cs-overlay.open{display:flex}
+.cs-box{background:#fff;border-radius:14px;padding:20px 24px;max-width:340px;width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.cs-box h3{font-size:14px;font-weight:500;margin-bottom:12px}
+.cs-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:.5px solid #f5f5f5}
+.cs-row:last-child{border-bottom:none}
+.cs-key{background:#f0f0f0;border-radius:4px;padding:1px 7px;font-family:monospace;font-size:11px;color:#555;font-weight:500;white-space:nowrap}
+body.dark .cs-box{background:#242428;color:#e2e2dc}
+body.dark .cs-row{border-bottom-color:#2e2e32}
+body.dark .cs-key{background:#333336;color:#aaa}
+/* Swipe flash */
+@keyframes swipe-flash{0%{opacity:.18}100%{opacity:0}}
+.swipe-flash{position:fixed;top:0;bottom:0;width:60px;pointer-events:none;z-index:50;animation:swipe-flash .25s ease-out forwards}
+.swipe-flash.left{left:0;background:linear-gradient(to right,#185fa5,transparent)}
+.swipe-flash.right{right:0;background:linear-gradient(to left,#185fa5,transparent)}
+/* OT type toggle */
+.ot-type-toggle{display:flex;gap:4px;margin-top:5px}
+.ott-btn{flex:1;padding:3px 6px;font-size:10px;border:.5px solid #ddd;border-radius:5px;background:#f5f5f0;cursor:pointer;text-align:center}
+.ott-btn.active{background:#185fa5;color:#fff;border-color:#185fa5}
+body.dark .ott-btn{background:#2a2a2e;border-color:#3a3a3e;color:#ccc}
+body.dark .ott-btn.active{background:#2a4a6e;border-color:#3a6a9e;color:#c8dff5}
+/* Forecast accuracy */
+.fcard .fa{font-size:9px;margin-top:2px}
+.fa-good{color:#27ae60}.fa-off{color:#c0392b}.fa-na{color:#bbb}
+/* Backup reminder */
+.backup-banner{display:none;background:#fff8e8;border:.5px solid #fac775;border-radius:8px;padding:7px 12px;font-size:11px;color:#854f0b;margin-bottom:8px;cursor:pointer}
+.backup-banner.show{display:block}
 /* Year tab nav */
 .year-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .year-nav button{background:#fff;border:.5px solid #ccc;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px}
@@ -499,6 +537,9 @@ body.dark .av-field .ak{color:#999}
 
   <!-- ── REPORT ── -->
   <div class="rpanel" id="tab-report">
+    <div class="backup-banner" id="backup-banner" onclick="showTab('settings',null)" title="Go to Settings → Backup">
+      ⏰ No backup in 30+ days — tap to export or sync
+    </div>
     <div class="net-box">
       <div class="net-label">Estimated net payout</div>
       <div class="net-val" id="net-out">—</div>
@@ -585,6 +626,15 @@ body.dark .av-field .ak{color:#999}
       <div class="rrow">
         <span class="rl">Hours taken as time-off (enter)</span>
         <span class="rv"><input type="number" id="ot-taken" min="0" step="0.5" placeholder="0" style="width:64px;padding:3px 6px;font-size:12px;border:.5px solid #ccc;border-radius:5px;text-align:right" oninput="saveOT()"></span>
+      </div>
+      <div class="rrow" id="ot-type-row" style="display:none">
+        <span class="rl" style="color:#aaa;font-size:11px">OT compensation type</span>
+        <span class="rv">
+          <div class="ot-type-toggle">
+            <div class="ott-btn active" id="ott-timeoff" onclick="setOTType('timeoff')">Time-off</div>
+            <div class="ott-btn" id="ott-paidout" onclick="setOTType('paidout')">Paid 150%</div>
+          </div>
+        </span>
       </div>
       <div class="rrow" style="border-bottom:none"><span class="rl">Balance owed to you</span><span class="rv" id="ot-balance">—</span></div>
       <div style="font-size:10px;color:#aaa;margin-top:6px" id="ot-ytd"></div>
@@ -862,7 +912,7 @@ body.dark .av-field .ak{color:#999}
       <button onclick="changeYearTab(1)">next ›</button>
     </div>
     <table class="year-table">
-      <thead><tr><th>Month</th><th>Gross</th><th>Net est.</th><th>OT h</th><th>Actual</th><th>Diff</th></tr></thead>
+      <thead><tr><th>Month</th><th>Gross</th><th>Net est.</th><th>OT h</th><th>Actual</th><th>Diff</th><th>YTD net</th></tr></thead>
       <tbody id="year-tbody"></tbody>
       <tfoot><tr id="year-tfoot"></tr></tfoot>
     </table>
@@ -900,6 +950,31 @@ body.dark .av-field .ak{color:#999}
   </div>
 </div>
 
+<!-- ═══ CHEAT SHEET ═══ -->
+<div class="cs-overlay" id="cs-overlay" onclick="if(event.target===this)closeCheatSheet()">
+  <div class="cs-box">
+    <h3>⌨️ Keyboard shortcuts</h3>
+    <div class="cs-row"><span>Navigate months</span><span><span class="cs-key">←</span> <span class="cs-key">→</span></span></div>
+    <div class="cs-row"><span>Go to today</span><span class="cs-key">T</span></div>
+    <div class="cs-row"><span>Go back (last view)</span><span class="cs-key">G</span></div>
+    <div class="cs-row"><span>Report tab</span><span class="cs-key">R</span></div>
+    <div class="cs-row"><span>Settings tab</span><span class="cs-key">S</span></div>
+    <div class="cs-row"><span>Year tab</span><span class="cs-key">Y</span></div>
+    <div class="cs-row"><span>Save shift in modal</span><span class="cs-key">Enter</span></div>
+    <div class="cs-row"><span>Close modal / picker</span><span class="cs-key">Esc</span></div>
+    <div class="cs-row"><span>This cheat sheet</span><span class="cs-key">?</span></div>
+    <div style="margin-top:12px;font-size:11px;color:#aaa">📱 Swipe left/right on calendar to change month. Long-press a cell to quick-delete.</div>
+    <button class="mbtn" style="width:100%;margin-top:12px" onclick="closeCheatSheet()">Close</button>
+  </div>
+</div>
+<!-- ═══ MONTH SUMMARY TOOLTIP ═══ -->
+<div class="mstt" id="mstt"></div>
+<!-- ═══ LONG-PRESS POPOVER ═══ -->
+<div class="lp-popover" id="lp-popover">
+  <span id="lp-label"></span>
+  <button onclick="lpConfirmDelete()">Delete</button>
+  <button class="cancel" onclick="lpCancel()">Cancel</button>
+</div>
 <!-- ═══ MODAL ═══ -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
 <div class="modal">
@@ -1367,6 +1442,7 @@ function renderReport(){
   renderMarginal();
   renderForecast();
   renderUrlaubTracker();
+  checkBackupReminder();
 }
 
 function renderTaxBreakdown(r){
@@ -1445,31 +1521,63 @@ function getWeekHoursForMonth(year,month){
   return weeks;
 }
 
+function _otEntry(mk){
+  // Backward compat: old entries are plain numbers
+  var raw=otData[mk];
+  if(raw==null)return{taken:0,type:'timeoff'};
+  if(typeof raw==='number')return{taken:raw,type:'timeoff'};
+  return raw;
+}
 function renderOT(){
   var mk=monthKey(currentYear,currentMonth);
   var accrued=getOTAccrued(currentYear,currentMonth);
-  var taken=otData[mk]||0;
-  var balance=Math.round((accrued-taken)*10)/10;
+  var entry=_otEntry(mk);
+  var taken=entry.taken||0;
+  var otType=entry.type||'timeoff';
   document.getElementById('ot-accrued').textContent=accrued.toFixed(1)+' h';
   document.getElementById('ot-taken').value=taken||'';
+  // Type toggle visibility
+  var typeRow=document.getElementById('ot-type-row');
+  if(typeRow) typeRow.style.display=(accrued>0||taken>0)?'':'none';
+  var t1=document.getElementById('ott-timeoff'),t2=document.getElementById('ott-paidout');
+  if(t1) t1.className='ott-btn'+(otType==='timeoff'?' active':'');
+  if(t2) t2.className='ott-btn'+(otType==='paidout'?' active':'');
+  var balance=Math.round((accrued-taken)*10)/10;
   var balEl=document.getElementById('ot-balance');
-  balEl.textContent=(balance>0?'+':'')+balance.toFixed(1)+' h';
-  balEl.className='rv '+(balance>0?'ot-bal-pos':balance<0?'ot-bal-neg':'');
+  if(balEl){
+    if(otType==='paidout'){
+      var hourly=getBaseForMonth(currentYear,currentMonth)/173.33;
+      balEl.textContent=accrued.toFixed(1)+'h → '+fmt(accrued*hourly*1.5)+' gross (150%)';
+      balEl.className='rv';
+    } else {
+      balEl.textContent=(balance>0?'+':'')+balance.toFixed(1)+' h';
+      balEl.className='rv '+(balance>0?'ot-bal-pos':balance<0?'ot-bal-neg':'');
+    }
+  }
   // YTD
   var ytdAccrued=0,ytdTaken=0;
   for(var m=0;m<12;m++){
     ytdAccrued+=getOTAccrued(currentYear,m);
-    ytdTaken+=otData[monthKey(currentYear,m)]||0;
+    ytdTaken+=_otEntry(monthKey(currentYear,m)).taken||0;
   }
   var ytdBal=Math.round((ytdAccrued-ytdTaken)*10)/10;
   document.getElementById('ot-ytd').textContent=
-    'YTD '+currentYear+': '+ytdAccrued.toFixed(1)+'h accrued · '+ytdTaken.toFixed(1)+'h comped · balance '+(ytdBal>0?'+':'')+ytdBal.toFixed(1)+'h';
+    'YTD '+currentYear+': '+ytdAccrued.toFixed(1)+'h accrued · '+ytdTaken.toFixed(1)+'h taken · balance '+(ytdBal>0?'+':'')+ytdBal.toFixed(1)+'h';
 }
-
 function saveOT(){
   var mk=monthKey(currentYear,currentMonth);
   var v=parseFloat(document.getElementById('ot-taken').value);
-  if(!isNaN(v)&&v>=0) otData[mk]=v; else delete otData[mk];
+  var entry=_otEntry(mk);
+  if(!isNaN(v)&&v>=0) entry.taken=v; else entry.taken=0;
+  otData[mk]=entry;
+  try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(e){}
+  renderOT();
+}
+function setOTType(type){
+  var mk=monthKey(currentYear,currentMonth);
+  var entry=_otEntry(mk);
+  entry.type=type;
+  otData[mk]=entry;
   try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(e){}
   renderOT();
 }
@@ -1640,6 +1748,9 @@ function renderCalendar(){
       var hint=document.createElement('span');hint.className='add-hint';hint.textContent='+ add';cell.appendChild(hint);
     }
     cell.addEventListener('click',function(){openModal(this.dataset.key);});
+    cell.addEventListener('touchstart',function(e){lpStart(e,this.dataset.key);},{passive:true});
+    cell.addEventListener('touchend',lpEnd,{passive:true});
+    cell.addEventListener('touchmove',lpEnd,{passive:true});
     grid.appendChild(cell);
   }
 }
@@ -1669,7 +1780,7 @@ function renderYear(){
   var todayD=new Date();
   document.getElementById('year-label-tab').textContent=yearTabYear;
   var tbody=document.getElementById('year-tbody');tbody.innerHTML='';
-  var tg=0,tn=0,totalOT=0;
+  var tg=0,tn=0,totalOT=0,ytdNet=0;
   var s=getSettings();
   var allResults=[];
   for(var m=0;m<12;m++) allResults.push(calcSalary(yearTabYear,m));
@@ -1681,11 +1792,12 @@ function renderYear(){
     var szData=isSZ?calcSonderzahlung(r.base):null;
     var monthOT=getOTAccrued(yearTabYear,m);
     tg+=r.gross+(szData?szData.gross:0);
-    tn+=r.net+(szData?szData.net:0);
+    var estNet=r.net+(szData?szData.net:0);
+    tn+=estNet;
+    ytdNet+=estNet;
     totalOT+=monthOT;
     var mk=monthKey(yearTabYear,m);
     var act=actuals[mk];
-    var estNet=r.net+(szData?szData.net:0);
     var diff=act!=null?act-estNet:null;
     var isCur=(yearTabYear===currentYear&&m===currentMonth);
     var isToday=(yearTabYear===todayD.getFullYear()&&m===todayD.getMonth());
@@ -1694,13 +1806,17 @@ function renderYear(){
     tr.className=rowClass;
     var mn=m;var yt=yearTabYear;
     var netDisplay=fmtN(r.net)+(szData?' <span style="font-size:9px;color:#9b8fd8">+SZ</span>':'');
-    tr.innerHTML='<td class="clickable" onclick="navToMonthYear('+mn+','+yt+')">'+(isCur?'→ ':isToday?'◉ ':'')+MONTH_NAMES[m].substring(0,3)+(isSZ?' 🎁':'')+
+    // Forecast accuracy badge
+    var acc=getForecastAccuracy(yearTabYear,m);
+    var accHtml=acc!=null?'<span class="fa '+(Math.abs(acc.diff)<5?'fa-good':Math.abs(acc.diff)<30?'fa-na':'fa-off')+'"> '+(acc.diff>=0?'+':'')+acc.diff.toFixed(0)+'</span>':'';
+    tr.innerHTML='<td class="clickable" onmouseenter="msttShow(event,'+yt+','+mn+')" onmouseleave="msttHide()" onclick="navToMonthYear('+mn+','+yt+')">'+(isCur?'→ ':isToday?'◉ ':'')+MONTH_NAMES[m].substring(0,3)+(isSZ?' 🎁':'')+
       '</td><td>'+fmtN(r.gross+(szData?szData.gross:0))+'</td>'+
-      '<td>'+netDisplay+'</td>'+
+      '<td>'+netDisplay+accHtml+'</td>'+
       '<td style="'+(monthOT>0?'color:#ef9f27;font-weight:500':'color:#ccc')+'">'+
         (monthOT>0?monthOT.toFixed(1):'—')+'</td>'+
       '<td><input class="actual-input-sm" type="number" placeholder="—" value="'+(act||'')+'" data-mk="'+mk+'" onchange="saveActual(this)" step="0.01"></td>'+
-      '<td style="'+(diff==null?'color:#ccc':diff>=0?'color:#27ae60':'color:#c0392b')+';font-weight:500">'+(diff==null?'—':(diff>=0?'+':'')+diff.toFixed(0))+'</td>';
+      '<td style="'+(diff==null?'color:#ccc':diff>=0?'color:#27ae60':'color:#c0392b')+';font-weight:500">'+(diff==null?'—':(diff>=0?'+':'')+diff.toFixed(0))+'</td>'+
+      '<td style="color:#aaa;font-size:10px">'+fmtN(ytdNet)+'</td>';
     tbody.appendChild(tr);
     if(szData){
       var szTr=document.createElement('tr');
@@ -1714,7 +1830,7 @@ function renderYear(){
   }
   document.getElementById('year-tfoot').innerHTML=
     '<td>Total</td><td>'+fmtN(tg)+'</td><td>'+fmtN(tn)+'</td>'+
-    '<td style="'+(totalOT>0?'color:#ef9f27;font-weight:500':'')+'">'+(totalOT>0?totalOT.toFixed(1)+'h':'—')+'</td><td colspan="2"></td>';
+    '<td style="'+(totalOT>0?'color:#ef9f27;font-weight:500':'')+'">'+(totalOT>0?totalOT.toFixed(1)+'h':'—')+'</td><td colspan="3"></td>';
   renderAVSummary();
 }
 
@@ -1963,10 +2079,14 @@ function toggleDark(){
   var tx=0;
   document.querySelector('.left').addEventListener('touchstart',function(e){
     tx=e.changedTouches[0].clientX;
+    lpEnd(); // cancel any pending long-press on swipe start
   },{passive:true});
   document.querySelector('.left').addEventListener('touchend',function(e){
     var dx=e.changedTouches[0].clientX-tx;
-    if(Math.abs(dx)>55){changeMonth(dx<0?1:-1);}
+    if(Math.abs(dx)>60){
+      _swipeFlash(dx<0?'left':'right');
+      changeMonth(dx<0?1:-1);
+    }
   },{passive:true});
 })();
 
@@ -2143,6 +2263,8 @@ function exportJSON(){
   var a=document.createElement('a');
   a.href=url;a.download='shiftplanner-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();URL.revokeObjectURL(url);
+  try{localStorage.setItem('med_last_export',new Date().toISOString());}catch(e){}
+  checkBackupReminder();
 }
 function importJSON(input){
   var file=input.files&&input.files[0];if(!file)return;
@@ -2191,6 +2313,7 @@ document.addEventListener('keydown',function(e){
   if(e.key==='s'||e.key==='S')showTab('settings',null);
   if(e.key==='y'||e.key==='Y')showTab('year',null);
   if(e.key==='g'||e.key==='G')goBack();
+  if(e.key==='?')openCheatSheet();
 });
 
 // ═══ PAYSLIP RECONCILER ═══
@@ -2651,6 +2774,101 @@ if('serviceWorker' in navigator){
   var swBlob=new Blob([swCode],{type:'application/javascript'});
   var swUrl=URL.createObjectURL(swBlob);
   navigator.serviceWorker.register(swUrl).catch(function(){});
+}
+
+// ═══ CHEAT SHEET ═══
+function openCheatSheet(){document.getElementById('cs-overlay').classList.add('open');}
+function closeCheatSheet(){document.getElementById('cs-overlay').classList.remove('open');}
+
+// ═══ BACKUP REMINDER ═══
+function checkBackupReminder(){
+  var banner=document.getElementById('backup-banner');
+  if(!banner)return;
+  var pushed=localStorage.getItem('med_sync_pushed');
+  var exported=localStorage.getItem('med_last_export');
+  var last=null;
+  if(pushed)last=new Date(pushed.split(' · ')[0]);
+  if(exported){var d=new Date(exported);if(!last||d>last)last=d;}
+  if(!last||(Date.now()-last.getTime())>30*24*60*60*1000){
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+
+// ═══ LONG-PRESS DELETE ═══
+var _lpTimer=null,_lpKey=null;
+function lpStart(e,k){
+  _lpKey=k;
+  _lpTimer=setTimeout(function(){
+    var sh=shifts[k]; if(!sh)return;
+    var pop=document.getElementById('lp-popover');
+    var lbl=document.getElementById('lp-label');
+    var labels={normal:'Early',middle:'Middle',late:'Late',latenight:'Late+Night',holiday:'Holiday',leave:'Leave',ruf:'Ruf',callin:'Call-in'};
+    lbl.textContent=(labels[sh.type]||sh.type)+' on '+k.split('-')[2]+'.';
+    var cell=e.target.closest('.day-cell')||e.target;
+    var rect=cell.getBoundingClientRect();
+    pop.style.top=(rect.bottom+4)+'px';
+    pop.style.left=Math.min(rect.left,window.innerWidth-200)+'px';
+    pop.classList.add('show');
+  },600);
+}
+function lpEnd(){clearTimeout(_lpTimer);_lpTimer=null;}
+function lpConfirmDelete(){
+  if(_lpKey&&shifts[_lpKey]){delete shifts[_lpKey];saveData();renderAll();}
+  lpCancel();
+}
+function lpCancel(){
+  document.getElementById('lp-popover').classList.remove('show');
+  _lpKey=null;
+}
+
+// ═══ MONTH SUMMARY TOOLTIP ═══
+function msttShow(e,y,m){
+  var tt=document.getElementById('mstt');
+  if(!tt)return;
+  var r=calcSalary(y,m);
+  var s=getSettings();
+  var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+  var szData=isSZ?calcSonderzahlung(r.base):null;
+  var estNet=r.net+(szData?szData.net:0);
+  var act=actuals[monthKey(y,m)];
+  tt.innerHTML=
+    '<div style="font-size:10px;color:#aaa;margin-bottom:6px;font-weight:500">'+MONTH_NAMES[m]+' '+y+'</div>'+
+    '<div class="mstt-row"><span>Gross</span><span>'+fmt(r.gross+(szData?szData.gross:0))+'</span></div>'+
+    '<div class="mstt-row"><span>SV</span><span>− '+fmt(r.svM.total)+'</span></div>'+
+    '<div class="mstt-row"><span>Lohnsteuer</span><span>− '+fmt(r.lst)+'</span></div>'+
+    (szData?'<div class="mstt-row"><span>SZ net</span><span>+ '+fmt(szData.net)+'</span></div>':'')+
+    '<div class="mstt-row mstt-total"><span>Net est.</span><span>'+fmt(estNet)+'</span></div>'+
+    (act!=null?'<div class="mstt-row"><span>Actual</span><span style="color:'+(act>=estNet?'#27ae60':'#c0392b')+'">'+fmt(act)+'</span></div>':'')+
+    '<div class="mstt-row"><span>Night h</span><span>'+r.nightH.toFixed(1)+'h</span></div>'+
+    '<div class="mstt-row"><span>OT hours</span><span>'+(getOTAccrued(y,m)>0?getOTAccrued(y,m).toFixed(1)+'h':'—')+'</span></div>';
+  var rect=e.target.getBoundingClientRect();
+  tt.style.top=(rect.bottom+6)+'px';
+  tt.style.left=Math.min(rect.left,window.innerWidth-210)+'px';
+  tt.classList.add('show');
+}
+function msttHide(){var tt=document.getElementById('mstt');if(tt)tt.classList.remove('show');}
+
+// ═══ SWIPE FLASH ═══
+function _swipeFlash(dir){
+  var el=document.createElement('div');
+  el.className='swipe-flash '+dir;
+  document.body.appendChild(el);
+  setTimeout(function(){el.remove();},300);
+}
+
+// ═══ FORECAST ACCURACY ═══
+function getForecastAccuracy(y,m){
+  var mk=monthKey(y,m);
+  var act=actuals[mk];
+  if(act==null)return null;
+  var r=calcSalary(y,m);
+  var s=getSettings();
+  var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
+  var szNet=isSZ?calcSonderzahlung(r.base).net:0;
+  var est=r.net+szNet;
+  return {diff:act-est,pct:est>0?((act-est)/est*100):0};
 }
 
 // ═══ BOOT ═══
