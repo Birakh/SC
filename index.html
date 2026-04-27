@@ -478,6 +478,29 @@ body.dark .av-box{background:#2e2318;border-color:#6a4a20}
 body.dark .av-box .av-title{color:#c8943a}
 body.dark .av-field{border-bottom-color:#3a2e18}
 body.dark .av-field .ak{color:#999}
+/* Shift templates */
+.tpl-list{margin-bottom:8px}
+.tpl-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:.5px solid #f0f0f0;font-size:12px}
+.tpl-row:last-child{border-bottom:none}
+.tpl-name{flex:1;font-weight:500;color:#333;white-space:nowrap}
+.tpl-desc{flex:2;color:#888;font-size:11px}
+.tpl-apply{padding:3px 8px;font-size:10px;border:.5px solid #ccc;border-radius:5px;background:#f5f5f0;cursor:pointer;white-space:nowrap}
+.tpl-apply:hover{background:#e8e8e4}
+.tpl-del{padding:3px 7px;font-size:10px;border:.5px solid #fcc;border-radius:5px;background:#fff5f5;cursor:pointer;color:#c0392b}
+.tpl-del:hover{background:#ffe8e8}
+body.dark .tpl-row{border-bottom-color:#2e2e32}
+body.dark .tpl-name{color:#e2e2dc}
+body.dark .tpl-desc{color:#666}
+body.dark .tpl-apply{background:#2a2a2e;border-color:#3a3a3e;color:#ccc}
+body.dark .tpl-apply:hover{background:#333336}
+body.dark .tpl-del{background:#2e2020;border-color:#5a2e2e;color:#e06c6c}
+/* AZG rest-period warning dot on calendar cell */
+.azg-dot{width:6px;height:6px;background:#e24b4a;border-radius:50%;display:inline-block;margin-left:3px;vertical-align:middle;cursor:help}
+/* Duplicate to next day button in modal */
+.dup-btn{font-size:11px;color:#185fa5;background:none;border:.5px solid #b8cfe8;border-radius:6px;padding:4px 10px;cursor:pointer;margin-top:6px;width:100%;text-align:center}
+.dup-btn:hover{background:#f0f7ff}
+body.dark .dup-btn{color:#6fa8dc;border-color:#2a4a6e}
+body.dark .dup-btn:hover{background:#1a2535}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -517,6 +540,13 @@ body.dark .av-field .ak{color:#999}
   </div>
   <div class="week-bar" id="week-bar"></div>
   <div id="past-month-banner" style="display:none;font-size:10px;color:#854f0b;background:#fff8e8;border:.5px solid #fac775;border-radius:6px;padding:4px 10px;margin-bottom:6px">📅 Viewing past month — figures are historical estimates</div>
+  <div style="margin-bottom:6px;display:flex;align-items:center;gap:6px">
+    <input type="text" id="shift-search" placeholder="🔍 Filter shifts…" maxlength="30"
+      oninput="renderCalendar()"
+      style="flex:1;font-size:11px;padding:4px 8px;border:.5px solid #ddd;border-radius:6px;background:#fafafa">
+    <button onclick="document.getElementById('shift-search').value='';renderCalendar()" title="Clear filter"
+      style="font-size:11px;padding:3px 8px;border:.5px solid #ddd;border-radius:6px;background:#f5f5f0;cursor:pointer;display:none" id="search-clear">✕</button>
+  </div>
   <div class="cal-dow-row">
     <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
     <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div>
@@ -600,7 +630,8 @@ body.dark .av-field .ak{color:#999}
     </div>
     <div class="panel-section">
       <div class="panel-label">Hours summary</div>
-      <div class="rrow"><span class="rl">Night hours (8% qualifying)</span><span class="rv" id="r-nighth">—</span></div>
+      <div class="rrow"><span class="rl">Night hours (8% qualifying, this month)</span><span class="rv" id="r-nighth">—</span></div>
+      <div class="rrow"><span class="rl">Night hours YTD (Jan–now)</span><span class="rv" id="r-nighth-ytd">—</span></div>
       <div class="rrow"><span class="rl">Middle shift days</span><span class="rv" id="r-middled">—</span></div>
       <div class="rrow"><span class="rl">Late shift days</span><span class="rv" id="r-lated">—</span></div>
       <div class="rrow"><span class="rl">Rufbereitschaft standby hours</span><span class="rv" id="r-rufh">—</span></div>
@@ -776,7 +807,21 @@ body.dark .av-field .ak{color:#999}
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Current grade (sets active base salary)</label>
         <select id="grade" onchange="saveSettings();renderAll()">
           <option value="4097.71">RT / 1 — €4,097.71</option>
+          <option value="4144.48">RT / 2 — €4,144.48</option>
+          <option value="4192.49">RT / 3 — €4,192.49</option>
+          <option value="4241.78">RT / 4 — €4,241.78</option>
+          <option value="4292.39">RT / 5 — €4,292.39</option>
+          <option value="4344.37">RT / 6 — €4,344.37</option>
+          <option value="4397.76">RT / 7 — €4,397.76</option>
+          <option value="4452.62">RT / 8 — €4,452.62</option>
           <option value="4376.33" selected>RT / 9 — €4,376.33</option>
+          <option value="4566.01">RT / 10 — €4,566.01</option>
+          <option value="4625.66">RT / 11 — €4,625.66</option>
+          <option value="4686.86">RT / 12 — €4,686.86</option>
+          <option value="4749.67">RT / 13 — €4,749.67</option>
+          <option value="4814.14">RT / 14 — €4,814.14</option>
+          <option value="4880.33">RT / 15 — €4,880.33</option>
+          <option value="0">Custom — use grade history ↓</option>
         </select></div>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Night 8% threshold (for early/normal shifts)</label>
         <select id="thresh" onchange="saveSettings();renderAll()">
@@ -854,11 +899,13 @@ body.dark .av-field .ak{color:#999}
         <input type="checkbox" id="ruf-sv-base" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
         <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer">Include Ruf pay in SV base (confirm with HR — §49 ASVG)</label>
       </div>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Weekend/holiday standby multiplier</label>
         <select id="ruf-wknd" onchange="saveSettings();renderAll()">
           <option value="1">× 1 same</option>
           <option value="2">× 2 double</option>
           <option value="4">× 4 quadruple</option>
-        </select></div>
+        </select>
+      </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -897,6 +944,17 @@ body.dark .av-field .ak{color:#999}
         <button class="mbtn" style="flex:1" onclick="document.getElementById('import-file').click()">📥 Import JSON</button>
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
+    </div>
+    <hr class="divider">
+    <div class="panel-section">
+      <div class="panel-label">📋 Shift Templates</div>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Save the current modal settings as a named template. Apply a template to fill a whole week from any day.</p>
+      <div class="tpl-list" id="tpl-list"></div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <input type="text" id="tpl-name-input" placeholder="Template name (e.g. Standard week)" maxlength="30" style="flex:1;font-size:12px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px">
+        <button class="mbtn primary" onclick="saveTemplate()" style="white-space:nowrap">💾 Save current</button>
+      </div>
+      <div style="font-size:10px;color:#aaa;margin-top:6px">Saves the shift type, start/end times, and note from the last-opened modal.</div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -1026,6 +1084,7 @@ body.dark .av-field .ak{color:#999}
       <button class="pat-btn" onclick="applyPattern('allWeekdays')">All weekdays this month</button>
     </div>
   </div>
+  <button class="dup-btn" onclick="duplicateToNextDay()">→ Save &amp; duplicate to next day</button>
   <div class="modal-actions">
     <button class="mbtn danger" id="m-delete" onclick="deleteShift()">Remove</button>
     <button class="mbtn" onclick="closeModal()">Cancel</button>
@@ -1036,32 +1095,58 @@ body.dark .av-field .ak{color:#999}
 
 <script>
 // ═══ STATE ═══
-var currentYear=2026, currentMonth=4, editingDate=null;
-var yearTabYear=2026;
+var _now=new Date();
+var currentYear=_now.getFullYear(), currentMonth=_now.getMonth(), editingDate=null;
+var yearTabYear=_now.getFullYear();
 var shifts={}, actuals={};
 var gradeHistory=[]; // [{ym:'YYYY-MM', base:4376.33}] sorted ascending
 var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
 var DOW_NAMES=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-var HOLIDAYS={
-  '2025-01-01':'Neujahr','2025-01-06':'Heilige Drei Könige','2025-04-21':'Ostermontag',
-  '2025-05-01':'Tag der Arbeit','2025-05-29':'Christi Himmelfahrt','2025-06-09':'Pfingstmontag',
-  '2025-06-19':'Fronleichnam','2025-08-15':'Maria Himmelfahrt','2025-10-26':'Nationalfeiertag',
-  '2025-11-01':'Allerheiligen','2025-12-08':'Maria Empfängnis','2025-12-25':'Weihnachten','2025-12-26':'Stefanitag',
-  '2026-01-01':'Neujahr','2026-01-06':'Heilige Drei Könige','2026-04-06':'Ostermontag',
-  '2026-05-01':'Tag der Arbeit','2026-05-14':'Christi Himmelfahrt','2026-05-25':'Pfingstmontag',
-  '2026-06-04':'Fronleichnam','2026-08-15':'Maria Himmelfahrt','2026-10-26':'Nationalfeiertag',
-  '2026-11-01':'Allerheiligen','2026-12-08':'Maria Empfängnis','2026-12-25':'Weihnachten','2026-12-26':'Stefanitag',
-  '2027-01-01':'Neujahr','2027-01-06':'Heilige Drei Könige','2027-04-05':'Ostermontag',
-  '2027-05-01':'Tag der Arbeit','2027-05-13':'Christi Himmelfahrt','2027-05-24':'Pfingstmontag',
-  '2027-06-03':'Fronleichnam','2027-08-15':'Maria Himmelfahrt','2027-10-26':'Nationalfeiertag',
-  '2027-11-01':'Allerheiligen','2027-12-08':'Maria Empfängnis','2027-12-25':'Weihnachten','2027-12-26':'Stefanitag',
-};
+// ═══ AUSTRIAN PUBLIC HOLIDAYS (computed per year) ═══
+// 9 fixed dates + 4 Easter-dependent (Meeus/Jones/Butcher algorithm)
+function computeHolidays(y){
+  // Easter Sunday via Meeus/Jones/Butcher
+  var a=y%19, b=Math.floor(y/100), c=y%100;
+  var d=Math.floor(b/4), e=b%4, f=Math.floor((b+8)/25);
+  var g=Math.floor((b-f+1)/3), h=(19*a+b-d-g+15)%30;
+  var i=Math.floor(c/4), k=c%4, l=(32+2*e+2*i-h-k)%7;
+  var m=Math.floor((a+11*h+22*l)/451);
+  var month=Math.floor((h+l-7*m+114)/31); // 3=Mar, 4=Apr
+  var day=(h+l-7*m+114)%31+1;
+  var easter=new Date(y,month-1,day);
+  function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
+  function key(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+  var h2={};
+  // Fixed holidays
+  h2[y+'-01-01']='Neujahr';
+  h2[y+'-01-06']='Heilige Drei Könige';
+  h2[y+'-05-01']='Tag der Arbeit';
+  h2[y+'-08-15']='Maria Himmelfahrt';
+  h2[y+'-10-26']='Nationalfeiertag';
+  h2[y+'-11-01']='Allerheiligen';
+  h2[y+'-12-08']='Maria Empfängnis';
+  h2[y+'-12-25']='Weihnachten';
+  h2[y+'-12-26']='Stefanitag';
+  // Easter-dependent
+  h2[key(addDays(easter,1))]='Ostermontag';
+  h2[key(addDays(easter,39))]='Christi Himmelfahrt';
+  h2[key(addDays(easter,50))]='Pfingstmontag';
+  h2[key(addDays(easter,60))]='Fronleichnam';
+  return h2;
+}
+// Cache per year to avoid recomputing on every isHol() call
+var _holidayCache={};
+function getHolidays(y){
+  if(!_holidayCache[y]) _holidayCache[y]=computeHolidays(y);
+  return _holidayCache[y];
+}
+function isHol(k){var y=parseInt(k.substring(0,4));return !!getHolidays(y)[k];}
+function getHolName(k){var y=parseInt(k.substring(0,4));return getHolidays(y)[k]||null;}
 
 // ═══ HELPERS ═══
 function pad(n){return n<10?'0'+n:''+n;}
 function dateKey(y,m,d){return y+'-'+pad(m+1)+'-'+pad(d);}
 function monthKey(y,m){return y+'-'+pad(m+1);}
-function isHol(k){return !!HOLIDAYS[k];}
 function isWknd(y,m,d){var w=new Date(y,m,d).getDay();return w===0||w===6;}
 function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function fmt(n){return '€ '+Math.abs(n).toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+(?!\d))/g,'.');}
@@ -1181,7 +1266,7 @@ function calcMonthlyLSt(monthlyTaxableGross){
 // ═══ SALARY CALC ═══
 function getSettings(){
   return {
-    base:      parseFloat(document.getElementById('grade').value)||4376.33,
+    base:      parseFloat(document.getElementById('grade').value)||0,
     thresh:    parseInt(document.getElementById('thresh').value)||20,
     rufRate:   parseFloat(document.getElementById('ruf-rate').value)||3.91,
     callinM:   parseFloat(document.getElementById('callin-mult').value)||1.5,
@@ -1409,16 +1494,27 @@ function renderReport(){
     }
   }
   document.getElementById('r-nighth').textContent=r.nightH.toFixed(2)+' h'+(r.lateNightH>0?' + '+r.lateNightH.toFixed(2)+'h late+night':'');
+  // Night hours YTD
+  var ytdNightH=0,ytdLateNightH=0;
+  for(var mn=0;mn<=currentMonth;mn++){
+    var na=calcNightAllowance(currentYear,mn);
+    ytdNightH+=na.nightH;ytdLateNightH+=na.lateNightH;
+  }
+  var ytdNightEl=document.getElementById('r-nighth-ytd');
+  if(ytdNightEl) ytdNightEl.textContent=ytdNightH.toFixed(1)+'h'+(ytdLateNightH>0?' + '+ytdLateNightH.toFixed(1)+'h late+night':'')+(ytdNightH+ytdLateNightH>0?' → '+fmt((ytdNightH+ytdLateNightH)*r.base/173.33*0.08)+' total 8% earned':'');
   document.getElementById('r-middled').textContent=r.middleDays+' days (prev month)';
   document.getElementById('r-lated').textContent=r.lateDays+' days (prev month)';
   document.getElementById('r-rufh').textContent=
     r.rufH.toFixed(2)+' h'+(r.rufWH>0?' ('+r.rufH_raw.toFixed(1)+'h weekday + '+r.rufWH.toFixed(1)+'h wknd/hol)':'');
   document.getElementById('r-callinh').textContent=r.callinH.toFixed(2)+' h';
   document.getElementById('r-holh').textContent=r.holH.toFixed(2)+' h';
-  // Pension YTD
+  // Pension YTD — compute directly from base+SV_PV per month (no full calcSalary needed)
   var pvMonth=r.svM.pv;
   var pvYTD=0;
-  for(var pm=0;pm<=currentMonth;pm++) pvYTD+=calcSalary(currentYear,pm).svM.pv;
+  for(var pm=0;pm<=currentMonth;pm++){
+    var pmBase=getBaseForMonth(currentYear,pm);
+    pvYTD+=calcSVMonthly(pmBase).pv;
+  }
   var pvAnnualCap=SV_CAP_MONTHLY*SV_PV*12;
   var pvPct=Math.min(100,(pvYTD/pvAnnualCap*100));
   document.getElementById('pv-month').textContent=fmt(pvMonth);
@@ -1440,6 +1536,7 @@ function renderReport(){
       '<span style="color:#bbb;font-size:11px">No deferred supplements this month</span>';
   }
   var mk=monthKey(currentYear,currentMonth);
+  _lastActualMk=null; // invalidate cache so updateActualDiff re-runs calcSalary for new month
   document.getElementById('actual-net').value=actuals[mk]||'';
   updateActualDiff();
   renderOT();
@@ -1479,15 +1576,20 @@ function renderTaxBreakdown(r){
     '<div style="line-height:1.9">'+legend+'</div>';
 }
 
+var _lastActualR=null,_lastActualMk=null;
 function updateActualDiff(){
   var mk=monthKey(currentYear,currentMonth);
-  var r=calcSalary(currentYear,currentMonth);
+  // Only re-run calcSalary if the month changed (not on every keypress)
+  if(_lastActualMk!==mk){_lastActualR=calcSalary(currentYear,currentMonth);_lastActualMk=mk;}
+  var r=_lastActualR;
   var val=parseFloat(document.getElementById('actual-net').value);
   var badge=document.getElementById('diff-badge');
   var note=document.getElementById('diff-note');
-  if(isNaN(val)){delete actuals[mk];badge.className='diff-badge diff-zero';badge.textContent='enter actual →';note.textContent='';}
-  else{
-    actuals[mk]=val; saveData();
+  if(isNaN(val)){
+    delete actuals[mk];
+    badge.className='diff-badge diff-zero';badge.textContent='enter actual →';note.textContent='';
+  } else {
+    actuals[mk]=val;saveData();
     var diff=val-r.net;
     badge.className='diff-badge '+(Math.abs(diff)<1?'diff-zero':diff>0?'diff-pos':'diff-neg');
     badge.textContent=(diff>=0?'+':'')+fmt(Math.abs(diff)).replace('€ ','€')+(diff>0?' more':' less')+' than predicted';
@@ -1703,11 +1805,15 @@ function renderTaxCalc(){
 // ═══ CALENDAR ═══
 function renderCalendar(){
   document.getElementById('month-label').textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
-  // Past month banner
   var today=new Date();
   var isPast=(currentYear<today.getFullYear())||(currentYear===today.getFullYear()&&currentMonth<today.getMonth());
   var banner=document.getElementById('past-month-banner');
-  if(banner) banner.style.display=isPast?'':'none';
+  if(banner)banner.style.display=isPast?'':'none';
+  var searchEl=document.getElementById('shift-search');
+  var searchQ=(searchEl&&searchEl.value.trim().toLowerCase())||'';
+  var clearBtn=document.getElementById('search-clear');
+  if(clearBtn)clearBtn.style.display=searchQ?'':'none';
+  var azgViolations=getAZGViolations();
   var grid=document.getElementById('cal-grid');
   grid.innerHTML='';
   var firstDow=(new Date(currentYear,currentMonth,1).getDay()+6)%7;
@@ -1722,6 +1828,15 @@ function renderCalendar(){
     var cell=document.createElement('div');
     cell.className='day-cell'+(weekend?' wknd-cell':'')+(isToday?' today-cell':'')+(sh?' has-shift':'');
     cell.dataset.key=k;
+    // Search filter: dim cells that don't match
+    if(searchQ&&sh){
+      var haystack=(sh.type+' '+(sh.note||'')).toLowerCase();
+      var typeLabel={normal:'early früh',middle:'middle mittel',late:'late spät',latenight:'latenight nacht',holiday:'holiday feiertag',leave:'leave urlaub',ruf:'ruf bereitschaft',callin:'callin einsatz'}[sh.type]||'';
+      var matches=(haystack+' '+typeLabel).includes(searchQ);
+      cell.style.opacity=matches?'1':'0.25';
+    } else {
+      cell.style.opacity='1';
+    }
     var num=document.createElement('div');
     num.className='dnum'+(weekend?' wknd-num':'');
     if(isToday){var dot=document.createElement('span');dot.className='today-dot';dot.textContent=d;num.appendChild(dot);}
@@ -1740,7 +1855,7 @@ function renderCalendar(){
       if(wh&&wh>48){var od=document.createElement('span');od.className='ot-dot '+(wh>60?'ot-over':'ot-warn');num.appendChild(od);}
     }
     cell.appendChild(num);
-    if(hol){var ht=document.createElement('span');ht.className='hol-tag';ht.textContent=HOLIDAYS[k];cell.appendChild(ht);}
+    if(hol){var ht=document.createElement('span');ht.className='hol-tag';ht.textContent=getHolName(k);cell.appendChild(ht);}
     if(sh){
       var pill=document.createElement('span');
       pill.className='shift-pill sp-'+sh.type;
@@ -1748,6 +1863,12 @@ function renderCalendar(){
       pill.textContent=(labels[sh.type]||sh.type)+' '+sh.start+'–'+sh.end;
       cell.appendChild(pill);
       if(sh.note){var noteEl=document.createElement('span');noteEl.className='shift-note';noteEl.textContent=sh.note;cell.appendChild(noteEl);}
+      if(azgViolations[k]){
+        var azgDot=document.createElement('span');
+        azgDot.className='azg-dot';
+        azgDot.title='⚠ Only '+azgViolations[k].restH+'h rest before this shift (AZG §12 requires 11h min)';
+        num.appendChild(azgDot);
+      }
     } else if(!weekend){
       var hint=document.createElement('span');hint.className='add-hint';hint.textContent='+ add';cell.appendChild(hint);
     }
@@ -1912,7 +2033,7 @@ function openModal(k){
   var mName=MONTH_NAMES[parseInt(parts[1])-1];
   var sh=shifts[k],hol=isHol(k);
   var dow=DOW_NAMES[new Date(k+'T12:00:00').getDay()];
-  document.getElementById('modal-title').textContent=dow+', '+mName+' '+d+(hol?' — '+HOLIDAYS[k]:'');
+  document.getElementById('modal-title').textContent=dow+', '+mName+' '+d+(hol?' — '+getHolName(k):'');
   document.getElementById('m-type').value=sh?sh.type:(hol?'holiday':'normal');
   document.getElementById('m-start').value=sh?sh.start:'07:00';
   document.getElementById('m-end').value=sh?sh.end:'15:00';
@@ -1968,7 +2089,7 @@ function applyPattern(mode){
     var days2=daysInMonth(currentYear,currentMonth);
     for(var d2=1;d2<=days2;d2++){var dw=new Date(currentYear,currentMonth,d2).getDay();if(dw>=1&&dw<=5)shifts[dateKey(currentYear,currentMonth,d2)]=Object.assign({},sd);}
   }
-  saveData();closeModal();renderAll();
+  saveData();closeModal(true);renderAll();
 }
 
 // ═══ NAV ═══
@@ -2063,11 +2184,11 @@ function loadData(){
 }
 function clearMonth(){if(!confirm('Clear '+MONTH_NAMES[currentMonth]+' '+currentYear+'?'))return;var pfx=monthKey(currentYear,currentMonth);Object.keys(shifts).forEach(function(k){if(k.substring(0,7)===pfx)delete shifts[k];});saveData();renderAll();}
 function clearAll(){
-  if(!confirm('Clear ALL data? This includes shifts, actuals, OT log, and grade history.'))return;
-  shifts={};actuals={};otData={};gradeHistory=[];
-  saveData();saveGradeHistory();
+  if(!confirm('Clear ALL data? This includes shifts, actuals, OT log, grade history, and templates.'))return;
+  shifts={};actuals={};otData={};gradeHistory=[];shiftTemplates=[];
+  saveData();saveGradeHistory();saveTemplates();
   try{localStorage.setItem('med_ot2','{}');}catch(e){}
-  renderAll();renderGradeHistory();
+  renderAll();renderGradeHistory();renderTemplates();
 }
 
 
@@ -2261,7 +2382,7 @@ async function syncFromRepo(){
 
 // ═══ LOCAL BACKUP ═══
 function exportJSON(){
-  var payload={version:4,exported:new Date().toISOString(),shifts:shifts,actuals:actuals,otData:otData,gradeHistory:gradeHistory};
+  var payload={version:4,exported:new Date().toISOString(),shifts:shifts,actuals:actuals,otData:otData,gradeHistory:gradeHistory,shiftTemplates:shiftTemplates};
   var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a');
@@ -2291,10 +2412,11 @@ function importJSON(input){
       if(!confirm('Replace ALL current data with the imported backup?\n\n'+keys.length+' shifts, '+Object.keys(parsed.actuals||{}).length+' actuals.'))return;
       shifts=parsed.shifts;actuals=parsed.actuals||{};otData=parsed.otData||{};
       gradeHistory=parsed.gradeHistory||[];
-      saveData();saveGradeHistory();
+      shiftTemplates=parsed.shiftTemplates||[];
+      saveData();saveGradeHistory();saveTemplates();
       try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
-      renderAll();renderGradeHistory();
-      alert('✓ Import successful — '+keys.length+' shifts loaded.');
+      renderAll();renderGradeHistory();renderTemplates();
+      alert('✓ Import successful — '+keys.length+' shifts loaded'+(shiftTemplates.length?' + '+shiftTemplates.length+' templates':'')+'.');
     }catch(err){alert('✗ Import failed: '+err.message);}
     input.value='';
   };
@@ -2414,11 +2536,7 @@ function copyPrevMonth(){
   saveData();renderAll();
   var msg='Copied '+copied+' shift'+(copied!==1?'s':'')+' from '+MONTH_NAMES[prevM]+' '+prevY+'.';
   if(skippedDays.length) msg+=' Skipped: '+skippedDays.join(', ');
-  var toast=document.createElement('div');
-  toast.textContent=msg;
-  toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;z-index:999;max-width:90vw;text-align:center';
-  document.body.appendChild(toast);
-  setTimeout(function(){toast.style.transition='opacity .5s';toast.style.opacity='0';setTimeout(function(){toast.remove();},500);},3500);
+  _showToast(msg,3500);
 }
 
 // ═══ MARGINAL RATE CALCULATOR ═══
@@ -2875,6 +2993,9 @@ function getForecastAccuracy(y,m){
 function exportXLSX(){
   if(typeof XLSX==='undefined'){alert('Excel library not loaded — check your internet connection.');return;}
   var s=getSettings();
+  // Export the year that's currently in view (year tab if open, else currentYear)
+  var yearTab=document.getElementById('tab-year');
+  var exportYear=(yearTab&&yearTab.style.display!=='none')?yearTabYear:currentYear;
   var wb=XLSX.utils.book_new();
 
   // ── Sheet 1: Monthly summary ──────────────────────────────────────────────
@@ -2882,16 +3003,16 @@ function exportXLSX(){
   var summaryRows=[['Monat','Brutto','Nacht 8%','Zulagen prev.','SV gesamt','LSt','Netto est.','SZ Netto','Netto inkl. SZ','Actual','Differenz','Nacht-h','Ruf-h','Urlaub-d','OT-h','Abrechnung']];
   var ytdNet=0;
   for(var m=0;m<12;m++){
-    var r=calcSalary(currentYear,m);
+    var r=calcSalary(exportYear,m);
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
     var szData=isSZ?calcSonderzahlung(r.base):null;
     var szNet=szData?szData.net:0;
     var estNet=r.net+szNet;
     ytdNet+=estNet;
-    var mk=monthKey(currentYear,m);
+    var mk=monthKey(exportYear,m);
     var act=actuals[mk]!=null?actuals[mk]:'';
     var diff=act!==''?act-estNet:'';
-    var ot=getOTAccrued(currentYear,m);
+    var ot=getOTAccrued(exportYear,m);
     summaryRows.push([
       MONTH_NAMES_DE[m],
       +r.gross.toFixed(2),
@@ -2920,13 +3041,13 @@ function exportXLSX(){
   var wsSummary=XLSX.utils.aoa_to_sheet(summaryRows);
   // Column widths
   wsSummary['!cols']=[{wch:12},{wch:10},{wch:10},{wch:14},{wch:10},{wch:10},{wch:10},{wch:10},{wch:12},{wch:10},{wch:10},{wch:9},{wch:9},{wch:9},{wch:9},{wch:12}];
-  XLSX.utils.book_append_sheet(wb,wsSummary,'Monatsübersicht '+currentYear);
+  XLSX.utils.book_append_sheet(wb,wsSummary,'Monatsübersicht '+exportYear);
 
   // ── Sheet 2: Shifts detail ────────────────────────────────────────────────
   var shiftRows=[['Datum','Wochentag','Typ','Start','Ende','Stunden','Nacht-h','Notiz']];
   var DOW_DE=['So','Mo','Di','Mi','Do','Fr','Sa'];
   var typeDE={normal:'Frühdienst',middle:'Mitteldienst',late:'Spätdienst',latenight:'Spät+Nacht',holiday:'Feiertag',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
-  Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);})
+  Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(exportYear);})
     .sort().forEach(function(k){
       var sh=shifts[k];
       var h=calcHours(sh.start,sh.end,s.thresh);
@@ -2935,12 +3056,12 @@ function exportXLSX(){
     });
   var wsShifts=XLSX.utils.aoa_to_sheet(shiftRows);
   wsShifts['!cols']=[{wch:12},{wch:10},{wch:16},{wch:8},{wch:8},{wch:9},{wch:9},{wch:30}];
-  XLSX.utils.book_append_sheet(wb,wsShifts,'Dienste '+currentYear);
+  XLSX.utils.book_append_sheet(wb,wsShifts,'Dienste '+exportYear);
 
   // ── Sheet 3: Tax breakdown ────────────────────────────────────────────────
-  var r0=calcSalary(currentYear,new Date().getMonth());
+  var r0=calcSalary(exportYear,new Date().getMonth());
   var taxRows=[
-    ['Steuer & SV Aufschlüsselung (Mustermann '+currentYear+')',''],
+    ['Steuer & SV Aufschlüsselung '+exportYear,''],
     ['Grundgehalt',+r0.base.toFixed(2)],
     ['Stundenlohn (brutto)',+(r0.base/173.33).toFixed(4)],
     ['',''],
@@ -2972,14 +3093,157 @@ function exportXLSX(){
   XLSX.utils.book_append_sheet(wb,wsTax,'Steuerinfo 2026');
 
   // ── Write file ────────────────────────────────────────────────────────────
-  XLSX.writeFile(wb,'shiftplanner-'+currentYear+'.xlsx');
+  XLSX.writeFile(wb,'shiftplanner-'+exportYear+'.xlsx');
   try{localStorage.setItem('med_last_export',new Date().toISOString());}catch(e){}
   checkBackupReminder();
 }
 
+// ═══ SHIFT TEMPLATES ═══
+var shiftTemplates=[]; // [{name, type, start, end, note}]
+
+function loadTemplates(){
+  try{var raw=localStorage.getItem('med_templates');if(raw)shiftTemplates=JSON.parse(raw);}catch(e){}
+}
+function saveTemplates(){
+  try{localStorage.setItem('med_templates',JSON.stringify(shiftTemplates));}catch(e){}
+  renderTemplates();
+}
+function saveTemplate(){
+  var nameEl=document.getElementById('tpl-name-input');
+  var name=(nameEl&&nameEl.value.trim())||'Template '+(shiftTemplates.length+1);
+  // Read last-used modal state (or defaults)
+  var tpl={
+    name:name,
+    type:document.getElementById('m-type').value||'normal',
+    start:document.getElementById('m-start').value||'07:00',
+    end:document.getElementById('m-end').value||'15:00',
+    note:(document.getElementById('m-note').value||'').trim()
+  };
+  // Overwrite if name already exists
+  var existing=shiftTemplates.findIndex(function(t){return t.name===name;});
+  if(existing>=0)shiftTemplates[existing]=tpl;
+  else shiftTemplates.push(tpl);
+  if(nameEl)nameEl.value='';
+  saveTemplates();
+}
+function deleteTemplate(idx){
+  shiftTemplates.splice(idx,1);
+  saveTemplates();
+}
+function applyTemplate(idx){
+  var tpl=shiftTemplates[idx];
+  if(!tpl)return;
+  // Use the currently viewed month — find the week containing today if in the current month,
+  // otherwise use the first week of the viewed month
+  var refDay;
+  var today=new Date();
+  if(currentYear===today.getFullYear()&&currentMonth===today.getMonth()){
+    refDay=new Date(today);
+  } else {
+    refDay=new Date(currentYear,currentMonth,1);
+  }
+  // Walk back to Monday of refDay's week
+  var dow=(refDay.getDay()+6)%7; // 0=Mon
+  var monday=new Date(refDay);monday.setDate(refDay.getDate()-dow);
+  var filled=0,skipped=[];
+  for(var d=0;d<5;d++){
+    var day=new Date(monday);day.setDate(monday.getDate()+d);
+    if(day.getMonth()!==currentMonth)continue; // skip days outside viewed month
+    var k=monthKey(day.getFullYear(),day.getMonth())+'-'+pad(day.getDate());
+    if(shifts[k]){skipped.push(day.getDate()+'.');continue;}
+    shifts[k]={type:tpl.type,start:tpl.start,end:tpl.end};
+    if(tpl.note)shifts[k].note=tpl.note;
+    filled++;
+  }
+  saveData();renderAll();
+  var msg='Applied "'+tpl.name+'" to '+filled+' day'+(filled!==1?'s':'')+' (Mon–Fri, '+MONTH_NAMES[currentMonth]+').';
+  if(skipped.length)msg+=' Skipped: '+skipped.join(', ');
+  _showToast(msg,3500);
+}
+function renderTemplates(){
+  var el=document.getElementById('tpl-list');
+  if(!el)return;
+  if(!shiftTemplates.length){
+    el.innerHTML='<div style="font-size:11px;color:#aaa;padding:4px 0">No templates yet. Open a shift modal, then save as a template above.</div>';
+    return;
+  }
+  var typeLabels={normal:'Early',middle:'Middle',late:'Late',latenight:'Late+Night',holiday:'Holiday',leave:'Leave',ruf:'Ruf',callin:'Call-in'};
+  el.innerHTML=shiftTemplates.map(function(t,i){
+    var desc=(typeLabels[t.type]||t.type)+' '+t.start+'–'+t.end+(t.note?' · '+t.note:'');
+    return '<div class="tpl-row">'+
+      '<span class="tpl-name">'+t.name+'</span>'+
+      '<span class="tpl-desc">'+desc+'</span>'+
+      '<button class="tpl-apply" onclick="applyTemplate('+i+')">Apply week</button>'+
+      '<button class="tpl-del" onclick="deleteTemplate('+i+')" title="Delete">✕</button>'+
+    '</div>';
+  }).join('');
+}
+
+function _showToast(msg,duration){
+  var toast=document.createElement('div');
+  toast.textContent=msg;
+  toast.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:8px 16px;border-radius:8px;font-size:12px;z-index:999;max-width:90vw;text-align:center';
+  document.body.appendChild(toast);
+  setTimeout(function(){toast.style.transition='opacity .5s';toast.style.opacity='0';setTimeout(function(){toast.remove();},500);},(duration||2500));
+}
+
+// ═══ AZG REST PERIOD CHECKER ═══
+// §12 AZG: minimum 11h rest between consecutive shifts
+function getAZGViolations(){
+  var violations={};
+  var keys=Object.keys(shifts).sort();
+  var REST_TYPES=new Set(['normal','middle','late','latenight','holiday','callin']);
+  for(var i=1;i<keys.length;i++){
+    var kPrev=keys[i-1], kCur=keys[i];
+    var shPrev=shifts[kPrev], shCur=shifts[kCur];
+    if(!shPrev||!shCur)continue;
+    if(!REST_TYPES.has(shPrev.type)||!REST_TYPES.has(shCur.type))continue;
+    var prevDate=new Date(kPrev+'T'+shPrev.end+':00');
+    var curDate=new Date(kCur+'T'+shCur.start+':00');
+    if(shPrev.end<=shPrev.start) prevDate.setDate(prevDate.getDate()+1);
+    var restH=(curDate-prevDate)/3600000;
+    if(restH>0&&restH<11) violations[kCur]={restH:restH.toFixed(1),prevKey:kPrev};
+  }
+  return violations;
+}
+
+// ═══ DUPLICATE TO NEXT DAY ═══
+function duplicateToNextDay(){
+  if(!editingDate)return;
+  // Save current shift first
+  var note=document.getElementById('m-note').value.trim();
+  var obj={type:document.getElementById('m-type').value,
+    start:document.getElementById('m-start').value,
+    end:document.getElementById('m-end').value};
+  if(note)obj.note=note;
+  shifts[editingDate]=obj;
+  // Find next calendar date
+  var parts=editingDate.split('-');
+  var d=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2])+1);
+  var nextKey=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  // Navigate to next day and open modal
+  if(d.getMonth()!==parseInt(parts[1])-1){
+    currentMonth=d.getMonth();currentYear=d.getFullYear();
+  }
+  saveData();
+  closeModal(true);
+  renderAll();
+  // Open next day's modal pre-filled with same values
+  setTimeout(function(){openModal(nextKey);},50);
+}
+
 // ═══ BOOT ═══
-function renderAll(){renderCalendar();renderWeekBar();renderReport();}
-loadData();renderAll();
+var _renderYearTimer=null;
+function renderAll(){
+  renderCalendar();renderWeekBar();renderReport();
+  // Keep year tab in sync if visible — debounced to avoid 12×calcSalary on rapid navigation
+  var yearTab=document.getElementById('tab-year');
+  if(yearTab&&yearTab.style.display!=='none'){
+    clearTimeout(_renderYearTimer);
+    _renderYearTimer=setTimeout(function(){yearTabYear=currentYear;renderYear();},200);
+  }
+}
+loadData();loadTemplates();renderAll();renderTemplates();
 </script>
 <!-- Storage warning banner -->
 <div id="storage-warn" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#c0392b;color:#fff;font-size:12px;padding:8px 16px;text-align:center;z-index:500">⚠️ Storage approaching limit (4MB) — export a JSON backup and consider clearing old years.</div>
