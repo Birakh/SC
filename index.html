@@ -161,7 +161,7 @@ select,input[type=number],input[type=text]{width:100%;padding:5px 7px;border:.5p
   .left{display:none}
   .right{position:static;height:auto;border:none;overflow:visible}
   .rtabs{display:none}
-  #tab-taxcalc,#tab-settings,#tab-year,#tab-compare{display:none!important}
+  #tab-taxcalc,#tab-settings,#tab-year,#tab-compare,#tab-sim{display:none!important}
   #tab-report{display:block!important}
   .icon-btn,.month-nav button,.payslip-box,.marginal-box,.ot-box,.actual-box{display:none}
   body{background:#fff;font-size:12px}
@@ -501,6 +501,35 @@ body.dark .tpl-del{background:#2e2020;border-color:#5a2e2e;color:#e06c6c}
 .dup-btn:hover{background:#f0f7ff}
 body.dark .dup-btn{color:#6fa8dc;border-color:#2a4a6e}
 body.dark .dup-btn:hover{background:#1a2535}
+/* Simulation tab */
+.sim-baseline{background:#f0f7ff;border:.5px solid #b8cfe8;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+.sim-baseline .sb-label{font-size:10px;color:#185fa5;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:4px}
+.sim-baseline .sb-net{font-size:20px;font-weight:600;color:#185fa5}
+.sim-baseline .sb-sub{font-size:10px;color:#aaa;margin-top:2px}
+body.dark .sim-baseline{background:#1a2535;border-color:#2a4a6e}
+body.dark .sim-baseline .sb-label{color:#6fa8dc}
+body.dark .sim-baseline .sb-net{color:#6fa8dc}
+.sim-slider-row{display:grid;grid-template-columns:1fr auto 60px;align-items:center;gap:8px;margin-bottom:8px}
+.sim-slider-row label{font-size:11px;color:#555;line-height:1.3}
+.sim-slider-row input[type=range]{width:100%;accent-color:#185fa5}
+.sim-slider-row .sim-count{font-size:12px;font-weight:500;text-align:right;min-width:28px;color:#185fa5}
+body.dark .sim-slider-row label{color:#999}
+.sim-result-box{border-radius:8px;padding:10px 12px;margin-top:10px;text-align:center}
+.sim-result-box.sim-up{background:#eafaf0;border:.5px solid #a3d9b5}
+.sim-result-box.sim-dn{background:#fff0f0;border:.5px solid #f5a5a5}
+.sim-result-box.sim-zero{background:#f5f5f0;border:.5px solid #e0e0e0}
+body.dark .sim-result-box.sim-up{background:#1a2e20;border-color:#3a7a4e}
+body.dark .sim-result-box.sim-dn{background:#2e1a1a;border-color:#7a3a3a}
+body.dark .sim-result-box.sim-zero{background:#2a2a2e;border-color:#3a3a3e}
+.sim-delta{font-size:22px;font-weight:700;margin-bottom:4px}
+.sim-delta.up{color:#27ae60}.sim-delta.dn{color:#c0392b}.sim-delta.zero{color:#aaa}
+body.dark .sim-delta.up{color:#6abf6a}body.dark .sim-delta.dn{color:#e06c6c}
+.sim-breakdown{font-size:11px;color:#666;line-height:1.8;margin-top:6px;text-align:left}
+body.dark .sim-breakdown{color:#888}
+.sim-verdict{font-size:11px;font-weight:500;margin-top:6px;color:#333}
+body.dark .sim-verdict{color:#ccc}
+.sim-reset{font-size:10px;color:#aaa;background:none;border:none;cursor:pointer;float:right;margin-top:-2px}
+.sim-reset:hover{color:#555}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -564,6 +593,7 @@ body.dark .dup-btn:hover{background:#1a2535}
     <div class="rtab"         onclick="showTab('settings',this)">Settings</div>
     <div class="rtab"         onclick="showTab('year',this)">Year</div>
     <div class="rtab"         onclick="showTab('compare',this)">Compare</div>
+    <div class="rtab"         onclick="showTab('sim',this)">Sim</div>
   </div>
 
   <!-- ── REPORT ── -->
@@ -997,6 +1027,51 @@ body.dark .dup-btn:hover{background:#1a2535}
   </div>
 </div>
 </div>
+
+  <!-- ── SIMULATION ── -->
+  <div class="rpanel" id="tab-sim" style="display:none">
+    <div style="font-size:11px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+      <span>💡 What-if simulator — <span id="sim-month-label"></span></span>
+      <button class="sim-reset" onclick="resetSim()">Reset all</button>
+    </div>
+    <div class="sim-baseline">
+      <div class="sb-label">Current month baseline net</div>
+      <div class="sb-net" id="sim-base-net">—</div>
+      <div class="sb-sub" id="sim-base-sub">based on shifts entered</div>
+    </div>
+    <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:8px">Add extra shifts</div>
+    <div class="sim-slider-row">
+      <label>🌙 Late shifts (14:00–22:30)<br><span style="color:#aaa;font-size:10px">+€50 supplement next month · 2.5h night pay this month</span></label>
+      <input type="range" id="sim-late" min="0" max="15" value="0" oninput="renderSim()">
+      <div class="sim-count" id="sim-late-val">0</div>
+    </div>
+    <div class="sim-slider-row">
+      <label>🌅 Middle shifts (11:30–20:00)<br><span style="color:#aaa;font-size:10px">+€35.50 supplement next month</span></label>
+      <input type="range" id="sim-middle" min="0" max="15" value="0" oninput="renderSim()">
+      <div class="sim-count" id="sim-middle-val">0</div>
+    </div>
+    <div class="sim-slider-row">
+      <label>☀️ Early shifts (07:00–15:00)<br><span style="color:#aaa;font-size:10px">no supplements · base pay only</span></label>
+      <input type="range" id="sim-normal" min="0" max="15" value="0" oninput="renderSim()">
+      <div class="sim-count" id="sim-normal-val">0</div>
+    </div>
+    <div class="sim-slider-row">
+      <label>📟 Rufbereitschaft (4.5h weekday)<br><span style="color:#aaa;font-size:10px">standby pay, outside SV base</span></label>
+      <input type="range" id="sim-ruf" min="0" max="15" value="0" oninput="renderSim()">
+      <div class="sim-count" id="sim-ruf-val">0</div>
+    </div>
+    <div class="sim-slider-row">
+      <label>🏖 Public holiday shifts (07:00–15:00)<br><span style="color:#aaa;font-size:10px">base pay now · 200% extra next month</span></label>
+      <input type="range" id="sim-hol" min="0" max="5" value="0" oninput="renderSim()">
+      <div class="sim-count" id="sim-hol-val">0</div>
+    </div>
+    <div class="sim-result-box sim-zero" id="sim-result-box">
+      <div class="sim-delta zero" id="sim-delta">+ € 0,00</div>
+      <div class="sim-breakdown" id="sim-breakdown"></div>
+      <div class="sim-verdict" id="sim-verdict"></div>
+    </div>
+    <div style="font-size:10px;color:#aaa;margin-top:10px;line-height:1.5">⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.</div>
+  </div>
 
 <!-- ═══ MONTH JUMP PICKER ═══ -->
 <div class="mjump-overlay" id="mjump-overlay" onclick="closeMonthJump()">
@@ -2110,14 +2185,15 @@ function goBack(){
   renderAll();
 }
 function showTab(name,btn){
-  ['report','taxcalc','settings','year','compare'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===name?'':'none';});
+  ['report','taxcalc','settings','year','compare','sim'].forEach(function(t){document.getElementById('tab-'+t).style.display=t===name?'':'none';});
   document.querySelectorAll('.rtab').forEach(function(b){b.classList.remove('active');});
   if(btn)btn.classList.add('active');
-  else{var idx={report:0,taxcalc:1,settings:2,year:3,compare:4}[name];document.querySelectorAll('.rtab')[idx].classList.add('active');}
+  else{var idx={report:0,taxcalc:1,settings:2,year:3,compare:4,sim:5}[name];document.querySelectorAll('.rtab')[idx].classList.add('active');}
   if(name==='year'){yearTabYear=currentYear;renderYear();}
   if(name==='compare'){populateCompareSelects();renderCompare();}
   if(name==='settings'){renderLastSynced();renderGradeHistory();checkSZConflict();}
   if(name==='taxcalc'){var r=calcSalary(currentYear,currentMonth);document.getElementById('tc-annual').value=(r.base*12).toFixed(0);document.getElementById('tc-suppl').value=(r.middleP+r.lateP+r.shiftA).toFixed(2);document.getElementById('tc-oncall').value=r.rufPay.toFixed(2);renderTaxCalc();}
+  if(name==='sim')renderSim();
 }
 
 // ═══ PERSIST ═══
@@ -3230,6 +3306,134 @@ function duplicateToNextDay(){
   renderAll();
   // Open next day's modal pre-filled with same values
   setTimeout(function(){openModal(nextKey);},50);
+}
+
+// ═══ SHIFT SIMULATOR ═══
+function resetSim(){
+  ['sim-late','sim-middle','sim-normal','sim-ruf','sim-hol'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value=0;
+  });
+  renderSim();
+}
+
+function renderSim(){
+  var r=calcSalary(currentYear,currentMonth);
+  var s=getSettings();
+  var hourly=r.base/173.33;
+
+  // Baseline
+  var baseNetEl=document.getElementById('sim-base-net');
+  var baseSubEl=document.getElementById('sim-base-sub');
+  if(baseNetEl) baseNetEl.textContent=fmt(r.net);
+  if(baseSubEl) baseSubEl.textContent=MONTH_NAMES[currentMonth]+' '+currentYear+' · taxable: '+fmt(r.taxable);
+  var lbl=document.getElementById('sim-month-label');
+  if(lbl) lbl.textContent=MONTH_NAMES[currentMonth]+' '+currentYear;
+
+  // Slider values
+  var nLate   =parseInt(document.getElementById('sim-late').value)||0;
+  var nMiddle =parseInt(document.getElementById('sim-middle').value)||0;
+  var nNormal =parseInt(document.getElementById('sim-normal').value)||0;
+  var nRuf    =parseInt(document.getElementById('sim-ruf').value)||0;
+  var nHol    =parseInt(document.getElementById('sim-hol').value)||0;
+
+  document.getElementById('sim-late-val').textContent=nLate;
+  document.getElementById('sim-middle-val').textContent=nMiddle;
+  document.getElementById('sim-normal-val').textContent=nNormal;
+  document.getElementById('sim-ruf-val').textContent=nRuf;
+  document.getElementById('sim-hol-val').textContent=nHol;
+
+  // What each shift type adds to THIS MONTH's taxable:
+  // Late:   2.5h night pay (same month) + 8h base paid as normal shift
+  //         supplement €50 goes NEXT month — not in this month's net
+  // Middle: 0 night pay + 8h base
+  //         supplement €35.50 goes NEXT month
+  // Normal: 0 night pay + 8h base (already in base if scheduled, but sim adds extra)
+  // Ruf:    4.5h × rufRate (outside SV base)
+  // Holiday:8h base pay now; 200% extra goes NEXT month
+
+  // Extra taxable this month from each type
+  var lateNightPay  = hourly*0.08*2.5*nLate;       // 2.5h night 8% per late shift
+  var lateBasePay   = hourly*8*nLate;               // 8h base rate (worked hours)
+  var middleBasePay = hourly*8*nMiddle;
+  var normalBasePay = hourly*8*nNormal;
+  var holBasePay    = hourly*8*nHol;
+  var rufPay        = s.rufRate*4.5*nRuf;           // outside SV base
+
+  // Total extra taxable (ruf excluded from SV base unless toggle)
+  var extraTaxable = lateNightPay + lateBasePay + middleBasePay + normalBasePay + holBasePay
+                    + (s.rufSVBase ? rufPay : 0);
+
+  // Marginal tax on the extra taxable
+  var baseTaxable = r.taxable;
+  var newTaxable  = baseTaxable + extraTaxable;
+  var marginalSV  = calcSVMonthly(newTaxable).total - calcSVMonthly(baseTaxable).total;
+  var marginalLSt = calcMonthlyLSt(newTaxable) - calcMonthlyLSt(baseTaxable);
+  var marginalTax = marginalSV + marginalLSt;
+
+  // Ruf LSt impact (if not in SV base, still taxable for LSt — but approximate via BR on ruf)
+  var rufLSt = s.rufSVBase ? 0 : (calcMonthlyLSt(baseTaxable + rufPay) - calcMonthlyLSt(baseTaxable));
+
+  // Net gain this month
+  var netGainWork = extraTaxable - marginalTax + (s.rufSVBase ? 0 : rufPay - rufLSt);
+  if(!s.rufSVBase) netGainWork = extraTaxable - marginalTax + rufPay - rufLSt;
+
+  // Supplements earned → next month (informational only)
+  var nextMonthSuppl = s.lateS*nLate + s.middleS*nMiddle + hourly*2*8*nHol;
+
+  // Effective marginal rate on the extra gross
+  var totalExtraGross = lateNightPay+lateBasePay+middleBasePay+normalBasePay+holBasePay+rufPay;
+  var margRate = totalExtraGross>0 ? ((marginalTax+rufLSt)/totalExtraGross*100) : 0;
+
+  // Update result box
+  var box=document.getElementById('sim-result-box');
+  var deltaEl=document.getElementById('sim-delta');
+  var bkEl=document.getElementById('sim-breakdown');
+  var verdictEl=document.getElementById('sim-verdict');
+
+  var isZero=(nLate+nMiddle+nNormal+nRuf+nHol===0);
+  if(isZero){
+    box.className='sim-result-box sim-zero';
+    deltaEl.className='sim-delta zero';
+    deltaEl.textContent='+ € 0,00';
+    bkEl.innerHTML='Move the sliders to simulate extra shifts.';
+    verdictEl.textContent='';
+    return;
+  }
+
+  var up=netGainWork>=0;
+  box.className='sim-result-box '+(up?'sim-up':'sim-dn');
+  deltaEl.className='sim-delta '+(up?'up':'dn');
+  deltaEl.textContent=(up?'+ ':'− ')+fmt(Math.abs(netGainWork)).replace('€ ','€ ');
+
+  // Breakdown lines
+  var lines=[];
+  if(nLate>0)   lines.push(nLate+'× late: '+fmt(lateNightPay)+' night 8% + '+fmt(lateBasePay)+' base pay');
+  if(nMiddle>0) lines.push(nMiddle+'× middle: '+fmt(middleBasePay)+' base pay');
+  if(nNormal>0) lines.push(nNormal+'× early: '+fmt(normalBasePay)+' base pay');
+  if(nRuf>0)    lines.push(nRuf+'× Ruf 4.5h: '+fmt(rufPay)+' standby pay');
+  if(nHol>0)    lines.push(nHol+'× holiday: '+fmt(holBasePay)+' base pay now');
+  lines.push('Extra gross this month: '+fmt(totalExtraGross));
+  lines.push('Marginal tax (SV+LSt): − '+fmt(marginalTax+rufLSt));
+  lines.push('Marginal rate: '+margRate.toFixed(1)+'%');
+  if(nextMonthSuppl>0.01) lines.push('→ Next month supplements: +'+fmt(nextMonthSuppl)+' (not included above)');
+  bkEl.innerHTML=lines.join('<br>');
+
+  // Plain-language verdict
+  var perShift = (nLate+nMiddle+nNormal+nRuf+nHol)>0 ? netGainWork/(nLate+nMiddle+nNormal+nRuf+nHol) : 0;
+  var v='';
+  if(nLate>0&&nMiddle===0&&nNormal===0&&nRuf===0&&nHol===0){
+    // Pure late shift analysis — the main use case
+    var netPerLate=netGainWork/nLate;
+    var grossPerLate=totalExtraGross/nLate;
+    v='Each late shift nets you '+fmt(netPerLate)+' this month';
+    if(nextMonthSuppl>0.01) v+=' + '+fmt(s.lateS*(1-margRate/100))+' net from the €50 supplement next month';
+    v+='. Marginal rate: '+margRate.toFixed(1)+'%.';
+    if(netPerLate<15) v+=' Low return — marginal rate is eating most of the supplement.';
+    else if(netPerLate>30) v+=' Good value — marginal tax is low enough to keep most of the gain.';
+  } else {
+    v='Net gain across all extra shifts: '+fmt(netGainWork)+' ('+fmt(perShift)+'/shift avg).';
+  }
+  verdictEl.textContent=v;
 }
 
 // ═══ BOOT ═══
