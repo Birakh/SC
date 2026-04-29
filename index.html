@@ -530,6 +530,16 @@ body.dark .sim-breakdown{color:#888}
 body.dark .sim-verdict{color:#ccc}
 .sim-reset{font-size:10px;color:#aaa;background:none;border:none;cursor:pointer;float:right;margin-top:-2px}
 .sim-reset:hover{color:#555}
+/* 14-salary explainer */
+.sz-explainer{background:#fff8e8;border:.5px solid #fac775;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:11px;line-height:1.7;color:#555}
+.sz-explainer strong{color:#333}
+body.dark .sz-explainer{background:#2e2318;border-color:#6a4a20;color:#c8a87a}
+body.dark .sz-explainer strong{color:#e2d0a0}
+.sz-calc-box{background:#f5f5f0;border-radius:8px;padding:10px 12px;margin:8px 0}
+body.dark .sz-calc-box{background:#2a2a2e}
+.sz-toggle-row{display:flex;align-items:center;gap:8px;margin:10px 0 4px}
+.sz-toggle-row label{font-size:11px;color:#555;cursor:pointer}
+body.dark .sz-toggle-row label{color:#999}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -757,6 +767,17 @@ body.dark .sim-verdict{color:#ccc}
   <div class="rpanel" id="tab-taxcalc" style="display:none">
     <div class="panel-label" style="margin-bottom:8px">Austrian 2026 Brutto → Netto Calculator</div>
 
+    <!-- 14-salary explainer -->
+    <div class="sz-explainer">
+      <strong>How 14 salaries work in Austria</strong><br>
+      Austrian law splits salary into two separate tax regimes:<br><br>
+      <strong>Regular salary (§66 EStG) — 12× per year</strong><br>
+      Your monthly salary is annualised at ×12 and taxed using the progressive Lohnsteuer brackets (0–55%). Social insurance (SV) applies at full rates every month.<br><br>
+      <strong>Sonderzahlungen (§67 EStG) — 2× per year</strong><br>
+      The 13th salary (Urlaubsgeld, typically June) and 14th salary (Weihnachtsgeld, typically November) are taxed at a <em>flat 6%</em> — only on the amount above the €620 Freibetrag. SV applies normally. This flat rate is significantly lower than your marginal bracket (likely 30–40%), which is why the SZ are very tax-efficient.<br><br>
+      <strong>The key rule:</strong> Lohnsteuer on regular monthly salary is always calculated using ×12 annualisation — never ×14. The SZ are calculated and taxed entirely separately.
+    </div>
+
     <div class="tax-input-grid">
       <div class="tax-field">
         <label>Annual gross (€)</label>
@@ -806,10 +827,38 @@ body.dark .sim-verdict{color:#ccc}
       <div class="rrow total-row"><span class="rl">Monthly net</span><span class="rv info" id="tc-mnet">—</span></div>
 
       <div class="panel-label" style="margin-top:12px">Annual totals</div>
-      <div class="rrow"><span class="rl">Annual gross</span><span class="rv" id="tc-agross">—</span></div>
-      <div class="rrow"><span class="rl">Annual SV total</span><span class="rv neg" id="tc-asv">—</span></div>
-      <div class="rrow"><span class="rl">Annual Lohnsteuer</span><span class="rv neg" id="tc-alst">—</span></div>
-      <div class="rrow total-row"><span class="rl">Annual net</span><span class="rv info" id="tc-anet">—</span></div>
+      <div class="rrow"><span class="rl">Annual gross (12 regular salaries)</span><span class="rv" id="tc-agross">—</span></div>
+      <div class="rrow"><span class="rl">Annual SV (regular months)</span><span class="rv neg" id="tc-asv">—</span></div>
+      <div class="rrow"><span class="rl">Annual Lohnsteuer (§66, progressive)</span><span class="rv neg" id="tc-alst">—</span></div>
+      <div class="rrow total-row"><span class="rl">Annual net (12 salaries)</span><span class="rv info" id="tc-anet">—</span></div>
+
+      <!-- SZ toggle -->
+      <div class="sz-toggle-row">
+        <input type="checkbox" id="tc-sz-toggle" checked onchange="renderTaxCalc()" style="width:auto;margin:0">
+        <label for="tc-sz-toggle">Include Sonderzahlungen (13th + 14th salary, §67)</label>
+      </div>
+      <div id="tc-sz-section">
+        <div class="sz-calc-box">
+          <div class="rrow"><span class="rl" style="color:#854f0b">SZ gross (2 × base salary)</span><span class="rv" id="tc-sz-gross">—</span></div>
+          <div class="rrow"><span class="rl" style="color:#854f0b">SZ Freibetrag (€620 × 2, tax-free)</span><span class="rv pos" id="tc-sz-free">— €1,240.00</span></div>
+          <div class="rrow"><span class="rl" style="color:#854f0b">SZ SV (normal rates, both months)</span><span class="rv neg" id="tc-sz-sv">—</span></div>
+          <div class="rrow"><span class="rl" style="color:#854f0b">SZ Lohnsteuer (6% flat, §67)</span><span class="rv neg" id="tc-sz-lst">—</span></div>
+          <div class="rrow"><span class="rl" style="color:#854f0b;font-weight:500">SZ net (both months combined)</span><span class="rv" id="tc-sz-net">—</span></div>
+          <div style="font-size:10px;color:#aaa;margin-top:6px" id="tc-sz-saving"></div>
+        </div>
+        <div class="rrow total-row" style="margin-top:4px">
+          <span class="rl">Grand total annual net <span style="font-size:9px;color:#aaa">(14 salaries)</span></span>
+          <span class="rv info" id="tc-grand-net">—</span>
+        </div>
+        <div class="rrow">
+          <span class="rl">True effective rate <span style="font-size:9px;color:#aaa">(all LSt / all gross)</span></span>
+          <span class="rv" id="tc-true-effrate">—</span>
+        </div>
+        <div class="rrow">
+          <span class="rl">True hourly rate <span style="font-size:9px;color:#aaa">(14-sal. annual net ÷ 2080h)</span></span>
+          <span class="rv" id="tc-true-hourly">—</span>
+        </div>
+      </div>
 
       <div class="panel-label" style="margin-top:12px">Effective rates</div>
       <div class="rrow"><span class="rl">Effective tax rate (LSt / gross)</span><span class="rv" id="tc-effrate">—</span></div>
@@ -827,7 +876,7 @@ body.dark .sim-verdict{color:#ccc}
       <div id="tc-supplement-rows"></div>
     </div>
     <div id="tc-cap-notice" style="display:none;background:#eaf3de;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:11px;color:#3b6d11">✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.</div>
-    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Enter your <strong>regular annual gross (12 salaries)</strong> — per §66 EStG, Austrian Lohnsteuer on monthly salary is always annualised at ×12. Sonderzahlungen (13th/14th month) are taxed separately at 6% flat under §67 and are <em>not</em> included here. UV is employer-only. Confirm with your payroll office.</p>
+    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.</p>
   </div>
 
   <!-- ── SETTINGS ── -->
@@ -1858,16 +1907,59 @@ function renderTaxCalc(){
   document.getElementById('tc-lst').textContent='− '+fmt(lst);
   document.getElementById('tc-haz').textContent='+ '+fmt(hazard);
   document.getElementById('tc-mnet').textContent=fmt(monthlyNet);
-  document.getElementById('tc-agross').textContent=fmt(annual);
+  document.getElementById('tc-agross').textContent=fmt(annual)+' (12 × '+fmt(annual/12)+')';
   document.getElementById('tc-asv').textContent='− '+fmt(annualSV);
-  document.getElementById('tc-alst').textContent='− '+fmt(annualLSt);
+  document.getElementById('tc-alst').textContent='− '+fmt(annualLSt)+' (progressive brackets)';
   document.getElementById('tc-anet').textContent=fmt(annualNet);
   document.getElementById('tc-effrate').textContent=effRate.toFixed(2)+'%';
   document.getElementById('tc-totrate').textContent=totRate.toFixed(2)+'%';
   document.getElementById('tc-hourly').textContent='€ '+(monthlyNet/173.33).toFixed(2)+'/h';
   document.getElementById('tc-marginal').textContent=(marginal*100).toFixed(0)+'%';
   var capNotice=document.getElementById('tc-cap-notice');
-  if(capNotice) capNotice.style.display=monthlyGross>SV_CAP_MONTHLY?'':'none'; // cap = €6,930/mo 2026
+  if(capNotice) capNotice.style.display=monthlyGross>SV_CAP_MONTHLY?'':'none';
+
+  // ── §67 Sonderzahlung section ──────────────────────────────────────────
+  var szToggle=document.getElementById('tc-sz-toggle');
+  var szSection=document.getElementById('tc-sz-section');
+  var includeSZ=szToggle&&szToggle.checked;
+  if(szSection) szSection.style.display=includeSZ?'':'none';
+  if(includeSZ){
+    var szBase=annual/12; // 1× monthly base per SZ (not including supplements)
+    var sz1=calcSonderzahlung(szBase);  // one SZ payout
+    var sz2=calcSonderzahlung(szBase);  // second SZ payout (same base)
+    var szGrossTotal=sz1.gross+sz2.gross;
+    var szSVTotal=sz1.sv+sz2.sv;
+    var szLSTTotal=sz1.lst+sz2.lst;
+    var szNetTotal=sz1.net+sz2.net;
+
+    // What LSt would have been without §67 flat rate (i.e. at marginal bracket)
+    var szLSTIfNormal=(Math.max(0,szBase-620)*marginal)*2; // approx: taxable × marginal
+    var szSaving=szLSTIfNormal-szLSTTotal;
+
+    document.getElementById('tc-sz-gross').textContent=fmt(szGrossTotal)+' (2 × '+fmt(szBase)+')';
+    document.getElementById('tc-sz-free').textContent='− €1,240.00 (2 × €620 Freibetrag)';
+    document.getElementById('tc-sz-sv').textContent='− '+fmt(szSVTotal)+' ('+((szSVTotal/szGrossTotal)*100).toFixed(2)+'%)';
+    document.getElementById('tc-sz-lst').textContent='− '+fmt(szLSTTotal)+' (6% flat, §67)';
+    document.getElementById('tc-sz-net').textContent=fmt(szNetTotal);
+
+    var savingEl=document.getElementById('tc-sz-saving');
+    if(savingEl){
+      savingEl.innerHTML='💡 §67 flat rate saves approx. <strong>'+fmt(szSaving)+'</strong> per year compared to taxing SZ at your '+
+        (marginal*100).toFixed(0)+'% marginal bracket. That\'s the whole point of the 14th salary structure.';
+    }
+
+    // Grand totals including SZ
+    var grandGross=annual+szGrossTotal;
+    var grandSV=annualSV+szSVTotal;
+    var grandLST=annualLSt+szLSTTotal;
+    var grandNet=annualNet+szNetTotal;
+    var trueEffRate=grandLST/grandGross*100;
+    var trueHourly=grandNet/2080; // 40h×52w
+
+    document.getElementById('tc-grand-net').textContent=fmt(grandNet);
+    document.getElementById('tc-true-effrate').textContent=trueEffRate.toFixed(2)+'% (LSt only) / '+((grandSV+grandLST)/grandGross*100).toFixed(2)+'% (SV+LSt)';
+    document.getElementById('tc-true-hourly').textContent='€ '+trueHourly.toFixed(2)+'/h';
+  }
 
   // Brackets table
   var tbody='';
