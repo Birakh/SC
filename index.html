@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ShiftPlanner">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23185fa5'/><text y='.9em' font-size='70' x='50%' text-anchor='middle'>📅</text></svg>">
-<title>Shift Salary Planner — MedAustron</title>
+<title>Austrian Shift &amp; Salary Planner</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0efea;color:#1a1a1a;font-size:14px;line-height:1.5}
@@ -478,7 +478,15 @@ body.dark .av-box{background:#2e2318;border-color:#6a4a20}
 body.dark .av-box .av-title{color:#c8943a}
 body.dark .av-field{border-bottom-color:#3a2e18}
 body.dark .av-field .ak{color:#999}
-/* Shift templates */
+/* Tooltip */
+.tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#e0e8f5;color:#185fa5;font-size:9px;font-weight:700;cursor:help;margin-left:3px;vertical-align:middle;flex-shrink:0}
+body.dark .tip{background:#2a4a6e;color:#8bbde0}
+/* Advanced accordion */
+.adv-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:8px 0;font-size:11px;color:#aaa;user-select:none}
+.adv-header:hover{color:#555}
+body.dark .adv-header:hover{color:#bbb}
+.adv-content{display:none}
+.adv-content.open{display:block}
 .tpl-list{margin-bottom:8px}
 .tpl-row{display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:.5px solid #f0f0f0;font-size:12px}
 .tpl-row:last-child{border-bottom:none}
@@ -550,8 +558,8 @@ body.dark .sz-toggle-row label{color:#999}
 <div class="left">
   <div class="app-header">
     <div>
-      <div class="app-title">Shift Salary Planner</div>
-      <div class="app-sub">MedAustron · click any day to add or edit a shift</div>
+      <div class="app-title">Shift &amp; Salary Planner</div>
+      <div class="app-sub">Austria · click any day to add or edit a shift</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <div class="month-nav">
@@ -882,42 +890,40 @@ body.dark .sz-toggle-row label{color:#999}
   <!-- ── SETTINGS ── -->
   <div class="rpanel" id="tab-settings" style="display:none">
     <div class="panel-section">
-      <div class="panel-label">Grade & pay</div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Current grade (sets active base salary)</label>
-        <select id="grade" onchange="saveSettings();renderAll()">
-          <option value="4097.71">RT / 1 — €4,097.71</option>
-          <option value="4144.48">RT / 2 — €4,144.48</option>
-          <option value="4192.49">RT / 3 — €4,192.49</option>
-          <option value="4241.78">RT / 4 — €4,241.78</option>
-          <option value="4292.39">RT / 5 — €4,292.39</option>
-          <option value="4344.37">RT / 6 — €4,344.37</option>
-          <option value="4397.76">RT / 7 — €4,397.76</option>
-          <option value="4452.62">RT / 8 — €4,452.62</option>
-          <option value="4376.33" selected>RT / 9 — €4,376.33</option>
-          <option value="4566.01">RT / 10 — €4,566.01</option>
-          <option value="4625.66">RT / 11 — €4,625.66</option>
-          <option value="4686.86">RT / 12 — €4,686.86</option>
-          <option value="4749.67">RT / 13 — €4,749.67</option>
-          <option value="4814.14">RT / 14 — €4,814.14</option>
-          <option value="4880.33">RT / 15 — €4,880.33</option>
-          <option value="0">Custom — use grade history ↓</option>
-        </select></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Night 8% threshold (for early/normal shifts)</label>
+      <div class="panel-label">Your Salary</div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Monthly gross salary (€) <span style="color:#aaa;font-weight:400">— find this on your payslip (Bruttobezug)</span></label>
+        <input type="number" id="grade" step="0.01" min="0" placeholder="e.g. 3200.00" onchange="saveSettings();renderAll()" style="font-size:14px;padding:6px 8px;border:.5px solid #ccc;border-radius:6px;width:100%">
+        <div style="font-size:10px;color:#aaa;margin-top:3px">Regular monthly salary before tax and social insurance. Bonus months are handled separately below.</div>
+      </div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Night-work starts after
+          <span class="tip" title="Austrian law (§68 EStG) defines night hours for the 8% tax-free supplement. Check your collective agreement.">ℹ</span></label>
         <select id="thresh" onchange="saveSettings();renderAll()">
-          <option value="18">After 18:00</option>
-          <option value="20" selected>After 20:00</option>
-          <option value="22">After 22:00</option>
-        </select></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Erschwerniszulage — Hazard allowance (€/month, tax-free)</label>
-        <input type="number" id="hazard-allow" value="230.43" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual Urlaub entitlement (days)</label>
-        <input type="number" id="urlaub-days" value="25" step="1" min="0" max="60" onchange="saveSettings();renderAll()"></div>
+          <option value="18">18:00</option>
+          <option value="20" selected>20:00</option>
+          <option value="22">22:00</option>
+        </select>
+        <div style="font-size:10px;color:#aaa;margin-top:3px">Hours worked after this time qualify for the 8% night allowance.</div>
+      </div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Special allowance — Zulage (€/month, tax-free)
+          <span class="tip" title="Any recurring tax-free allowance from your employer, e.g. hazard pay (Erschwerniszulage). Find it on your payslip. Set to 0 if none.">ℹ</span></label>
+        <input type="number" id="hazard-allow" value="0" step="0.01" min="0" onchange="saveSettings();renderAll()">
+      </div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual leave entitlement (days)</label>
+        <input type="number" id="urlaub-days" value="25" step="1" min="0" max="60" onchange="saveSettings();renderAll()">
+      </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <input type="checkbox" id="show-employer-costs" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
-        <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer">Show employer-side costs in Report (DB+DZ+MV+UV)</label>
+        <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer">Show employer costs in Report (DB + DZ + MV + UV)</label>
       </div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Betriebsratsumlage — Works council deduction (%)</label>
-        <input type="number" id="br-rate" value="0.3" step="0.05" min="0" max="2" onchange="saveSettings();renderAll()"></div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Works council deduction — Betriebsratsumlage (%)
+          <span class="tip" title="A small deduction if you have a works council. Typically 0.25–0.5%. Check your payslip or ask HR. Set to 0 if unsure.">ℹ</span></label>
+        <input type="number" id="br-rate" value="0" step="0.05" min="0" max="2" onchange="saveSettings();renderAll()">
+      </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -973,58 +979,47 @@ body.dark .sz-toggle-row label{color:#999}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">Rufbereitschaft — confirm with HR</div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Standby flat rate (€/hour)</label>
-        <input type="number" id="ruf-rate" value="3.91" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Rufeinsatz call-in rate</label>
+      <div class="panel-label">On-call &amp; Standby</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Configure if you work standby shifts (Rufbereitschaft) or get called in outside your normal hours.</div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Standby flat rate (€/hour)
+          <span class="tip" title="The hourly rate you receive for being on standby (Rufbereitschaft). Find this in your contract or collective agreement.">ℹ</span></label>
+        <input type="number" id="ruf-rate" value="0" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Call-in overtime rate</label>
         <select id="callin-mult" onchange="saveSettings();renderAll()">
-          <option value="1.5">+50% overtime</option>
-          <option value="2.0">+100% overtime</option>
+          <option value="1.5">+50% (standard overtime)</option>
+          <option value="2.0">+100% (double time)</option>
           <option value="1.0">Normal rate</option>
         </select></div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <input type="checkbox" id="ruf-sv-base" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
-        <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer">Include Ruf pay in SV base (confirm with HR — §49 ASVG)</label>
+        <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer">Include standby pay in social insurance base
+          <span class="tip" title="In some contracts standby pay is included in the SV calculation base, in others it is not. Ask your HR or payroll office.">ℹ</span></label>
       </div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Weekend/holiday standby multiplier</label>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Weekend / holiday standby multiplier</label>
         <select id="ruf-wknd" onchange="saveSettings();renderAll()">
-          <option value="1">× 1 same</option>
-          <option value="2">× 2 double</option>
-          <option value="4">× 4 quadruple</option>
+          <option value="1">× 1 — same as weekday</option>
+          <option value="2">× 2 — double</option>
+          <option value="4">× 4 — quadruple</option>
         </select>
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">☁️ Secure Cloud Sync (Private GitHub Repo)</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">
-        Data is AES-GCM encrypted before upload — only ciphertext ever leaves this device.
-        Use a <strong style="color:#555">fine-grained PAT</strong> scoped to your target repo with
-        <em>Contents: Read &amp; Write</em> only.
-        PAT lives in <code style="font-size:9px;background:#f0f0f0;padding:1px 4px;border-radius:3px">sessionStorage</code>
-        (cleared on tab close); repo/branch in
-        <code style="font-size:9px;background:#f0f0f0;padding:1px 4px;border-radius:3px">localStorage</code>;
-        password never stored.
-        <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5;white-space:nowrap">Create fine-grained PAT ↗</a>
-      </p>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">GitHub PAT</label>
-        <input type="password" id="sync-pat" placeholder="ghp_…" autocomplete="off" oninput="saveSyncConfig()"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Repository <span style="color:#bbb">(owner/repo-name)</span></label>
-        <input type="text" id="sync-repo" placeholder="e.g. abi/my-private-notes" autocomplete="off" oninput="saveSyncConfig()"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Branch <span style="color:#bbb">(default: main)</span></label>
-        <input type="text" id="sync-branch" placeholder="main" autocomplete="off" oninput="saveSyncConfig()" style="width:120px"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Sync Password <span style="color:#bbb">(in memory only)</span></label>
-        <input type="password" id="sync-password" placeholder="encryption passphrase" autocomplete="new-password"></div>
-      <div style="display:flex;gap:6px;margin-bottom:4px">
-        <button class="mbtn primary" style="flex:1" onclick="syncToRepo()">⬆ Push to Repo<span class="sync-dirty-dot" id="dirty-dot" title="Unsynced local changes"></span></button>
-        <button class="mbtn" style="flex:1" onclick="syncFromRepo()">⬇ Pull from Repo</button>
+      <div class="panel-label">Social Insurance — Regional settings</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Most rates are set by Austrian federal law. The Wohnbauförderungsbeitrag varies by state (Bundesland). Confirm with your payslip.</div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Housing subsidy contribution — WBF (% of gross)
+          <span class="tip" title="Wohnbauförderungsbeitrag — a state-level SV contribution. Lower Austria (NÖ): 0.5%. Vienna: 0.5%. Other states may differ. Check your payslip.">ℹ</span></label>
+        <input type="number" id="wbf-rate" value="0.5" step="0.1" min="0" max="1" onchange="saveSettings();renderAll()">
       </div>
-      <div id="sync-status" style="font-size:11px;color:#888;text-align:center;min-height:18px;margin-top:4px"></div>
-      <div id="sync-last" style="font-size:10px;color:#aaa;text-align:center;margin-top:3px"></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">💾 Local Backup</div>
+      <div class="panel-label">💾 Backup</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Export a backup file regularly. Your data lives only in this browser — no automatic cloud backup unless you set up sync below.</div>
       <div style="display:flex;gap:6px;margin-bottom:6px">
         <button class="mbtn" style="flex:1" onclick="exportJSON()">📤 Export JSON</button>
         <button class="mbtn" style="flex:1" onclick="exportXLSX()">📊 Export Excel</button>
@@ -1034,14 +1029,45 @@ body.dark .sz-toggle-row label{color:#999}
     </div>
     <hr class="divider">
     <div class="panel-section">
+      <!-- Advanced accordion -->
+      <div class="adv-header" onclick="toggleAdv()">
+        <span>☁️ Advanced — Cloud Sync</span>
+        <span id="adv-arrow">▸</span>
+      </div>
+      <div class="adv-content" id="adv-content">
+        <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.6">
+          <strong style="color:#555">Optional.</strong> Sync your data to a private GitHub repository — encrypted on your device before upload.<br><br>
+          <strong>Step 1:</strong> Create a private GitHub repo (free).<br>
+          <strong>Step 2:</strong> Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">fine-grained PAT ↗</a> with <em>Contents: Read &amp; Write</em> for that repo only.<br>
+          <strong>Step 3:</strong> Choose a strong sync password. <strong>Write it down</strong> — without it your data cannot be decrypted.<br>
+          <strong>Step 4:</strong> Fill in the fields below and press Push.
+        </p>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">GitHub Personal Access Token (PAT)</label>
+          <input type="password" id="sync-pat" placeholder="ghp_…" autocomplete="off" oninput="saveSyncConfig()"></div>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Repository <span style="color:#bbb">(owner/repo-name)</span></label>
+          <input type="text" id="sync-repo" placeholder="e.g. yourname/my-planner" autocomplete="off" oninput="saveSyncConfig()"></div>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Branch</label>
+          <input type="text" id="sync-branch" placeholder="main" autocomplete="off" oninput="saveSyncConfig()" style="width:120px"></div>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Sync Password <span style="color:#bbb">(never stored — enter each session)</span></label>
+          <input type="password" id="sync-password" placeholder="Your encryption passphrase" autocomplete="new-password"></div>
+        <div style="display:flex;gap:6px;margin-bottom:4px">
+          <button class="mbtn primary" style="flex:1" onclick="syncToRepo()">⬆ Push<span class="sync-dirty-dot" id="dirty-dot" title="Unsynced changes"></span></button>
+          <button class="mbtn" style="flex:1" onclick="syncFromRepo()">⬇ Pull</button>
+        </div>
+        <div id="sync-status" style="font-size:11px;color:#888;text-align:center;min-height:18px;margin-top:4px"></div>
+        <div id="sync-last" style="font-size:10px;color:#aaa;text-align:center;margin-top:3px"></div>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="panel-section">
       <div class="panel-label">📋 Shift Templates</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Save the current modal settings as a named template. Apply a template to fill a whole week from any day.</p>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Save a shift pattern as a template. Apply it to fill Mon–Fri of any week in one tap.</p>
       <div class="tpl-list" id="tpl-list"></div>
       <div style="display:flex;gap:6px;align-items:center">
         <input type="text" id="tpl-name-input" placeholder="Template name (e.g. Standard week)" maxlength="30" style="flex:1;font-size:12px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px">
         <button class="mbtn primary" onclick="saveTemplate()" style="white-space:nowrap">💾 Save current</button>
       </div>
-      <div style="font-size:10px;color:#aaa;margin-top:6px">Saves the shift type, start/end times, and note from the last-opened modal.</div>
+      <div style="font-size:10px;color:#aaa;margin-top:6px">Opens the last-used modal type, times and note as the template.</div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -1130,6 +1156,37 @@ body.dark .sz-toggle-row label{color:#999}
     <div style="font-size:10px;color:#aaa;margin-top:10px;line-height:1.5">⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.</div>
   </div>
 
+<!-- ═══ FIRST-RUN WIZARD ═══ -->
+<div class="cs-overlay" id="wizard-overlay">
+  <div class="cs-box" style="max-width:380px">
+    <div style="font-size:18px;margin-bottom:4px">👋 Welcome to Shift & Salary Planner</div>
+    <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6">A free, private Austrian shift calculator. Your data never leaves your device. Let's set up the three things we need.</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">1. Your monthly gross salary (€)</label>
+      <input type="number" id="wiz-salary" placeholder="e.g. 3200.00" step="0.01" min="0" style="width:100%;font-size:14px;padding:7px 10px;border:.5px solid #ccc;border-radius:7px">
+      <div style="font-size:10px;color:#aaa;margin-top:3px">Find this on your payslip (Bruttobezug). You can change it later.</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">2. Do you receive bonus months?</label>
+      <select id="wiz-model" style="width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px">
+        <option value="14">Yes — 13th and 14th salary (standard in Austria)</option>
+        <option value="13">Yes — one bonus month</option>
+        <option value="12">No — 12 salaries only</option>
+      </select>
+      <div style="font-size:10px;color:#aaa;margin-top:3px">Most Austrian employees receive Urlaubsgeld (June) + Weihnachtsgeld (November).</div>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">3. Do you work shift or on-call hours?</label>
+      <select id="wiz-shifts" style="width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px">
+        <option value="yes">Yes — I work shifts (early, late, nights, weekends)</option>
+        <option value="no">No — regular office hours only</option>
+      </select>
+    </div>
+    <button class="mbtn primary" style="width:100%;padding:10px;font-size:13px" onclick="finishWizard()">Get started →</button>
+    <div style="font-size:10px;color:#aaa;margin-top:10px;text-align:center">All settings can be changed later in the Settings tab.</div>
+  </div>
+</div>
+
 <!-- ═══ MONTH JUMP PICKER ═══ -->
 <div class="mjump-overlay" id="mjump-overlay" onclick="closeMonthJump()">
   <div class="mjump-popup" id="mjump-popup" onclick="event.stopPropagation()">
@@ -1189,6 +1246,21 @@ body.dark .sz-toggle-row label{color:#999}
   <div class="mfield">
     <label>Type</label>
     <select id="m-type" onchange="updateDuration();_markModalDirty()">
+      <option value="normal">☀️ Early / Normal shift</option>
+      <option value="middle">🌅 Middle shift</option>
+      <option value="late">🌙 Late shift</option>
+      <option value="latenight">🌙 Late + Night 8%</option>
+      <option value="holiday">🏖 Public holiday worked</option>
+      <option value="leave">🏝 Annual leave</option>
+      <option value="ruf">📟 On-call standby (Ruf)</option>
+      <option value="callin">🚨 Call-in (Rufeinsatz)</option>
+    </select>
+    <div style="font-size:10px;color:#aaa;margin-top:3px">
+      <strong>Early/Middle/Late:</strong> standard shifts at different times ·
+      <strong>Late+Night 8%:</strong> late shift where the night allowance applies ·
+      <strong>Standby:</strong> you're on call but not physically at work ·
+      <strong>Call-in:</strong> called in during standby
+    </div>
       <option value="normal">Normal shift (8% night hours)</option>
       <option value="middle">Middle shift — 11:30–20:00 (+€35.50 fixed)</option>
       <option value="late">Late shift — 14:00–22:30 (+€50 fixed)</option>
@@ -1326,7 +1398,7 @@ function removeGradeEntry(ym){
 }
 
 function saveGradeHistory(){
-  try{localStorage.setItem('med_grade_hist',JSON.stringify(gradeHistory));}catch(e){}
+  try{localStorage.setItem('sp_grades',JSON.stringify(gradeHistory));}catch(e){}
   markDirty(true);
 }
 
@@ -1371,25 +1443,19 @@ function calcLohnsteuerAnnual(annualTaxableAfterSV){
 
 var SV_CAP_MONTHLY=6930; // 2026 Höchstbeitragsgrundlage (annual cap €97,020)
 var SV_AV_THRESHOLD=2630; // AV = 0% below this monthly gross (§2 AlVG 2026)
-function calcSVMonthly(monthlyGross){
+// SV_WBF is now configurable via wbf-rate setting (default 0.5%)
+function calcSVMonthly(monthlyGross, wbfRate){
+  var wbf=wbfRate!=null?wbfRate:SV_WBF; // allow override; default = NÖ 0.5%
   var capped=Math.min(monthlyGross,SV_CAP_MONTHLY);
-  var av=monthlyGross>=SV_AV_THRESHOLD?capped*SV_AV:0; // AV only applies above threshold
-  var total=capped*SV_KV+capped*SV_PV+av+capped*SV_AK+capped*SV_WBF;
-  return {
-    kv:  capped*SV_KV,
-    pv:  capped*SV_PV,
-    av:  av,
-    ak:  capped*SV_AK,
-    wbf: capped*SV_WBF,
-    total: total,
-    capped: monthlyGross>SV_CAP_MONTHLY
-  };
+  var av=monthlyGross>=SV_AV_THRESHOLD?capped*SV_AV:0;
+  var total=capped*SV_KV+capped*SV_PV+av+capped*SV_AK+capped*wbf;
+  return {kv:capped*SV_KV,pv:capped*SV_PV,av:av,ak:capped*SV_AK,wbf:capped*wbf,total:total,capped:monthlyGross>SV_CAP_MONTHLY};
 }
 
-function calcMonthlyLSt(monthlyTaxableGross){
+function calcMonthlyLSt(monthlyTaxableGross, wbfRate){
   // Annualize → deduct actual SV (respects AV threshold) → apply brackets → monthly
   var annual=monthlyTaxableGross*12;
-  var annualSV=calcSVMonthly(monthlyTaxableGross).total*12; // uses real SV incl. AV threshold
+  var annualSV=calcSVMonthly(monthlyTaxableGross, wbfRate).total*12;
   var annualAfterSV=annual-annualSV;
   var annualLSt=calcLohnsteuerAnnual(annualAfterSV);
   return annualLSt/12;
@@ -1405,14 +1471,15 @@ function getSettings(){
     rufWknd:   parseFloat(document.getElementById('ruf-wknd').value)||1,
     middleS:   parseFloat(document.getElementById('middle-suppl').value)||35.50,
     lateS:     parseFloat(document.getElementById('late-suppl').value)||50.00,
-    hazard:    parseFloat(document.getElementById('hazard-allow').value)||230.43,
+    hazard:    parseFloat(document.getElementById('hazard-allow').value)||0,
     szMonth1:  parseInt(document.getElementById('sz-month1').value),
     szMonth2:  parseInt(document.getElementById('sz-month2').value),
     salaryModel: parseInt(document.getElementById('salary-model').value)||14,
     urlaubDays:parseInt(document.getElementById('urlaub-days').value)||25,
     showEmployerCosts:document.getElementById('show-employer-costs').checked,
-    brRate:(parseFloat(document.getElementById('br-rate').value)||0.3)/100,
+    brRate:(parseFloat(document.getElementById('br-rate').value)||0)/100,
     rufSVBase:document.getElementById('ruf-sv-base').checked,
+    wbfRate:(parseFloat(document.getElementById('wbf-rate').value)||0.5)/100,
   };
 }
 
@@ -1509,8 +1576,8 @@ function calcSalary(year,month){
     + holBasePay + leavePay + callinP
     + (s.rufSVBase?rufPay:0); // Ruf in SV base only if enabled in Settings
   var br  = taxable*s.brRate;
-  var svM = calcSVMonthly(taxable);
-  var lst = calcMonthlyLSt(taxable);
+  var svM = calcSVMonthly(taxable, s.wbfRate);
+  var lst = calcMonthlyLSt(taxable, s.wbfRate);
   var gross = taxable+rufPay+s.hazard-br;
   var net   = gross-svM.total-lst;
 
@@ -1538,9 +1605,9 @@ function calcSalary(year,month){
   };
 }
 
-function calcSonderzahlung(base){
+function calcSonderzahlung(base, wbfRate){
   // Austrian §67 taxation: up to €620 Freibetrag, remainder at fixed 6%; SV on full amount
-  var svAmount=calcSVMonthly(base).total; // respects AV threshold and cap
+  var svAmount=calcSVMonthly(base, wbfRate).total; // respects AV threshold and cap
   var lst=Math.max(0,base-620)*0.06;
   return {gross:base, sv:svAmount, lst:lst, net:base-svAmount-lst};
 }
@@ -1586,8 +1653,8 @@ function renderReport(){
     capRow.style.display=r.svM.capped?'':'none';
     if(r.svM.capped&&document.getElementById('r-cap-save')){
       // Actual saving = SV on full taxable minus SV on capped amount
-      var svUncapped=calcSVMonthly(r.taxable).total;
-      var svCapped=calcSVMonthly(SV_CAP_MONTHLY).total;
+      var svUncapped=calcSVMonthly(r.taxable, s.wbfRate).total;
+      var svCapped=calcSVMonthly(SV_CAP_MONTHLY, s.wbfRate).total;
       document.getElementById('r-cap-save').textContent='saving '+fmt(svUncapped-svCapped);
     }
   }
@@ -1653,7 +1720,7 @@ function renderReport(){
   var pvYTD=0;
   for(var pm=0;pm<=currentMonth;pm++){
     var pmBase=getBaseForMonth(currentYear,pm);
-    pvYTD+=calcSVMonthly(pmBase).pv;
+    pvYTD+=calcSVMonthly(pmBase, s.wbfRate).pv;
   }
   var pvAnnualCap=SV_CAP_MONTHLY*SV_PV*12;
   var pvPct=Math.min(100,(pvYTD/pvAnnualCap*100));
@@ -1816,7 +1883,7 @@ function saveOT(){
   var entry=_otEntry(mk);
   if(!isNaN(v)&&v>=0) entry.taken=v; else entry.taken=0;
   otData[mk]=entry;
-  try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(e){}
+  try{localStorage.setItem('sp_ot',JSON.stringify(otData));}catch(e){}
   renderOT();
 }
 function setOTType(type){
@@ -1824,7 +1891,7 @@ function setOTType(type){
   var entry=_otEntry(mk);
   entry.type=type;
   otData[mk]=entry;
-  try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(e){}
+  try{localStorage.setItem('sp_ot',JSON.stringify(otData));}catch(e){}
   renderOT();
 }
 
@@ -1850,7 +1917,8 @@ function renderTaxCalc(){
   var holPayM=hourly*2*holhM;
 
   var monthlyGross=annual/12+suppl+oncallM+holPayM;
-  var sv=calcSVMonthly(monthlyGross);
+  var s=getSettings();
+  var sv=calcSVMonthly(monthlyGross, s.wbfRate);
   var lst=calcMonthlyLSt(monthlyGross);
   var annualSV=sv.total*12;
   var annualLSt=lst*12;
@@ -1974,13 +2042,13 @@ function renderTaxCalc(){
   // Supplement impact
   var rows='';
   if(suppl>0){
-    rows+='<div class="rrow"><span class="rl">Supplements (€'+suppl.toFixed(2)+'/month)</span><span class="rv pos">+€'+(suppl-(calcSVMonthly(monthlyGross+suppl).total-sv.total)-calcMonthlyLSt(monthlyGross+suppl)+lst).toFixed(2)+' net impact</span></div>';
+    rows+='<div class="rrow"><span class="rl">Supplements (€'+suppl.toFixed(2)+'/month)</span><span class="rv pos">+€'+(suppl-(calcSVMonthly(monthlyGross+suppl,s.wbfRate).total-sv.total)-calcMonthlyLSt(monthlyGross+suppl,s.wbfRate)+lst).toFixed(2)+' net impact</span></div>';
   }
   if(oncallM>0){
-    rows+='<div class="rrow"><span class="rl">On-call pay (€'+oncallM.toFixed(2)+'/month)</span><span class="rv pos">+€'+(oncallM-(calcSVMonthly(monthlyGross+oncallM).total-sv.total)-calcMonthlyLSt(monthlyGross+oncallM)+lst).toFixed(2)+' net impact</span></div>';
+    rows+='<div class="rrow"><span class="rl">On-call pay (€'+oncallM.toFixed(2)+'/month)</span><span class="rv pos">+€'+(oncallM-(calcSVMonthly(monthlyGross+oncallM,s.wbfRate).total-sv.total)-calcMonthlyLSt(monthlyGross+oncallM,s.wbfRate)+lst).toFixed(2)+' net impact</span></div>';
   }
   if(holhM>0){
-    rows+='<div class="rrow"><span class="rl">Holiday hours '+holhM+' × €'+(hourly*2).toFixed(2)+'/h</span><span class="rv pos">+€'+(holPayM-(calcSVMonthly(monthlyGross+holPayM).total-sv.total)-calcMonthlyLSt(monthlyGross+holPayM)+lst).toFixed(2)+' net (approx)</span></div>';
+    rows+='<div class="rrow"><span class="rl">Holiday hours '+holhM+' × €'+(hourly*2).toFixed(2)+'/h</span><span class="rv pos">+€'+(holPayM-(calcSVMonthly(monthlyGross+holPayM,s.wbfRate).total-sv.total)-calcMonthlyLSt(monthlyGross+holPayM,s.wbfRate)+lst).toFixed(2)+' net (approx)</span></div>';
   }
   document.getElementById('tc-supplement-rows').innerHTML=rows||'<div style="font-size:11px;color:#aaa">Enter supplements above to see impact</div>';
 }
@@ -2315,8 +2383,8 @@ function saveData(){
       var warn=document.getElementById('storage-warn');
       if(warn) warn.style.display='none';
     }
-    localStorage.setItem('med_shifts2',JSON.stringify(shifts));
-    localStorage.setItem('med_actuals2',JSON.stringify(actuals));
+    localStorage.setItem('sp_shifts',JSON.stringify(shifts));
+    localStorage.setItem('sp_actuals',JSON.stringify(actuals));
     markDirty(true);
   }catch(e){
     var warn=document.getElementById('storage-warn');
@@ -2324,16 +2392,16 @@ function saveData(){
   }
 }
 function markDirty(isDirty){
-  try{localStorage.setItem('med_sync_dirty',isDirty?'1':'0');}catch(e){}
+  try{localStorage.setItem('sp_dirty',isDirty?'1':'0');}catch(e){}
   var dot=document.getElementById('dirty-dot');
   if(dot) dot.className='sync-dirty-dot'+(isDirty?' show':'');
 }
-function saveSettings(){try{localStorage.setItem('med_settings2',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value,showEmployerCosts:document.getElementById('show-employer-costs').checked,brRate:document.getElementById('br-rate').value,rufSVBase:document.getElementById('ruf-sv-base').checked,salaryModel:document.getElementById('salary-model').value}));}catch(e){}}
+function saveSettings(){try{localStorage.setItem('sp_settings',JSON.stringify({grade:document.getElementById('grade').value,thresh:document.getElementById('thresh').value,rufRate:document.getElementById('ruf-rate').value,callinMult:document.getElementById('callin-mult').value,rufWknd:document.getElementById('ruf-wknd').value,middleS:document.getElementById('middle-suppl').value,lateS:document.getElementById('late-suppl').value,hazard:document.getElementById('hazard-allow').value,szMonth1:document.getElementById('sz-month1').value,szMonth2:document.getElementById('sz-month2').value,urlaubDays:document.getElementById('urlaub-days').value,showEmployerCosts:document.getElementById('show-employer-costs').checked,brRate:document.getElementById('br-rate').value,rufSVBase:document.getElementById('ruf-sv-base').checked,salaryModel:document.getElementById('salary-model').value,wbfRate:document.getElementById('wbf-rate').value}));}catch(e){}}
 function loadData(){
   try{
-    var s=localStorage.getItem('med_shifts2'),a=localStorage.getItem('med_actuals2'),cfg=localStorage.getItem('med_settings2');
-    var ot=localStorage.getItem('med_ot2');
-    var gh=localStorage.getItem('med_grade_hist');
+    var s=localStorage.getItem('sp_shifts'),a=localStorage.getItem('sp_actuals'),cfg=localStorage.getItem('sp_settings');
+    var ot=localStorage.getItem('sp_ot');
+    var gh=localStorage.getItem('sp_grades');
     if(s)shifts=JSON.parse(s);
     if(a)actuals=JSON.parse(a);
     if(ot)otData=JSON.parse(ot);
@@ -2354,17 +2422,18 @@ function loadData(){
       if(c.brRate!=null)document.getElementById('br-rate').value=c.brRate;
       if(c.rufSVBase)document.getElementById('ruf-sv-base').checked=c.rufSVBase;
       if(c.salaryModel)document.getElementById('salary-model').value=c.salaryModel;
+      if(c.wbfRate!=null)document.getElementById('wbf-rate').value=c.wbfRate;
     }
-    var pat=sessionStorage.getItem('med_sync_pat');
+    var pat=sessionStorage.getItem('sp_sync_pat');
     if(pat)document.getElementById('sync-pat').value=pat;
-    var sc=localStorage.getItem('med_sync_cfg2');
+    var sc=localStorage.getItem('sp_sync_cfg');
     if(sc){var scj=JSON.parse(sc);
       if(scj.repo)document.getElementById('sync-repo').value=scj.repo;
       if(scj.branch)document.getElementById('sync-branch').value=scj.branch;
     }
     renderLastSynced();
-    markDirty(localStorage.getItem('med_sync_dirty')==='1');
-    if(localStorage.getItem('med_dark2')==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
+    markDirty(localStorage.getItem('sp_dirty')==='1');
+    if(localStorage.getItem('sp_dark')==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
   }catch(e){}
 }
 function clearMonth(){if(!confirm('Clear '+MONTH_NAMES[currentMonth]+' '+currentYear+'?'))return;var pfx=monthKey(currentYear,currentMonth);Object.keys(shifts).forEach(function(k){if(k.substring(0,7)===pfx)delete shifts[k];});saveData();renderAll();}
@@ -2372,7 +2441,7 @@ function clearAll(){
   if(!confirm('Clear ALL data? This includes shifts, actuals, OT log, grade history, and templates.'))return;
   shifts={};actuals={};otData={};gradeHistory=[];shiftTemplates=[];
   saveData();saveGradeHistory();saveTemplates();
-  try{localStorage.setItem('med_ot2','{}');}catch(e){}
+  try{localStorage.setItem('sp_ot','{}');}catch(e){}
   renderAll();renderGradeHistory();renderTemplates();
 }
 
@@ -2381,7 +2450,7 @@ function clearAll(){
 function toggleDark(){
   var on=document.body.classList.toggle('dark');
   document.getElementById('dark-btn').textContent=on?'☀️':'🌙';
-  try{localStorage.setItem('med_dark2',on?'1':'0');}catch(e){}
+  try{localStorage.setItem('sp_dark',on?'1':'0');}catch(e){}
 }
 
 // ═══ SWIPE NAVIGATION ═══
@@ -2404,8 +2473,8 @@ function toggleDark(){
 function renderLastSynced(){
   var el=document.getElementById('sync-last');
   if(!el)return;
-  var pushed=localStorage.getItem('med_sync_pushed');
-  var pulled=localStorage.getItem('med_sync_pulled');
+  var pushed=localStorage.getItem('sp_pushed');
+  var pulled=localStorage.getItem('sp_pulled');
   var parts=[];
   if(pushed)parts.push('⬆ '+pushed);
   if(pulled)parts.push('⬇ '+pulled);
@@ -2416,9 +2485,9 @@ function renderLastSynced(){
 function saveSyncConfig(){
   try{
     // PAT is sensitive — sessionStorage only (cleared on tab/browser close, not origin-persistent)
-    sessionStorage.setItem('med_sync_pat', document.getElementById('sync-pat').value);
+    sessionStorage.setItem('sp_sync_pat', document.getElementById('sync-pat').value);
     // Repo + branch are not secrets — localStorage is fine
-    localStorage.setItem('med_sync_cfg2', JSON.stringify({
+    localStorage.setItem('sp_sync_cfg', JSON.stringify({
       repo:   document.getElementById('sync-repo').value.trim(),
       branch: document.getElementById('sync-branch').value.trim()||'main'
     }));
@@ -2523,7 +2592,7 @@ async function syncToRepo(){
     var resp=await fetch(repoApiUrl(cfg.repo),{method:'PUT',headers:repoHeaders(cfg.pat),body:JSON.stringify(body)});
     if(!resp.ok){var err=await resp.json();throw new Error(err.message||resp.status);}
     setSyncStatus('✓ Pushed — commit: '+commitMsg,false);
-    try{localStorage.setItem('med_sync_pushed',new Date().toLocaleString('de-AT')+' · '+commitMsg);}catch(e){}
+    try{localStorage.setItem('sp_pushed',new Date().toLocaleString('de-AT')+' · '+commitMsg);}catch(e){}
     markDirty(false);
     renderLastSynced();
   }catch(e){
@@ -2552,11 +2621,11 @@ async function syncFromRepo(){
     shifts=parsed.shifts;actuals=parsed.actuals||{};otData=parsed.otData||{};
     gradeHistory=parsed.gradeHistory||[];
     saveData();saveGradeHistory();
-    try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
+    try{localStorage.setItem('sp_ot',JSON.stringify(otData));}catch(ex){}
     renderAll();
     var ts=new Date().toLocaleTimeString('de-AT');
     setSyncStatus('✓ Pulled & loaded at '+ts,false);
-    try{localStorage.setItem('med_sync_pulled',new Date().toLocaleString('de-AT'));}catch(e){}
+    try{localStorage.setItem('sp_pulled',new Date().toLocaleString('de-AT'));}catch(e){}
     renderLastSynced();
   }catch(e){
     setSyncStatus('✗ Pull failed: '+(e.message||'Decryption error — check password.'),true);
@@ -2573,7 +2642,7 @@ function exportJSON(){
   var a=document.createElement('a');
   a.href=url;a.download='shiftplanner-backup-'+new Date().toISOString().slice(0,10)+'.json';
   a.click();URL.revokeObjectURL(url);
-  try{localStorage.setItem('med_last_export',new Date().toISOString());}catch(e){}
+  try{localStorage.setItem('sp_last_export',new Date().toISOString());}catch(e){}
   checkBackupReminder();
 }
 function importJSON(input){
@@ -2599,7 +2668,7 @@ function importJSON(input){
       gradeHistory=parsed.gradeHistory||[];
       shiftTemplates=parsed.shiftTemplates||[];
       saveData();saveGradeHistory();saveTemplates();
-      try{localStorage.setItem('med_ot2',JSON.stringify(otData));}catch(ex){}
+      try{localStorage.setItem('sp_ot',JSON.stringify(otData));}catch(ex){}
       renderAll();renderGradeHistory();renderTemplates();
       alert('✓ Import successful — '+keys.length+' shifts loaded'+(shiftTemplates.length?' + '+shiftTemplates.length+' templates':'')+'.');
     }catch(err){alert('✗ Import failed: '+err.message);}
@@ -2696,7 +2765,7 @@ async function analysePayslip(){
     html+='<div style="font-size:10px;color:#bbb;margin-top:6px">Net payout auto-filled if found · ✓ within €1 · ✗ differs</div>';
     resultEl.innerHTML=html;
   }catch(err){
-    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Analysis failed: '+err.message+'. Paste cleaner text or check network.</div>';
+    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">'+_apiErrorMsg(err)+'</div>';
   }
 }
 
@@ -2765,8 +2834,8 @@ function renderMarginal(){
   }
   var isRuf=(type==='ruf_weekday'||type==='ruf_wknd');
   var taxableWith=taxable+(isRuf?0:extraGross);
-  var marginalSV=calcSVMonthly(taxableWith).total-calcSVMonthly(taxable).total;
-  var marginalLSt=calcMonthlyLSt(taxableWith)-calcMonthlyLSt(taxable);
+  var marginalSV=calcSVMonthly(taxableWith,s.wbfRate).total-calcSVMonthly(taxable,s.wbfRate).total;
+  var marginalLSt=calcMonthlyLSt(taxableWith,s.wbfRate)-calcMonthlyLSt(taxable,s.wbfRate);
   var marginalTax=marginalSV+marginalLSt;
   var netGain=extraGross-marginalTax;
   var effectiveRate=extraGross>0?(marginalTax/extraGross*100):0;
@@ -2830,7 +2899,7 @@ function renderUrlaubTracker(){
 function exportICal(){
   var typeLabels={normal:'Early shift',middle:'Middle shift',late:'Late shift',latenight:'Late shift (8%)',holiday:'Holiday shift',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
   var s2=getSettings(); // hoisted — same settings for all events
-  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//ShiftPlanner MedAustron//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Shifts '+currentYear];
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Austrian Shift Planner//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Shifts '+currentYear];
   var keys=Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);});
   keys.sort().forEach(function(k){
     var sh=shifts[k];
@@ -2851,7 +2920,7 @@ function exportICal(){
     }
     var summary=(typeLabels[sh.type]||sh.type)+(sh.note?' — '+sh.note:'');
     lines.push('BEGIN:VEVENT');
-    lines.push('UID:shift-'+k+'@medaustron-planner');
+    lines.push('UID:shift-'+k+'@shift-planner');
     lines.push('DTSTART;TZID=Europe/Vienna:'+dtStart);
     lines.push('DTEND;TZID=Europe/Vienna:'+dtEnd);
     lines.push('SUMMARY:'+summary);
@@ -2994,7 +3063,7 @@ async function analysePayslipPhoto(input){
     html+='<div style="font-size:10px;color:#bbb;margin-top:6px">✓ within €1 · ✗ differs · net auto-filled if found</div>';
     resultEl.innerHTML=html;
   }catch(err){
-    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">Photo analysis failed: '+err.message+'</div>';
+    resultEl.innerHTML='<div style="font-size:11px;color:#c0392b">'+_apiErrorMsg(err)+'</div>';
   }
   input.value='';
 }
@@ -3087,8 +3156,8 @@ function closeCheatSheet(){document.getElementById('cs-overlay').classList.remov
 function checkBackupReminder(){
   var banner=document.getElementById('backup-banner');
   if(!banner)return;
-  var pushed=localStorage.getItem('med_sync_pushed');
-  var exported=localStorage.getItem('med_last_export');
+  var pushed=localStorage.getItem('sp_pushed');
+  var exported=localStorage.getItem('sp_last_export');
   var last=null;
   if(pushed)last=new Date(pushed.split(' · ')[0]);
   if(exported){var d=new Date(exported);if(!last||d>last)last=d;}
@@ -3279,7 +3348,7 @@ function exportXLSX(){
 
   // ── Write file ────────────────────────────────────────────────────────────
   XLSX.writeFile(wb,'shiftplanner-'+exportYear+'.xlsx');
-  try{localStorage.setItem('med_last_export',new Date().toISOString());}catch(e){}
+  try{localStorage.setItem('sp_last_export',new Date().toISOString());}catch(e){}
   checkBackupReminder();
 }
 
@@ -3287,10 +3356,10 @@ function exportXLSX(){
 var shiftTemplates=[]; // [{name, type, start, end, note}]
 
 function loadTemplates(){
-  try{var raw=localStorage.getItem('med_templates');if(raw)shiftTemplates=JSON.parse(raw);}catch(e){}
+  try{var raw=localStorage.getItem('sp_templates');if(raw)shiftTemplates=JSON.parse(raw);}catch(e){}
 }
 function saveTemplates(){
-  try{localStorage.setItem('med_templates',JSON.stringify(shiftTemplates));}catch(e){}
+  try{localStorage.setItem('sp_templates',JSON.stringify(shiftTemplates));}catch(e){}
   renderTemplates();
 }
 function saveTemplate(){
@@ -3475,8 +3544,8 @@ function renderSim(){
   // Marginal tax on the extra taxable
   var baseTaxable = r.taxable;
   var newTaxable  = baseTaxable + extraTaxable;
-  var marginalSV  = calcSVMonthly(newTaxable).total - calcSVMonthly(baseTaxable).total;
-  var marginalLSt = calcMonthlyLSt(newTaxable) - calcMonthlyLSt(baseTaxable);
+  var marginalSV  = calcSVMonthly(newTaxable, s.wbfRate).total - calcSVMonthly(baseTaxable, s.wbfRate).total;
+  var marginalLSt = calcMonthlyLSt(newTaxable, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate);
   var marginalTax = marginalSV + marginalLSt;
 
   // Ruf LSt impact (if not in SV base, still taxable for LSt — but approximate via BR on ruf)
@@ -3545,6 +3614,67 @@ function renderSim(){
   verdictEl.textContent=v;
 }
 
+// ═══ MIGRATE legacy med_ keys → sp_ keys (runs once, then removes old keys) ═══
+(function migrateLegacyKeys(){
+  var map={'med_shifts2':'sp_shifts','med_actuals2':'sp_actuals','med_settings2':'sp_settings',
+    'med_ot2':'sp_ot','med_grade_hist':'sp_grades','med_sync_cfg2':'sp_sync_cfg',
+    'med_dark2':'sp_dark','med_sync_dirty':'sp_dirty','med_sync_pushed':'sp_pushed',
+    'med_templates':'sp_templates','med_last_export':'sp_last_export'};
+  Object.entries(map).forEach(function(kv){
+    var old=kv[0],neu=kv[1];
+    if(localStorage.getItem(old)!==null&&localStorage.getItem(neu)===null){
+      try{localStorage.setItem(neu,localStorage.getItem(old));localStorage.removeItem(old);}catch(e){}
+    }
+  });
+})();
+
+// ═══ ADVANCED ACCORDION ═══
+function toggleAdv(){
+  var c=document.getElementById('adv-content');
+  var a=document.getElementById('adv-arrow');
+  var open=c.classList.toggle('open');
+  if(a) a.textContent=open?'▾':'▸';
+}
+
+// ═══ FIRST-RUN WIZARD ═══
+function finishWizard(){
+  var salary=parseFloat(document.getElementById('wiz-salary').value);
+  if(!salary||salary<=0){alert('Please enter your monthly salary to continue.');return;}
+  var model=document.getElementById('wiz-model').value;
+  var hasShifts=document.getElementById('wiz-shifts').value==='yes';
+  // Apply wizard values to settings
+  document.getElementById('grade').value=salary.toFixed(2);
+  document.getElementById('salary-model').value=model;
+  // Configure SZ months based on model
+  if(model==='14'){document.getElementById('sz-month1').value='5';document.getElementById('sz-month2').value='11';}
+  else if(model==='13'){document.getElementById('sz-month1').value='11';document.getElementById('sz-month2').value='-1';}
+  else{document.getElementById('sz-month1').value='-1';document.getElementById('sz-month2').value='-1';}
+  // If no shifts, set standby rate to 0
+  if(!hasShifts){document.getElementById('ruf-rate').value='0';}
+  saveSettings();
+  try{localStorage.setItem('sp_wizard_done','1');}catch(e){}
+  document.getElementById('wizard-overlay').classList.remove('open');
+  renderAll();
+}
+
+function checkWizard(){
+  if(!localStorage.getItem('sp_wizard_done')&&!localStorage.getItem('sp_settings')){
+    document.getElementById('wizard-overlay').classList.add('open');
+  }
+}
+
+// ═══ GRACEFUL API ERROR ═══
+function _apiErrorMsg(err){
+  var msg=err&&err.message?err.message:'Unknown error';
+  if(msg.includes('Failed to fetch')||msg.includes('NetworkError')){
+    return 'Network error — check your internet connection.';
+  }
+  if(msg.includes('401')||msg.includes('403')){
+    return 'API key error — the AI feature requires a valid Anthropic API key. Contact the app administrator.';
+  }
+  return 'AI analysis failed: '+msg+'. Try pasting the payslip text instead of uploading a photo.';
+}
+
 // ═══ BOOT ═══
 var _renderYearTimer=null;
 function renderAll(){
@@ -3556,7 +3686,7 @@ function renderAll(){
     _renderYearTimer=setTimeout(function(){yearTabYear=currentYear;renderYear();},200);
   }
 }
-loadData();loadTemplates();renderAll();renderTemplates();
+loadData();loadTemplates();renderAll();renderTemplates();checkWizard();
 </script>
 <!-- Storage warning banner -->
 <div id="storage-warn" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#c0392b;color:#fff;font-size:12px;padding:8px 16px;text-align:center;z-index:500">⚠️ Storage approaching limit (4MB) — export a JSON backup and consider clearing old years.</div>
