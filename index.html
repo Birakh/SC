@@ -588,6 +588,55 @@ body.dark .infl-box{background:#1a2535;border-color:#2a4a6e}
 .infl-real{font-size:13px;font-weight:500;margin:4px 0}
 .infl-good{color:#27ae60}.infl-bad{color:#c0392b}
 body.dark .infl-good{color:#6abf6a}body.dark .infl-bad{color:#e06c6c}
+/* ── Waterfall chart (C) ── */
+.wf-wrap{margin:12px 0;overflow-x:auto}
+.wf-chart{display:flex;flex-direction:column;gap:4px;min-width:260px}
+.wf-row{display:flex;align-items:center;gap:6px;font-size:10px}
+.wf-label{width:90px;color:#888;text-align:right;flex-shrink:0;white-space:nowrap}
+.wf-bar-wrap{flex:1;position:relative;height:18px;background:#f0f0f0;border-radius:3px;overflow:hidden}
+body.dark .wf-bar-wrap{background:#2e2e32}
+.wf-bar{position:absolute;top:0;height:100%;border-radius:3px;transition:width .4s ease}
+.wf-bar.gross{background:#185fa5}
+.wf-bar.sv{background:#ef9f27}
+.wf-bar.lst{background:#e24b4a}
+.wf-bar.net{background:#27ae60}
+.wf-bar.sz{background:#9b8fd8}
+.wf-val{width:70px;flex-shrink:0;text-align:right;font-size:10px;font-weight:500;color:#555}
+body.dark .wf-val{color:#aaa}
+.wf-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:9px;color:#888}
+.wf-leg-dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:middle}
+
+/* ── Shift heatmap (D) ── */
+.hm-wrap{overflow-x:auto;margin:10px 0}
+.hm-grid{display:grid;grid-template-columns:repeat(53,1fr);gap:2px;min-width:600px}
+.hm-cell{width:100%;padding-bottom:100%;border-radius:2px;cursor:default;transition:transform .1s}
+.hm-cell:hover{transform:scale(1.4);z-index:10;position:relative}
+.hm-empty{background:transparent}
+.hm-none{background:#e8e8e4}
+body.dark .hm-none{background:#2a2a2e}
+.hm-normal{background:#5b9bd5}
+.hm-middle{background:#f5a623}
+.hm-late{background:#9b8fd8}
+.hm-latenight{background:#6c5fb5}
+.hm-holiday{background:#e24b4a}
+.hm-leave{background:#27ae60}
+.hm-ruf{background:#f0c040}
+.hm-callin{background:#e8854a}
+.hm-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;font-size:9px;color:#888;align-items:center}
+.hm-dot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle;flex-shrink:0}
+.hm-month-labels{display:grid;grid-template-columns:repeat(53,1fr);gap:2px;min-width:600px;margin-bottom:2px;font-size:8px;color:#aaa}
+/* KV presets */
+.kv-select{width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px;margin-bottom:6px;background:#fff}
+body.dark .kv-select{background:#2a2a2e;border-color:#3a3a3e;color:#e2e2dc}
+.kv-note{font-size:10px;color:#aaa;line-height:1.5;margin-top:4px}
+.kv-applied{font-size:10px;color:#27ae60;margin-top:4px;display:none}
+/* Waterfall tooltip */
+.wf-row{position:relative}
+.wf-tooltip{display:none;position:absolute;left:96px;top:-28px;background:#1a1a1a;color:#fff;font-size:10px;padding:4px 8px;border-radius:5px;white-space:nowrap;z-index:50;pointer-events:none}
+.wf-row:hover .wf-tooltip{display:block}
+/* Pendlerpauschale + Familienbonus */
+.tc-extra-box{background:#f5f5f0;border-radius:8px;padding:10px 12px;margin-bottom:10px}
+body.dark .tc-extra-box{background:#2a2a2e}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -688,6 +737,17 @@ body.dark .infl-good{color:#6abf6a}body.dark .infl-bad{color:#e06c6c}
       <div class="rrow total-row"><span class="rl">Total gross</span><span class="rv" id="r-gross">—</span></div>
     </div>
     <div class="panel-section">
+      <div class="panel-label">Pay waterfall</div>
+      <div class="wf-wrap">
+        <div class="wf-chart" id="wf-chart"></div>
+        <div class="wf-legend">
+          <span><span class="wf-leg-dot" style="background:#185fa5"></span>Gross</span>
+          <span><span class="wf-leg-dot" style="background:#ef9f27"></span>SV</span>
+          <span><span class="wf-leg-dot" style="background:#e24b4a"></span>LSt</span>
+          <span><span class="wf-leg-dot" style="background:#27ae60"></span>Net</span>
+          <span><span class="wf-leg-dot" style="background:#9b8fd8"></span>SZ (if month)</span>
+        </div>
+      </div>
       <div class="panel-label">Deductions (Austrian 2026 rates)</div>
       <div class="rrow"><span class="rl">KV Krankenversicherung (3.87%)</span><span class="rv neg" id="r-kv">—</span></div>
       <div class="rrow" id="r-cap-row" style="display:none"><span class="rl" style="color:#27ae60">✓ SV cap reached (€6,930/mo max)</span><span class="rv pos" id="r-cap-save">—</span></div>
@@ -938,6 +998,47 @@ body.dark .infl-good{color:#6abf6a}body.dark .infl-bad{color:#e06c6c}
     <div id="tc-cap-notice" style="display:none;background:#eaf3de;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:11px;color:#3b6d11">✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.</div>
     <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.</p>
 
+    <!-- Pendlerpauschale + Familienbonus -->
+    <div class="panel-label" style="margin-top:14px">🚗 Pendlerpauschale &amp; Familienbonus Plus</div>
+    <div class="tc-extra-box">
+      <div style="font-size:10px;color:#aaa;margin-bottom:10px;line-height:1.5">These reduce your annual Lohnsteuer directly. Enter what applies to you — the monthly LSt estimate above will update.</div>
+      <div style="margin-bottom:8px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Pendlerpauschale — commuter deduction (€/year)
+          <span class="tip" title="Kleine Pendlerpauschale (public transport available): 372–1,476€/year. Große Pendlerpauschale (no public transport): 744–2,784€/year. Depends on distance and availability. Use the BMF Pendlerrechner to find your exact amount.">ℹ</span></label>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <input type="number" id="tc-pendler" value="0" step="100" min="0" oninput="renderTaxCalc()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
+          <select id="tc-pendler-preset" onchange="applyPendlerPreset()" style="font-size:11px;padding:4px 8px;border:.5px solid #ccc;border-radius:6px">
+            <option value="">Quick-pick distance…</option>
+            <option value="372">Klein: 2–20 km (€372)</option>
+            <option value="744">Klein: 20–40 km (€744)</option>
+            <option value="1116">Klein: 40–60 km (€1,116)</option>
+            <option value="1476">Klein: 60+ km (€1,476)</option>
+            <option value="744">Groß: 2–20 km (€744)</option>
+            <option value="1476">Groß: 20–40 km (€1,476)</option>
+            <option value="2220">Groß: 40–60 km (€2,220)</option>
+            <option value="2784">Groß: 60+ km (€2,784)</option>
+          </select>
+        </div>
+        <div style="font-size:10px;color:#aaa;margin-top:3px">Also adds <strong>Pendlereuro</strong> (€2/km × one-way distance per year) automatically if you enter a custom amount.</div>
+      </div>
+      <div style="margin-bottom:4px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Familienbonus Plus — children tax credit (€/year)
+          <span class="tip" title="€2,000/year per child under 18 in Austria (€166.68/month). €700/year for children 18+ in education. Shared 50/50 with partner or taken in full by one parent. Reduces Lohnsteuer directly — cannot go below €0.">ℹ</span></label>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <input type="number" id="tc-fambonus" value="0" step="500" min="0" oninput="renderTaxCalc()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
+          <select id="tc-fambonus-preset" onchange="applyFambonusPreset()" style="font-size:11px;padding:4px 8px;border:.5px solid #ccc;border-radius:6px">
+            <option value="">Quick-pick children…</option>
+            <option value="2000">1 child under 18 (€2,000)</option>
+            <option value="4000">2 children under 18 (€4,000)</option>
+            <option value="6000">3 children under 18 (€6,000)</option>
+            <option value="1000">1 child (shared 50/50) (€1,000)</option>
+            <option value="700">1 child 18+ in education (€700)</option>
+          </select>
+        </div>
+      </div>
+      <div id="tc-extra-impact" style="font-size:11px;color:#27ae60;margin-top:8px;font-weight:500"></div>
+    </div>
+
     <!-- Nettolohnrechner -->
     <div class="panel-label" style="margin-top:14px">🔄 Nettolohnrechner — Reverse Calculator</div>
     <div class="netto-box">
@@ -1027,6 +1128,38 @@ body.dark .infl-good{color:#6abf6a}body.dark .infl-bad{color:#e06c6c}
           <input type="number" id="gh-base" step="0.01" placeholder="4376.33" style="font-size:11px;padding:4px 6px"></div>
         <button class="mbtn primary" style="padding:5px 10px;flex:none;white-space:nowrap" onclick="addGradeEntry()">Add</button>
       </div>
+    </div>
+    <hr class="divider">
+    <div class="panel-section">
+      <div class="panel-label">🏛 Kollektivvertrag (KV) preset</div>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.</p>
+      <select class="kv-select" id="kv-preset" onchange="applyKVPreset()">
+        <option value="">— Select your sector —</option>
+        <optgroup label="Healthcare &amp; Social">
+          <option value="gesundheit_kh">Krankenanstalten (hospitals) — KAKuG</option>
+          <option value="gesundheit_pflege">Pflege &amp; Sozialberufe — BAGS</option>
+          <option value="rotes_kreuz">Rotes Kreuz</option>
+        </optgroup>
+        <optgroup label="Industry &amp; Trade">
+          <option value="metall">Metalltechnische Industrie</option>
+          <option value="elektro">Elektroindustrie</option>
+          <option value="chemie">Chemische Industrie</option>
+        </optgroup>
+        <optgroup label="Retail &amp; Hospitality">
+          <option value="handel">Handel (retail)</option>
+          <option value="gastgewerbe">Gastgewerbe (hospitality)</option>
+        </optgroup>
+        <optgroup label="Public &amp; Tech">
+          <option value="oeffentlich">Öffentlicher Dienst (Bund)</option>
+          <option value="it">IT / EDV-Dienstleistungen</option>
+        </optgroup>
+        <optgroup label="Other">
+          <option value="bewachung">Bewachungsgewerbe (security)</option>
+          <option value="transport">Transport &amp; Verkehr</option>
+        </optgroup>
+      </select>
+      <div class="kv-applied" id="kv-applied">✓ KV preset applied — review and adjust below if needed</div>
+      <div class="kv-note">Values are typical approximations. Always verify with your actual contract or HR. <a href="https://www.wko.at/service/kollektivvertrag" target="_blank" rel="noopener" style="color:#185fa5">Find your KV ↗</a></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -1189,6 +1322,22 @@ body.dark .infl-good{color:#6abf6a}body.dark .infl-bad{color:#e06c6c}
       <div class="av-title">📋 Arbeitnehmerveranlagung helper — <span id="av-year-label"></span></div>
       <div id="av-fields"></div>
       <p style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.5">Estimated values based on planned shifts. Use actual payslips for the official L1 form. Not legal/tax advice.</p>
+    </div>
+    <div class="panel-label" style="margin-top:12px">Shift heatmap <span style="font-size:10px;color:#aaa;font-weight:400" id="hm-year-label"></span></div>
+    <div class="hm-wrap">
+      <div class="hm-month-labels" id="hm-month-labels"></div>
+      <div class="hm-grid" id="hm-grid"></div>
+    </div>
+    <div class="hm-legend">
+      <span><span class="hm-dot" style="background:#5b9bd5"></span>Early</span>
+      <span><span class="hm-dot" style="background:#f5a623"></span>Middle</span>
+      <span><span class="hm-dot" style="background:#9b8fd8"></span>Late</span>
+      <span><span class="hm-dot" style="background:#6c5fb5"></span>Late+Night</span>
+      <span><span class="hm-dot" style="background:#e24b4a"></span>Holiday</span>
+      <span><span class="hm-dot" style="background:#27ae60"></span>Leave</span>
+      <span><span class="hm-dot" style="background:#f0c040"></span>Standby</span>
+      <span><span class="hm-dot" style="background:#e8854a"></span>Call-in</span>
+      <span><span class="hm-dot" style="background:#e8e8e4"></span>No shift</span>
     </div>
   </div>
 
@@ -1574,9 +1723,10 @@ var SV_AK=0.005;  // AK-Umlage (Arbeiterkammerumlage)
 var SV_WBF=0.005; // Wohnbauförderungsbeitrag (NÖ)
 var SV_TOTAL=SV_KV+SV_PV+SV_AV+SV_AK+SV_WBF; // 0.1807
 
-function calcLohnsteuerAnnual(annualTaxableAfterSV){
+function calcLohnsteuerAnnual(annualTaxableAfterSV, pendler, fambonus){
   // 2026: Sonderausgabenpauschale abolished; only Werbungskostenpauschale €132 remains
-  var adj=annualTaxableAfterSV-132;
+  // Pendlerpauschale deducted before brackets; Familienbonus Plus after
+  var adj=annualTaxableAfterSV-(pendler||0)-132;
   if(adj<=0) return 0;
   var tax=0;
   BRACKETS.forEach(function(b){
@@ -1587,6 +1737,8 @@ function calcLohnsteuerAnnual(annualTaxableAfterSV){
   });
   // Absetzbeträge: ANAB (€612) abolished 2026; only Verkehrsabsetzbetrag (VAB) €496 remains
   tax=Math.max(0,tax-496);
+  // Familienbonus Plus reduces LSt directly, floor at €0
+  tax=Math.max(0,tax-(fambonus||0));
   return tax;
 }
 
@@ -1900,6 +2052,7 @@ function renderReport(){
   renderForecast();
   renderUrlaubTracker();
   checkBackupReminder();
+  renderWaterfall();
 }
 
 function renderTaxBreakdown(r){
@@ -2060,26 +2213,42 @@ function renderTaxCalc(){
   var suppl=parseFloat(document.getElementById('tc-suppl').value)||0;
   var oncallM=parseFloat(document.getElementById('tc-oncall').value)||0;
   var holhM=parseFloat(document.getElementById('tc-holh').value)||0;
-  var hazard=parseFloat(document.getElementById('tc-hazard').value)||230.43;
+  var hazard=parseFloat(document.getElementById('tc-hazard').value)||0;
+  var pendler=parseFloat(document.getElementById('tc-pendler').value)||0;
+  var fambonus=parseFloat(document.getElementById('tc-fambonus').value)||0;
   var s=getSettings();
   var hourly=s.base/173.33;
   var holPayM=hourly*2*holhM;
 
   var monthlyGross=annual/12+suppl+oncallM+holPayM;
-  var s=getSettings();
   var sv=calcSVMonthly(monthlyGross, s.wbfRate);
-  var lst=calcMonthlyLSt(monthlyGross);
+  // Pass pendler + fambonus into LSt calc
   var annualSV=sv.total*12;
-  var annualLSt=lst*12;
+  var annualAfterSVraw=monthlyGross*12-annualSV;
+  var annualLStRaw=calcLohnsteuerAnnual(annualAfterSVraw,0,0); // baseline without deductions
+  var annualLSt=calcLohnsteuerAnnual(annualAfterSVraw,pendler,fambonus);
+  var lst=annualLSt/12;
+  var saving=annualLStRaw-annualLSt;
   var monthlyNet=monthlyGross-sv.total-lst+hazard;
   var annualNet=monthlyNet*12;
   var effRate=annualLSt/(annual>0?annual:1)*100;
   var totRate=(annualSV+annualLSt)/(annual>0?annual:1)*100;
   var marginal=BRACKETS.reduce(function(acc,b){
-    // Use actual annual after-SV income to find the bracket
-    var annualAfterSVForMarginal=monthlyGross*12-sv.total*12;
+    var annualAfterSVForMarginal=monthlyGross*12-annualSV;
     return annualAfterSVForMarginal>b.from?b.rate:acc;
   },0);
+
+  // Show Pendler/Familienbonus impact
+  var impactEl=document.getElementById('tc-extra-impact');
+  if(impactEl){
+    if(saving>0.01){
+      impactEl.textContent='✓ Pendlerpauschale + Familienbonus saves €'+saving.toFixed(2)+'/year (€'+( saving/12).toFixed(2)+'/month) in Lohnsteuer';
+      impactEl.style.display='';
+    } else {
+      impactEl.textContent='';
+      impactEl.style.display='none';
+    }
+  }
 
   // Summary cards
   var cards=[
@@ -2092,7 +2261,7 @@ function renderTaxCalc(){
     return '<div class="tscard"><div class="tsl">'+c.l+'</div><div class="tsv">'+c.v+'</div><div class="tss">'+c.s+'</div></div>';
   }).join('');
 
-  var annualAfterSV=annual-sv.total*12; // use actual SV (respects AV threshold + cap)
+  var annualAfterSV=annualAfterSVraw; // use actual SV (respects AV threshold + cap)
   // Bracket bar — use actual BRACKETS thresholds (0, 13539, 21992, 36458, 70365, 104859)
   var b0e=BRACKETS[1].from,b20e=BRACKETS[2].from,b30e=BRACKETS[3].from,b40e=BRACKETS[4].from,b48e=BRACKETS[5].from;
   var segments=[
@@ -2360,6 +2529,7 @@ function renderYear(){
     '<td>Total</td><td>'+fmtN(tg)+'</td><td>'+fmtN(tn)+'</td>'+
     '<td style="'+(totalOT>0?'color:#ef9f27;font-weight:500':'')+'">'+(totalOT>0?totalOT.toFixed(1)+'h':'—')+'</td><td colspan="3"></td>';
   renderAVSummary();
+  renderHeatmap();
 }
 
 function saveActual(inp){
@@ -3998,6 +4168,149 @@ function renderSVAnnual(){
     pct.toFixed(1)+'% of theoretical maximum (€'+fmt(maxAnnual).replace('€ ','')+'/year)<br>'+
     'Breakdown: KV '+fmt(sv.kv*12)+' · PV '+fmt(sv.pv*12)+' · AV '+fmt(sv.av*12)+' · AK '+fmt(sv.ak*12)+' · WBF '+fmt(sv.wbf*12)+
     '</div>';
+}
+
+// ═══ WATERFALL CHART ═══
+function renderWaterfall(){
+  var el=document.getElementById('wf-chart');
+  if(!el)return;
+  var r=calcSalary(currentYear,currentMonth);
+  var s=getSettings();
+  var isSZ=(s.szMonth1>=0&&currentMonth===s.szMonth1)||(s.szMonth2>=0&&currentMonth===s.szMonth2);
+  var szData=isSZ?calcSonderzahlung(r.base,s.wbfRate):null;
+  var gross=r.gross+(szData?szData.gross:0);
+  var sv=r.svM.total+(szData?szData.sv:0);
+  var lst=r.lst+(szData?szData.lst:0);
+  var net=r.net+(szData?szData.net:0);
+  var max=gross;
+  function bar(label,val,cls,isNeg,tooltipExtra){
+    var pct=(Math.abs(val)/max*100).toFixed(1);
+    var tip=fmt(Math.abs(val))+' ('+pct+'% of gross)'+(tooltipExtra?' · '+tooltipExtra:'');
+    return '<div class="wf-row">'+
+      '<span class="wf-label">'+label+'</span>'+
+      '<div class="wf-bar-wrap">'+
+        '<div class="wf-bar '+cls+'" style="width:'+pct+'%"></div>'+
+        '<div class="wf-tooltip">'+tip+'</div>'+
+      '</div>'+
+      '<span class="wf-val" style="color:'+(isNeg?'#e24b4a':cls==='net'?'#27ae60':'#555')+'">'+
+        (isNeg?'−':'')+fmt(Math.abs(val))+
+      '</span>'+
+    '</div>';
+  }
+  var html='';
+  html+=bar('Gross',gross,'gross',false,'100% baseline');
+  html+=bar('−SV',sv,'sv',true,((sv/gross*100).toFixed(1)+'% of gross'));
+  html+=bar('−LSt',lst,'lst',true,((lst/gross*100).toFixed(1)+'% of gross'));
+  if(szData) html+=bar('SZ this mo.',szData.net,'sz',false,'§67 flat 6%');
+  html+=bar('Net',net,'net',false,((net/gross*100).toFixed(1)+'% of gross'));
+  el.innerHTML=html;
+}
+
+// ═══ SHIFT HEATMAP ═══
+function renderHeatmap(){
+  var grid=document.getElementById('hm-grid');
+  var monthLabels=document.getElementById('hm-month-labels');
+  var yearLabel=document.getElementById('hm-year-label');
+  if(!grid)return;
+  var y=yearTabYear;
+  if(yearLabel) yearLabel.textContent=y;
+  // Build 53-week grid (Sun→Sat, but Mon-first display)
+  // Find Jan 1 day-of-week
+  var jan1=new Date(y,0,1);
+  var startDow=(jan1.getDay()+6)%7; // 0=Mon
+  var totalDays=((y%4===0&&y%100!==0)||(y%400===0))?366:365;
+  // Build lookup of shift keys
+  var shiftLookup={};
+  Object.keys(shifts).forEach(function(k){if(k.startsWith(String(y)))shiftLookup[k]=shifts[k].type;});
+  // 7 rows (Mon-Sun), up to 53 cols
+  var cells=[];
+  var monthColMap={};
+  for(var col=0;col<53;col++) cells.push(Array(7).fill(null));
+  for(var d=0;d<totalDays;d++){
+    var date=new Date(y,0,d+1);
+    var dow=(date.getDay()+6)%7; // 0=Mon
+    var col=Math.floor((d+startDow)/7);
+    var mo=date.getMonth();
+    if(!monthColMap[mo]) monthColMap[mo]=col;
+    var key=y+'-'+pad(date.getMonth()+1)+'-'+pad(date.getDate());
+    var typ=shiftLookup[key]||'none';
+    cells[col][dow]={date:key,type:typ,d:date.getDate(),m:mo};
+  }
+  // Month label row
+  var mlHtml='';
+  for(var c=0;c<53;c++){
+    var mo2=null;
+    for(var mv in monthColMap){if(monthColMap[mv]===c){mo2=parseInt(mv);break;}}
+    mlHtml+='<div style="text-align:center;overflow:hidden">'+(mo2!==null?MONTH_NAMES[mo2].substring(0,3):'')+'</div>';
+  }
+  if(monthLabels) monthLabels.innerHTML=mlHtml;
+  // Cell grid (row-major: 7 rows of 53 cols)
+  // Build column by column, row by row
+  var gridHtml='';
+  for(var col2=0;col2<53;col2++){
+    for(var row=0;row<7;row++){
+      var cell=cells[col2][row];
+      if(!cell){gridHtml+='<div class="hm-cell hm-empty"></div>';continue;}
+      var cls='hm-cell hm-'+cell.type;
+      var title=cell.date+(cell.type!=='none'?' — '+cell.type:'');
+      gridHtml+='<div class="'+cls+'" title="'+title+'"></div>';
+    }
+  }
+  grid.style.gridTemplateColumns='repeat(53,1fr)';
+  grid.style.gridTemplateRows='repeat(7,1fr)';
+  grid.innerHTML=gridHtml;
+}
+
+// ═══ KV PRESETS ═══
+var KV_PRESETS={
+  // Healthcare
+  gesundheit_kh:{name:'Krankenanstalten',middleS:40,lateS:55,thresh:20,rufRate:5.20,wbf:0.5,note:'Typical Vienna/NÖ hospital KV. Verify with your Dienstgeber.'},
+  gesundheit_pflege:{name:'BAGS Pflege',middleS:35,lateS:50,thresh:20,rufRate:4.50,wbf:0.5,note:'Soziale Dienste (BAGS). Supplements vary by employer.'},
+  rotes_kreuz:{name:'Rotes Kreuz',middleS:38,lateS:52,thresh:20,rufRate:4.80,wbf:0.5,note:'Österreichisches Rotes Kreuz KV.'},
+  // Industry
+  metall:{name:'Metalltechnische Industrie',middleS:0,lateS:60,thresh:20,rufRate:0,wbf:0.5,note:'Late shift supplement ~€60/d. No standard middle shift supplement. Verify with works council.'},
+  elektro:{name:'Elektroindustrie',middleS:0,lateS:55,thresh:20,rufRate:0,wbf:0.5,note:'Supplements per shift agreement. Verify with your Betriebsrat.'},
+  chemie:{name:'Chemische Industrie',middleS:30,lateS:55,thresh:20,rufRate:0,wbf:0.5,note:'Typical values. Chemical industry KV supplements vary widely.'},
+  // Retail/Hospitality
+  handel:{name:'Handel',middleS:0,lateS:0,thresh:19,rufRate:0,wbf:0.5,note:'Handel KV has no standard shift supplements. Late-evening bonus may apply after 19:00.'},
+  gastgewerbe:{name:'Gastgewerbe',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,note:'Gastgewerbe KV: night supplement 20:00–06:00. No fixed middle/late supplements.'},
+  // Public/Tech
+  oeffentlich:{name:'Öffentlicher Dienst (Bund)',middleS:35,lateS:50,thresh:20,rufRate:3.91,wbf:0.5,note:'Bundesbedienstete VBG/BDG. Supplements set by Erlass. Verify with your Dienststelle.'},
+  it:{name:'IT/EDV-Dienstleistungen',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,note:'IT-KV: standard office hours. No shift supplements unless agreed individually.'},
+  // Other
+  bewachung:{name:'Bewachungsgewerbe',middleS:0,lateS:55,thresh:20,rufRate:4.00,wbf:0.5,note:'Security KV: night/late supplements apply. Verify exact amounts with employer.'},
+  transport:{name:'Transport &amp; Verkehr',middleS:0,lateS:45,thresh:20,rufRate:0,wbf:0.5,note:'Transport KV: late supplement typical. Varies by sub-sector (road/rail/aviation).'},
+};
+
+function applyKVPreset(){
+  var key=document.getElementById('kv-preset').value;
+  var note=document.getElementById('kv-applied');
+  if(!key){if(note)note.style.display='none';return;}
+  var kv=KV_PRESETS[key];if(!kv)return;
+  document.getElementById('middle-suppl').value=kv.middleS.toFixed(2);
+  document.getElementById('late-suppl').value=kv.lateS.toFixed(2);
+  document.getElementById('thresh').value=String(kv.thresh);
+  if(kv.rufRate>0) document.getElementById('ruf-rate').value=kv.rufRate.toFixed(2);
+  document.getElementById('wbf-rate').value=kv.wbf.toFixed(1);
+  if(note){note.textContent='✓ '+kv.name+' applied — '+kv.note;note.style.display='block';}
+  saveSettings();renderAll();
+}
+
+function applyPendlerPreset(){
+  var sel=document.getElementById('tc-pendler-preset');
+  var val=sel.value;
+  if(!val)return;
+  document.getElementById('tc-pendler').value=val;
+  sel.value='';
+  renderTaxCalc();
+}
+function applyFambonusPreset(){
+  var sel=document.getElementById('tc-fambonus-preset');
+  var val=sel.value;
+  if(!val)return;
+  document.getElementById('tc-fambonus').value=val;
+  sel.value='';
+  renderTaxCalc();
 }
 
 // ═══ BOOT ═══
