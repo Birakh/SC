@@ -1870,16 +1870,24 @@ function calcSalary(year,month){
   var rufPay     = s.rufRate*rufH + s.rufRate*s.rufWknd*rufWH;
   var callinP    = hourly*s.callinM*callinH;
 
-  // Taxable: base + current night 8% + prev month fixed supplements + current base pays
-  var taxable = base
-    + night.shiftA + night.lateNightA
+  // §68 EStG: night supplement (8%) is tax-free but social-insurance applies
+  // SV base: includes night 8% (social insurance on full gross)
+  // LSt base: excludes night 8% (tax-free per §68(1))
+  var svTaxable = base
+    + night.shiftA + night.lateNightA          // night 8% in SV ✓
     + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
     + holBasePay + leavePay + callinP
-    + (s.rufSVBase?rufPay:0); // Ruf in SV base only if enabled in Settings
-  var br  = taxable*s.brRate;
-  var svM = calcSVMonthly(taxable, s.wbfRate);
-  var lst = calcMonthlyLSt(taxable, s.wbfRate);
-  var gross = taxable+rufPay+s.hazard-br;
+    + (s.rufSVBase?rufPay:0);
+  var lstTaxable = base
+    // night.shiftA + night.lateNightA EXCLUDED — §68 tax-free
+    + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
+    + holBasePay + leavePay + callinP
+    + (s.rufSVBase?rufPay:0);
+  var taxable = svTaxable; // keep 'taxable' for backward compat (SV base)
+  var br  = svTaxable*s.brRate;
+  var svM = calcSVMonthly(svTaxable, s.wbfRate);
+  var lst = calcMonthlyLSt(lstTaxable, s.wbfRate);
+  var gross = svTaxable+rufPay+s.hazard-br;
   var net   = gross-svM.total-lst;
 
   var earned = calcEarnedSupplements(year,month); // this month's deferred (for display)
@@ -1893,7 +1901,7 @@ function calcSalary(year,month){
     holExtra:prevSuppl.holExtra,
     // Current month base pays:
     holBasePay, leavePay, rufPay, callinP,
-    taxable,br,gross,svM,lst,net,hazard:s.hazard,
+    taxable,lstTaxable,br,gross,svM,lst,net,hazard:s.hazard,
     // Hours for display:
     nightH:night.nightH, lateNightH:night.lateNightH, holH, leaveH,
     rufH:rufH+rufWH, rufH_raw:rufH, rufWH:rufWH, callinH,
@@ -3131,19 +3139,21 @@ function renderMarginal(){
   var prevS=calcEarnedSupplements(prevY,prevM);
   // Current month night allowance
   var nightA=calcNightAllowance(currentYear,currentMonth);
-  var taxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+prevS.holExtra;
+  // §68: night allowance in SV base but NOT in LSt base
+  var svTaxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+prevS.holExtra;
+  var lstTaxableBase=base+prevS.middleP+prevS.lateP+prevS.holExtra; // night excluded
 
-  var extraGross=0, extraLabel='';
+  var extraGross=0, extraLabel='', isNightPay=false;
   if(type==='normal_night'){
     var nightH=2; extraGross=hourly*0.08*nightH;
-    extraLabel='8h early shift · '+nightH+'h after 20:00';
+    extraLabel='8h early shift · '+nightH+'h after 20:00'; isNightPay=true;
   } else if(type==='middle'){
     extraGross=s.middleS; extraLabel='middle supplement €'+s.middleS.toFixed(2);
   } else if(type==='late'){
     extraGross=s.lateS; extraLabel='late supplement €'+s.lateS.toFixed(2);
   } else if(type==='latenight'){
     var nightH2=2.5; extraGross=hourly*0.08*nightH2;
-    extraLabel='8h late+night · '+nightH2+'h after 20:00';
+    extraLabel='8h late+night · '+nightH2+'h after 20:00'; isNightPay=true;
   } else if(type==='ruf_weekday'){
     extraGross=s.rufRate*4.5;
     extraLabel='4.5h weekday standby @ €'+s.rufRate.toFixed(2)+'/h';
@@ -3156,9 +3166,11 @@ function renderMarginal(){
     extraGross=hourly*2*8; extraLabel='8h holiday · base + 200% extra';
   }
   var isRuf=(type==='ruf_weekday'||type==='ruf_wknd');
-  var taxableWith=taxable+(isRuf?0:extraGross);
-  var marginalSV=calcSVMonthly(taxableWith,s.wbfRate).total-calcSVMonthly(taxable,s.wbfRate).total;
-  var marginalLSt=calcMonthlyLSt(taxableWith,s.wbfRate)-calcMonthlyLSt(taxable,s.wbfRate);
+  // For SV: add to svTaxable. For LSt: only add if not night pay (§68 exempt)
+  var svTaxableWith=svTaxable+(isRuf?0:extraGross);
+  var lstTaxableWith=lstTaxableBase+(isRuf||isNightPay?0:extraGross);
+  var marginalSV=calcSVMonthly(svTaxableWith,s.wbfRate).total-calcSVMonthly(svTaxable,s.wbfRate).total;
+  var marginalLSt=calcMonthlyLSt(lstTaxableWith,s.wbfRate)-calcMonthlyLSt(lstTaxableBase,s.wbfRate);
   var marginalTax=marginalSV+marginalLSt;
   var netGain=extraGross-marginalTax;
   var effectiveRate=extraGross>0?(marginalTax/extraGross*100):0;
@@ -3865,14 +3877,19 @@ function renderSim(){
                     + (s.rufSVBase ? rufPay : 0);
 
   // Marginal tax on the extra taxable
-  var baseTaxable = r.taxable;
-  var newTaxable  = baseTaxable + extraTaxable;
-  var marginalSV  = calcSVMonthly(newTaxable, s.wbfRate).total - calcSVMonthly(baseTaxable, s.wbfRate).total;
-  var marginalLSt = calcMonthlyLSt(newTaxable, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate);
+  var baseTaxable = r.lstTaxable; // §68-corrected LSt base (night excluded)
+  var svBaseTaxable = r.taxable;  // SV base (night included)
+  // Night pay is §68 exempt — add to SV base but NOT LSt base
+  var newSVTaxable  = svBaseTaxable  + lateBasePay + middleBasePay + normalBasePay + holBasePay + lateNightPay + (s.rufSVBase?rufPay:0);
+  var newLSTTaxable = baseTaxable    + lateBasePay + middleBasePay + normalBasePay + holBasePay
+                    // lateNightPay excluded (§68 night pay) + rufPay excluded unless in SV base
+                    + (s.rufSVBase?rufPay:0);
+  var marginalSV  = calcSVMonthly(newSVTaxable, s.wbfRate).total - calcSVMonthly(svBaseTaxable, s.wbfRate).total;
+  var marginalLSt = calcMonthlyLSt(newLSTTaxable, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate);
   var marginalTax = marginalSV + marginalLSt;
 
-  // Ruf LSt impact (if not in SV base, still taxable for LSt — but approximate via BR on ruf)
-  var rufLSt = s.rufSVBase ? 0 : (calcMonthlyLSt(baseTaxable + rufPay) - calcMonthlyLSt(baseTaxable));
+  // Ruf LSt impact (if not in SV base, still taxable for LSt)
+  var rufLSt = s.rufSVBase ? 0 : (calcMonthlyLSt(baseTaxable + rufPay, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate));
 
   // Net gain this month
   var netGainWork = extraTaxable - marginalTax + (s.rufSVBase ? 0 : rufPay - rufLSt);
