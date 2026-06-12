@@ -609,7 +609,8 @@ body.dark .wf-val{color:#aaa}
 /* ── Shift heatmap (D) ── */
 .hm-wrap{overflow-x:auto;margin:10px 0}
 .hm-grid{display:grid;grid-template-columns:repeat(53,1fr);gap:2px;min-width:600px}
-.hm-cell{width:100%;padding-bottom:100%;border-radius:2px;cursor:default;transition:transform .1s}
+.hm-cell{width:100%;padding-bottom:100%;border-radius:2px;cursor:pointer;transition:transform .1s}
+.hm-cell.hm-empty{cursor:default}
 .hm-cell:hover{transform:scale(1.4);z-index:10;position:relative}
 .hm-empty{background:transparent}
 .hm-none{background:#e8e8e4}
@@ -1819,7 +1820,9 @@ function calcEarnedSupplements(year,month){
   return {
     middleP:  s.middleS*middleDays,
     lateP:    s.lateS*lateDays,
-    holExtra: hourly*2*holH,
+    holExtraBase: hourly*holH,    // base pay for holiday hours — taxable (SV + LSt)
+    holExtraSuppl: hourly*holH,   // §68(1) Feiertagszuschlag 100% supplement — SV applies, LSt exempt
+    holExtra: hourly*2*holH,      // combined total (kept for display compatibility)
     middleDays, lateDays, holH
   };
 }
@@ -1870,23 +1873,29 @@ function calcSalary(year,month){
   var rufPay     = s.rufRate*rufH + s.rufRate*s.rufWknd*rufWH;
   var callinP    = hourly*s.callinM*callinH;
 
-  // §68 EStG: night supplement (8%) is tax-free but social-insurance applies
-  // SV base: includes night 8% (social insurance on full gross)
-  // LSt base: excludes night 8% (tax-free per §68(1))
+  // §68 EStG split:
+  // SV base: all earnings (night, holiday base+supplement, supplements)
+  // LSt base: excludes §68 tax-free components (night 8%, Feiertagszuschlag 100% supplement)
   var svTaxable = base
-    + night.shiftA + night.lateNightA          // night 8% in SV ✓
-    + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
+    + night.shiftA + night.lateNightA
+    + prevSuppl.middleP + prevSuppl.lateP
+    + (prevSuppl.holExtraBase||0) + (prevSuppl.holExtraSuppl||0)
     + holBasePay + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var lstTaxable = base
-    // night.shiftA + night.lateNightA EXCLUDED — §68 tax-free
-    + prevSuppl.middleP + prevSuppl.lateP + prevSuppl.holExtra
+    // night pay EXCLUDED — §68(1) Nachtzulage tax-free
+    + prevSuppl.middleP + prevSuppl.lateP
+    + (prevSuppl.holExtraBase||0)   // base pay for holiday hours — taxable
+    // holExtraSuppl EXCLUDED — §68(1) Feiertagszuschlag 100% supplement tax-free
     + holBasePay + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var taxable = svTaxable; // keep 'taxable' for backward compat (SV base)
   var br  = svTaxable*s.brRate;
   var svM = calcSVMonthly(svTaxable, s.wbfRate);
-  var lst = calcMonthlyLSt(lstTaxable, s.wbfRate);
+  // Austrian §66 EStG: LSt base = lstTaxable - actual SV (computed on svTaxable)
+  // NOT sv(lstTaxable) — the SV deducted for LSt must match what was actually paid
+  var annualLSTBase = lstTaxable*12 - svM.total*12;
+  var lst = calcLohnsteuerAnnual(annualLSTBase) / 12;
   var gross = svTaxable+rufPay+s.hazard-br;
   var net   = gross-svM.total-lst;
 
@@ -3141,7 +3150,7 @@ function renderMarginal(){
   var nightA=calcNightAllowance(currentYear,currentMonth);
   // §68: night allowance in SV base but NOT in LSt base
   var svTaxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+prevS.holExtra;
-  var lstTaxableBase=base+prevS.middleP+prevS.lateP+prevS.holExtra; // night excluded
+  var lstTaxableBase=base+prevS.middleP+prevS.lateP; // holExtra excluded (§68 Feiertagszuschlag)
 
   var extraGross=0, extraLabel='', isNightPay=false;
   if(type==='normal_night'){
@@ -3855,51 +3864,36 @@ function renderSim(){
   document.getElementById('sim-ruf-val').textContent=nRuf;
   document.getElementById('sim-hol-val').textContent=nHol;
 
-  // What each shift type adds to THIS MONTH's taxable:
-  // Late:   2.5h night pay (same month) + 8h base paid as normal shift
-  //         supplement €50 goes NEXT month — not in this month's net
-  // Middle: 0 night pay + 8h base
-  //         supplement €35.50 goes NEXT month
-  // Normal: 0 night pay + 8h base (already in base if scheduled, but sim adds extra)
-  // Ruf:    4.5h × rufRate (outside SV base)
-  // Holiday:8h base pay now; 200% extra goes NEXT month
-
-  // Extra taxable this month from each type
-  var lateNightPay  = hourly*0.08*2.5*nLate;       // 2.5h night 8% per late shift
-  var lateBasePay   = hourly*8*nLate;               // 8h base rate (worked hours)
-  var middleBasePay = hourly*8*nMiddle;
+  // Late/middle are REPLACEMENT shifts (late instead of early) — only extras matter:
+  //   Late:   2.5h night 8% this month (§68 exempt) + €50 supplement NEXT month
+  //   Middle: no night pay + €35.50 supplement NEXT month
+  // Normal/Ruf/Holiday are ADDITIONAL shifts — full extra pay applies
+  var lateNightPay  = hourly*0.08*2.5*nLate;   // §68 tax-free, SV applies
   var normalBasePay = hourly*8*nNormal;
   var holBasePay    = hourly*8*nHol;
-  var rufPay        = s.rufRate*4.5*nRuf;           // outside SV base
+  var rufPay        = s.rufRate*4.5*nRuf;
 
-  // Total extra taxable (ruf excluded from SV base unless toggle)
-  var extraTaxable = lateNightPay + lateBasePay + middleBasePay + normalBasePay + holBasePay
-                    + (s.rufSVBase ? rufPay : 0);
+  // This month's SV base (includes night pay)
+  var newSVTaxable = svBaseTaxable + lateNightPay + normalBasePay + holBasePay + (s.rufSVBase?rufPay:0);
+  // This month's LSt base (night pay excluded §68)
+  var newLSTTaxable = baseTaxable  + normalBasePay + holBasePay + (s.rufSVBase?rufPay:0);
 
-  // Marginal tax on the extra taxable
-  var baseTaxable = r.lstTaxable; // §68-corrected LSt base (night excluded)
-  var svBaseTaxable = r.taxable;  // SV base (night included)
-  // Night pay is §68 exempt — add to SV base but NOT LSt base
-  var newSVTaxable  = svBaseTaxable  + lateBasePay + middleBasePay + normalBasePay + holBasePay + lateNightPay + (s.rufSVBase?rufPay:0);
-  var newLSTTaxable = baseTaxable    + lateBasePay + middleBasePay + normalBasePay + holBasePay
-                    // lateNightPay excluded (§68 night pay) + rufPay excluded unless in SV base
-                    + (s.rufSVBase?rufPay:0);
   var marginalSV  = calcSVMonthly(newSVTaxable, s.wbfRate).total - calcSVMonthly(svBaseTaxable, s.wbfRate).total;
   var marginalLSt = calcMonthlyLSt(newLSTTaxable, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate);
   var marginalTax = marginalSV + marginalLSt;
+  var rufLSt = s.rufSVBase ? 0 : (calcMonthlyLSt(baseTaxable+rufPay, s.wbfRate)-calcMonthlyLSt(baseTaxable, s.wbfRate));
 
-  // Ruf LSt impact (if not in SV base, still taxable for LSt)
-  var rufLSt = s.rufSVBase ? 0 : (calcMonthlyLSt(baseTaxable + rufPay, s.wbfRate) - calcMonthlyLSt(baseTaxable, s.wbfRate));
+  var netGainThisMonth = lateNightPay + normalBasePay + holBasePay - marginalTax
+                        + (s.rufSVBase?0:rufPay-rufLSt);
 
-  // Net gain this month
-  var netGainWork = extraTaxable - marginalTax + (s.rufSVBase ? 0 : rufPay - rufLSt);
-  if(!s.rufSVBase) netGainWork = extraTaxable - marginalTax + rufPay - rufLSt;
+  // Next month supplements (separate — shown as additional line)
+  var nextMonthSupplGross = s.lateS*nLate + s.middleS*nMiddle + hourly*2*8*nHol;
+  // Estimate net of supplements at current marginal LSt rate
+  var marginalSVSuppl = calcSVMonthly(r.taxable+nextMonthSupplGross, s.wbfRate).total - calcSVMonthly(r.taxable, s.wbfRate).total;
+  var marginalLStSuppl = calcMonthlyLSt(r.lstTaxable+nextMonthSupplGross, s.wbfRate) - calcMonthlyLSt(r.lstTaxable, s.wbfRate);
+  var nextMonthNet = nextMonthSupplGross - marginalSVSuppl - marginalLStSuppl;
 
-  // Supplements earned → next month (informational only)
-  var nextMonthSuppl = s.lateS*nLate + s.middleS*nMiddle + hourly*2*8*nHol;
-
-  // Effective marginal rate on the extra gross
-  var totalExtraGross = lateNightPay+lateBasePay+middleBasePay+normalBasePay+holBasePay+rufPay;
+  var totalExtraGross = lateNightPay+normalBasePay+holBasePay+rufPay;
   var margRate = totalExtraGross>0 ? ((marginalTax+rufLSt)/totalExtraGross*100) : 0;
 
   // Update result box
@@ -3918,39 +3912,42 @@ function renderSim(){
     return;
   }
 
-  var up=netGainWork>=0;
+  var up=netGainThisMonth>=0;
   box.className='sim-result-box '+(up?'sim-up':'sim-dn');
   deltaEl.className='sim-delta '+(up?'up':'dn');
-  deltaEl.textContent=(up?'+ ':'− ')+fmt(Math.abs(netGainWork)).replace('€ ','€ ');
+  deltaEl.textContent=(up?'+ ':'− ')+fmt(Math.abs(netGainThisMonth)).replace('€ ','€ ');
 
-  // Breakdown lines
   var lines=[];
-  if(nLate>0)   lines.push(nLate+'× late: '+fmt(lateNightPay)+' night 8% + '+fmt(lateBasePay)+' base pay');
-  if(nMiddle>0) lines.push(nMiddle+'× middle: '+fmt(middleBasePay)+' base pay');
-  if(nNormal>0) lines.push(nNormal+'× early: '+fmt(normalBasePay)+' base pay');
+  if(nLate>0)   lines.push(nLate+'× late: '+fmt(lateNightPay)+' night 8% this month (§68 tax-free)');
+  if(nMiddle>0) lines.push(nMiddle+'× middle: night pay n/a (no hours after '+s.thresh+':00)');
+  if(nNormal>0) lines.push(nNormal+'× extra early: '+fmt(normalBasePay)+' base pay');
   if(nRuf>0)    lines.push(nRuf+'× Ruf 4.5h: '+fmt(rufPay)+' standby pay');
   if(nHol>0)    lines.push(nHol+'× holiday: '+fmt(holBasePay)+' base pay now');
-  lines.push('Extra gross this month: '+fmt(totalExtraGross));
-  lines.push('Marginal tax (SV+LSt): − '+fmt(marginalTax+rufLSt));
-  lines.push('Marginal rate: '+margRate.toFixed(1)+'%');
-  if(nextMonthSuppl>0.01) lines.push('→ Next month supplements: +'+fmt(nextMonthSuppl)+' (not included above)');
-  bkEl.innerHTML=lines.join('<br>');
+  if(totalExtraGross>0) lines.push('Extra gross this month: '+fmt(totalExtraGross));
+  if(marginalTax+rufLSt>0) lines.push('SV+LSt on this month: − '+fmt(marginalTax+rufLSt));
+  if(nextMonthSupplGross>0){
+    lines.push('');
+    lines.push('Next month supplements (paid separately):');
+    if(nLate>0)   lines.push('  '+nLate+'× late supplement: '+fmt(s.lateS*nLate)+' gross → ~'+fmt(s.lateS*nLate*(1-(margRate/100)))+' net');
+    if(nMiddle>0) lines.push('  '+nMiddle+'× middle supplement: '+fmt(s.middleS*nMiddle)+' gross → ~'+fmt(s.middleS*nMiddle*(1-(margRate/100)))+' net');
+    if(nHol>0)    lines.push('  '+nHol+'× holiday 200% extra: '+fmt(hourly*2*8*nHol)+' gross → ~'+fmt(hourly*2*8*nHol*(1-(margRate/100)))+' net');
+  }
+  bkEl.innerHTML=lines.filter(l=>l!=='').join('<br>');
 
-  // Plain-language verdict
-  var perShift = (nLate+nMiddle+nNormal+nRuf+nHol)>0 ? netGainWork/(nLate+nMiddle+nNormal+nRuf+nHol) : 0;
+  // Verdict
   var v='';
   if(nLate>0&&nMiddle===0&&nNormal===0&&nRuf===0&&nHol===0){
-    // Pure late shift analysis — the main use case
-    var netPerLate=netGainWork/nLate;
-    var grossPerLate=totalExtraGross/nLate;
-    v='Each late shift nets you '+fmt(netPerLate)+' this month';
-    if(nextMonthSuppl>0.01) v+=' + '+fmt(s.lateS*(1-margRate/100))+' net from the €50 supplement next month';
-    v+='. Marginal rate: '+margRate.toFixed(1)+'%.';
-    if(netPerLate<15) v+=' Low return — marginal rate is eating most of the supplement.';
-    else if(netPerLate>30) v+=' Good value — marginal tax is low enough to keep most of the gain.';
+    var netPerLate=netGainThisMonth/nLate;
+    var supplNetPerLate=nextMonthNet/nLate;
+    v='Each late shift: '+fmt(netPerLate)+' net this month (night 8%)';
+    if(supplNetPerLate>0) v+=' + '+fmt(supplNetPerLate)+' net next month (supplement). Total per shift: '+fmt(netPerLate+supplNetPerLate)+'.';
+    else v+='. No supplement configured — set late supplement in Settings.';
+  } else if(nMiddle>0&&nLate===0&&nNormal===0&&nRuf===0&&nHol===0){
+    var supplNetPerMiddle=nextMonthNet/nMiddle;
+    v='Each middle shift adds '+fmt(supplNetPerMiddle>0?supplNetPerMiddle:0)+' net next month from the supplement.';
+    if(s.middleS===0) v=' No middle supplement configured — set it in Settings.';
   } else {
-    v='Net gain across all extra shifts: '+fmt(netGainWork)+' ('+fmt(perShift)+'/shift avg).';
-  }
+    v='Net this month: '+fmt(netGainThisMonth)+(nextMonthNet>0?' + '+fmt(nextMonthNet)+' next month from supplements':'')+'.';}
   verdictEl.textContent=v;
 }
 
@@ -4269,8 +4266,8 @@ function renderHeatmap(){
       var cell=cells[col2][row];
       if(!cell){gridHtml+='<div class="hm-cell hm-empty"></div>';continue;}
       var cls='hm-cell hm-'+cell.type;
-      var title=cell.date+(cell.type!=='none'?' — '+cell.type:'');
-      gridHtml+='<div class="'+cls+'" title="'+title+'"></div>';
+      var title=cell.date+(cell.type!=='none'?' — '+cell.type:'')+' · click to open '+MONTH_NAMES[cell.m];
+      gridHtml+='<div class="'+cls+'" title="'+title+'" onclick="navToMonthYear('+cell.m+','+y+')" style="cursor:pointer"></div>';
     }
   }
   grid.style.gridTemplateColumns='repeat(53,1fr)';
