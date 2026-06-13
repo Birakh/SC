@@ -648,47 +648,48 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <div class="left">
   <div class="app-header">
     <div>
-      <div class="app-title">Shift &amp; Salary Planner</div>
-      <div class="app-sub">Austria · click any day to add or edit a shift</div>
+      <div class="app-title" data-i18n="appTitle">Shift &amp; Salary Planner</div>
+      <div class="app-sub" data-i18n="appSub">Austria · click any day to add or edit a shift</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <div class="month-nav">
         <button onclick="changeMonth(-1)">‹</button>
         <div class="month-label" id="month-label" onclick="openMonthJump(event)" style="cursor:pointer;user-select:none" title="Click to jump to any month"></div>
         <button onclick="changeMonth(1)">›</button>
-        <button onclick="goToToday()" title="Jump to today" style="font-size:11px;padding:4px 8px">Today</button>
+        <button onclick="goToToday()" title="Jump to today" style="font-size:11px;padding:4px 8px" data-i18n="today">Today</button>
       </div>
-      <button class="icon-btn" onclick="window.print()">🖨 Print</button>
-      <button class="icon-btn" onclick="exportICal()" title="Export shifts to .ics for Google / Apple Calendar">📅 iCal</button>
-      <button class="icon-btn" onclick="copyPrevMonth()" title="Copy previous month's shifts into this month">📋 Copy prev</button>
+      <button class="icon-btn" onclick="window.print()" data-i18n="print">🖨 Print</button>
+      <button class="icon-btn" onclick="exportICal()" title="Export shifts to .ics for Google / Apple Calendar" data-i18n="icalBtn">📅 iCal</button>
+      <button class="icon-btn" onclick="copyPrevMonth()" title="Copy previous month's shifts into this month" data-i18n="copyPrevBtn">📋 Copy prev</button>
       <button class="icon-btn" id="dark-btn" onclick="toggleDark()" title="Toggle dark mode">🌙</button>
+      <button class="icon-btn" id="lang-btn" onclick="toggleLang()" title="Switch language / Sprache wechseln">🌐 DE</button>
     </div>
   </div>
   <div class="legend">
-    <span class="lpill lp-normal">Early 07–15</span>
-    <span class="lpill lp-middle">Middle 11:30–20 <b style="color:#0f6e56">+€35.50</b></span>
-    <span class="lpill lp-late">Late 14–22:30 <b style="color:#3c3489">+€50</b></span>
-    <span class="lpill lp-latenight">Late+Night 14–22:30 <b style="color:#26215c">+8% only</b></span>
-    <span class="lpill lp-holiday">Public holiday <b style="color:#854f0b">+200%</b></span>
-    <span class="lpill lp-leave">Urlaub</span>
-    <span class="lpill lp-ruf">On-call</span>
-    <span class="lpill lp-callin">Rufeinsatz</span>
-    <span style="font-size:10px;color:#aaa;margin-left:2px">OT: <span style="color:#ef9f27">●</span>&gt;48h <span style="color:#e24b4a">●</span>&gt;60h</span>
+    <span class="lpill lp-normal" data-i18n="legEarly">Early 07–15</span>
+    <span class="lpill lp-middle"><span data-i18n="legMiddle">Middle 11:30–20</span> <b style="color:#0f6e56">+€35.50</b></span>
+    <span class="lpill lp-late"><span data-i18n="legLate">Late 14–22:30</span> <b style="color:#3c3489">+€50</b></span>
+    <span class="lpill lp-latenight"><span data-i18n="legLateNight">Late+Night 14–22:30</span> <b style="color:#26215c" data-i18n="legNightOnly">+8% only</b></span>
+    <span class="lpill lp-holiday"><span data-i18n="legHoliday">Public holiday</span> <b style="color:#854f0b">+200%</b></span>
+    <span class="lpill lp-leave" data-i18n="legLeave">Urlaub</span>
+    <span class="lpill lp-ruf" data-i18n="legOnCall">On-call</span>
+    <span class="lpill lp-callin" data-i18n="legCallin">Rufeinsatz</span>
+    <span style="font-size:10px;color:#aaa;margin-left:2px"><span data-i18n="otLabel">OT</span>: <span style="color:#ef9f27">●</span>&gt;48h <span style="color:#e24b4a">●</span>&gt;60h</span>
   </div>
   <div class="week-bar" id="week-bar"></div>
   <div id="past-month-banner" style="display:none;font-size:10px;color:#854f0b;background:#fff8e8;border:.5px solid #fac775;border-radius:6px;padding:4px 10px;margin-bottom:6px">📅 Viewing past month — figures are historical estimates</div>
   <div style="margin-bottom:6px;display:flex;align-items:center;gap:6px">
     <input type="text" id="shift-search" placeholder="🔍 Filter shifts…" maxlength="30"
-      oninput="renderCalendar()"
+      oninput="renderCalendar()" data-i18n-placeholder="filterShifts"
       style="flex:1;font-size:11px;padding:4px 8px;border:.5px solid #ddd;border-radius:6px;background:#fafafa">
     <button onclick="document.getElementById('shift-search').value='';renderCalendar()" title="Clear filter"
       style="font-size:11px;padding:3px 8px;border:.5px solid #ddd;border-radius:6px;background:#f5f5f0;cursor:pointer;display:none" id="search-clear">✕</button>
   </div>
   <div class="cal-dow-row">
-    <div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
-    <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div>
-    <div class="cal-dow">Fri</div>
-    <div class="cal-dow wknd">Sat</div><div class="cal-dow wknd">Sun</div>
+    <div class="cal-dow" data-i18n="dowMon">Mon</div><div class="cal-dow" data-i18n="dowTue">Tue</div>
+    <div class="cal-dow" data-i18n="dowWed">Wed</div><div class="cal-dow" data-i18n="dowThu">Thu</div>
+    <div class="cal-dow" data-i18n="dowFri">Fri</div>
+    <div class="cal-dow wknd" data-i18n="dowSat">Sat</div><div class="cal-dow wknd" data-i18n="dowSun">Sun</div>
   </div>
   <div class="cal-grid" id="cal-grid"></div>
 </div>
@@ -696,12 +697,12 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ RIGHT — PANEL ═══ -->
 <div class="right">
   <div class="rtabs">
-    <div class="rtab active"  onclick="showTab('report',this)">Report</div>
-    <div class="rtab"         onclick="showTab('taxcalc',this)">Tax Calc</div>
-    <div class="rtab"         onclick="showTab('settings',this)">Settings</div>
-    <div class="rtab"         onclick="showTab('year',this)">Year</div>
-    <div class="rtab"         onclick="showTab('compare',this)">Compare</div>
-    <div class="rtab"         onclick="showTab('sim',this)">Sim</div>
+    <div class="rtab active"  onclick="showTab('report',this)" data-i18n="tabReport">Report</div>
+    <div class="rtab"         onclick="showTab('taxcalc',this)" data-i18n="tabTaxCalc">Tax Calc</div>
+    <div class="rtab"         onclick="showTab('settings',this)" data-i18n="tabSettings">Settings</div>
+    <div class="rtab"         onclick="showTab('year',this)" data-i18n="tabYear">Year</div>
+    <div class="rtab"         onclick="showTab('compare',this)" data-i18n="tabCompare">Compare</div>
+    <div class="rtab"         onclick="showTab('sim',this)" data-i18n="tabSim">Sim</div>
   </div>
 
   <!-- ── REPORT ── -->
@@ -723,7 +724,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:5px">3-month net forecast</div>
     <div class="forecast-strip" id="forecast-strip"></div>
     <div class="panel-section">
-      <div class="panel-label">Gross breakdown</div>
+      <div class="panel-label" data-i18n="lblGrossBreakdown">Gross breakdown</div>
       <div class="rrow"><span class="rl">Base salary</span><span class="rv" id="r-base">—</span></div>
       <div class="rrow"><span class="rl">Night allowance 8% (this month's shifts)</span><span class="rv" id="r-shift">—</span></div>
       <div class="rrow"><span class="rl">Middle shift supplement (×days, prev month)</span><span class="rv" id="r-middle">—</span></div>
@@ -738,7 +739,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="rrow total-row"><span class="rl">Total gross</span><span class="rv" id="r-gross">—</span></div>
     </div>
     <div class="panel-section">
-      <div class="panel-label">Pay waterfall</div>
+      <div class="panel-label" data-i18n="lblWaterfall">Pay waterfall</div>
       <div class="wf-wrap">
         <div class="wf-chart" id="wf-chart"></div>
         <div class="wf-legend">
@@ -749,7 +750,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
           <span><span class="wf-leg-dot" style="background:#9b8fd8"></span>SZ (if month)</span>
         </div>
       </div>
-      <div class="panel-label">Deductions (Austrian 2026 rates)</div>
+      <div class="panel-label" data-i18n="lblDeductions">Deductions (Austrian 2026 rates)</div>
       <div class="rrow"><span class="rl">KV Krankenversicherung (3.87%)</span><span class="rv neg" id="r-kv">—</span></div>
       <div class="rrow" id="r-cap-row" style="display:none"><span class="rl" style="color:#27ae60">✓ SV cap reached (€6,930/mo max)</span><span class="rv pos" id="r-cap-save">—</span></div>
       <div class="rrow" id="r-sv-remaining-row"><span class="rl">SV-pflichtiger Restbetrag bis Deckelung</span><span class="rv" id="r-sv-remaining">—</span></div>
@@ -778,7 +779,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       </div>
     </div>
     <div class="panel-section">
-      <div class="panel-label">Hours summary</div>
+      <div class="panel-label" data-i18n="lblHoursSummary">Hours summary</div>
       <div class="rrow"><span class="rl">Night hours (8% qualifying, this month)</span><span class="rv" id="r-nighth">—</span></div>
       <div class="rrow"><span class="rl">Night hours YTD (Jan–now)</span><span class="rv" id="r-nighth-ytd">—</span></div>
       <div class="rrow"><span class="rl">Middle shift days</span><span class="rv" id="r-middled">—</span></div>
@@ -886,7 +887,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
 
   <!-- ── TAX CALC ── -->
   <div class="rpanel" id="tab-taxcalc" style="display:none">
-    <div class="panel-label" style="margin-bottom:8px">Austrian 2026 Brutto → Netto Calculator</div>
+    <div class="panel-label" style="margin-bottom:8px" data-i18n="lblBruttoNetto">Austrian 2026 Brutto → Netto Calculator</div>
 
     <!-- 14-salary explainer -->
     <div class="sz-explainer">
@@ -936,7 +937,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="bracket-legend" id="tc-legend"></div>
       <div class="tax-summary-grid" id="tc-summary"></div>
 
-      <div class="panel-label">Monthly breakdown</div>
+      <div class="panel-label" data-i18n="lblMonthlyBreakdown">Monthly breakdown</div>
       <div class="rrow"><span class="rl">Monthly gross (taxable)</span><span class="rv" id="tc-mgross">—</span></div>
       <div class="rrow"><span class="rl">KV 3.87%</span><span class="rv neg" id="tc-kv">—</span></div>
       <div class="rrow"><span class="rl">PV 10.25%</span><span class="rv neg" id="tc-pv">—</span></div>
@@ -947,7 +948,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="rrow"><span class="rl">Hazard allowance (tax-free)</span><span class="rv pos" id="tc-haz">—</span></div>
       <div class="rrow total-row"><span class="rl">Monthly net</span><span class="rv info" id="tc-mnet">—</span></div>
 
-      <div class="panel-label" style="margin-top:12px">Annual totals</div>
+      <div class="panel-label" style="margin-top:12px" data-i18n="lblAnnualTotals">Annual totals</div>
       <div class="rrow"><span class="rl">Annual gross (12 regular salaries)</span><span class="rv" id="tc-agross">—</span></div>
       <div class="rrow"><span class="rl">Annual SV (regular months)</span><span class="rv neg" id="tc-asv">—</span></div>
       <div class="rrow"><span class="rl">Annual Lohnsteuer (§66, progressive)</span><span class="rv neg" id="tc-alst">—</span></div>
@@ -981,26 +982,26 @@ body.dark .tc-extra-box{background:#2a2a2e}
         </div>
       </div>
 
-      <div class="panel-label" style="margin-top:12px">Effective rates</div>
+      <div class="panel-label" style="margin-top:12px" data-i18n="lblEffRates">Effective rates</div>
       <div class="rrow"><span class="rl">Effective tax rate (LSt / gross)</span><span class="rv" id="tc-effrate">—</span></div>
       <div class="rrow"><span class="rl">Total deduction rate (SV+LSt)</span><span class="rv" id="tc-totrate">—</span></div>
       <div class="rrow"><span class="rl">Hourly rate net (173.33h/month)</span><span class="rv" id="tc-hourly">—</span></div>
       <div class="rrow"><span class="rl">Marginal tax bracket</span><span class="rv" id="tc-marginal">—</span></div>
 
-      <div class="panel-label" style="margin-top:12px">2026 Lohnsteuer brackets</div>
+      <div class="panel-label" style="margin-top:12px" data-i18n="lblBrackets">2026 Lohnsteuer brackets</div>
       <table class="rate-table">
         <thead><tr><th>Income band (annual)</th><th>Rate</th><th>Your income here</th></tr></thead>
         <tbody id="tc-brackets"></tbody>
       </table>
 
-      <div class="panel-label" style="margin-top:12px">Supplement & on-call impact</div>
+      <div class="panel-label" style="margin-top:12px" data-i18n="lblSupplImpact">Supplement & on-call impact</div>
       <div id="tc-supplement-rows"></div>
     </div>
     <div id="tc-cap-notice" style="display:none;background:#eaf3de;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:11px;color:#3b6d11">✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.</div>
     <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.</p>
 
     <!-- Pendlerpauschale + Familienbonus -->
-    <div class="panel-label" style="margin-top:14px">🚗 Pendlerpauschale &amp; Familienbonus Plus</div>
+    <div class="panel-label" style="margin-top:14px" data-i18n="lblPendlerFam">🚗 Pendlerpauschale &amp; Familienbonus Plus</div>
     <div class="tc-extra-box">
       <div style="font-size:10px;color:#aaa;margin-bottom:10px;line-height:1.5">These reduce your annual Lohnsteuer directly. Enter what applies to you — the monthly LSt estimate above will update.</div>
       <div style="margin-bottom:8px">
@@ -1041,7 +1042,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
 
     <!-- Nettolohnrechner -->
-    <div class="panel-label" style="margin-top:14px">🔄 Nettolohnrechner — Reverse Calculator</div>
+    <div class="panel-label" style="margin-top:14px" data-i18n="lblNetto">🔄 Nettolohnrechner — Reverse Calculator</div>
     <div class="netto-box">
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Enter the net amount you want to take home. The app calculates the gross salary you would need to negotiate for.</div>
       <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px">
@@ -1055,7 +1056,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
 
     <!-- Inflationsanpassung -->
-    <div class="panel-label" style="margin-top:14px">📈 Inflationsanpassung — Real Wage Check</div>
+    <div class="panel-label" style="margin-top:14px" data-i18n="lblInflation">📈 Inflationsanpassung — Real Wage Check</div>
     <div class="infl-box">
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Did your salary keep up with inflation? Enter last year's gross to find out.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
@@ -1073,7 +1074,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
 
     <!-- SV Annual Tracker -->
-    <div class="panel-label" style="margin-top:14px">🏥 SV Jahrestracker</div>
+    <div class="panel-label" style="margin-top:14px" data-i18n="lblSVTracker">🏥 SV Jahrestracker</div>
     <div class="sv-annual-box">
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Total social insurance you will pay this year at the current monthly gross. Almost all Austrians pay far below the theoretical maximum of ~€17,550/year.</div>
       <div id="sv-annual-result" style="font-size:11px;color:#aaa">Enter a salary above to see your annual SV.</div>
@@ -1083,7 +1084,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
   <!-- ── SETTINGS ── -->
   <div class="rpanel" id="tab-settings" style="display:none">
     <div class="panel-section">
-      <div class="panel-label">Your Salary</div>
+      <div class="panel-label" data-i18n="lblYourSalary">Your Salary</div>
       <div style="margin-bottom:8px">
         <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Monthly gross salary (€) <span style="color:#aaa;font-weight:400">— find this on your payslip (Bruttobezug)</span></label>
         <input type="number" id="grade" step="0.01" min="0" placeholder="e.g. 3200.00" onchange="saveSettings();renderAll()" style="font-size:14px;padding:6px 8px;border:.5px solid #ccc;border-radius:6px;width:100%">
@@ -1132,7 +1133,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">🏛 Kollektivvertrag (KV) preset</div>
+      <div class="panel-label" data-i18n="lblKVPreset">🏛 Kollektivvertrag (KV) preset</div>
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.</p>
       <select class="kv-select" id="kv-preset" onchange="applyKVPreset()">
         <option value="">— Select your sector —</option>
@@ -1164,7 +1165,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">Fixed shift supplements</div>
+      <div class="panel-label" data-i18n="lblFixedSuppl">Fixed shift supplements</div>
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Check your <strong style="color:#555">collective agreement (Kollektivvertrag)</strong> or payslip for your actual supplement amounts. These vary widely between employers and sectors. If you have no shift supplements, set both to 0.</p>
       <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Middle shift supplement (€/day)
         <span class="tip" title="A fixed bonus paid for each middle-shift day worked (e.g. 11:30–20:00). Paid the following month. Check your contract — many employees have €0 here.">ℹ</span></label>
@@ -1175,7 +1176,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">Sonderzahlungen (13th / 14th month)</div>
+      <div class="panel-label" data-i18n="lblSZ">Sonderzahlungen (13th / 14th month)</div>
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
         <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">13th month (Urlaubsgeld)</label>
@@ -1207,7 +1208,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">On-call &amp; Standby</div>
+      <div class="panel-label" data-i18n="lblOnCall">On-call &amp; Standby</div>
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Configure if you work standby shifts (Rufbereitschaft) or get called in outside your normal hours.</div>
       <div style="margin-bottom:8px">
         <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Standby flat rate (€/hour)
@@ -1236,7 +1237,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">Social Insurance — Regional settings</div>
+      <div class="panel-label" data-i18n="lblSVRegional">Social Insurance — Regional settings</div>
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Most rates are set by Austrian federal law. The Wohnbauförderungsbeitrag varies by state (Bundesland). Confirm with your payslip.</div>
       <div style="margin-bottom:8px">
         <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Housing subsidy contribution — WBF (% of gross)
@@ -1246,7 +1247,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">💾 Backup</div>
+      <div class="panel-label" data-i18n="lblBackup">💾 Backup</div>
       <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Export a backup file regularly. Your data lives only in this browser — no automatic cloud backup unless you set up sync below.</div>
       <div style="display:flex;gap:6px;margin-bottom:6px">
         <button class="mbtn" style="flex:1" onclick="exportJSON()">📤 Export JSON</button>
@@ -1289,7 +1290,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">📋 Shift Templates</div>
+      <div class="panel-label" data-i18n="lblTemplates">📋 Shift Templates</div>
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Save a shift pattern as a template. Apply it to fill Mon–Fri of any week in one tap.</p>
       <div class="tpl-list" id="tpl-list"></div>
       <div style="display:flex;gap:6px;align-items:center">
@@ -1300,7 +1301,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">Data</div>
+      <div class="panel-label" data-i18n="lblData">Data</div>
       <button class="mbtn" onclick="clearMonth()" style="margin-bottom:6px;width:100%">🗑 Clear current month</button>
       <button class="mbtn danger" onclick="clearAll()" style="width:100%">⚠️ Clear all data</button>
     </div>
@@ -1344,7 +1345,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
 
   <!-- ── COMPARE ── -->
   <div class="rpanel" id="tab-compare" style="display:none">
-    <div class="panel-label" style="margin-bottom:8px">Month comparison</div>
+    <div class="panel-label" style="margin-bottom:8px" data-i18n="lblMonthComparison">Month comparison</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
       <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Month A</label>
         <select id="cmp-a" onchange="renderCompare()"></select></div>
@@ -1359,37 +1360,37 @@ body.dark .tc-extra-box{background:#2a2a2e}
   <!-- ── SIMULATION ── -->
   <div class="rpanel" id="tab-sim" style="display:none">
     <div style="font-size:11px;font-weight:500;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-      <span>💡 What-if simulator — <span id="sim-month-label"></span></span>
-      <button class="sim-reset" onclick="resetSim()">Reset all</button>
+      <span>💡 <span data-i18n="simTitle">What-if simulator</span> — <span id="sim-month-label"></span></span>
+      <button class="sim-reset" onclick="resetSim()" data-i18n="resetAll">Reset all</button>
     </div>
     <div class="sim-baseline">
-      <div class="sb-label">Current month baseline net</div>
+      <div class="sb-label" data-i18n="simBaseline">Current month baseline net</div>
       <div class="sb-net" id="sim-base-net">—</div>
-      <div class="sb-sub" id="sim-base-sub">based on shifts entered</div>
+      <div class="sb-sub" id="sim-base-sub" data-i18n="simBasedOnShifts">based on shifts entered</div>
     </div>
-    <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:8px">Add extra shifts</div>
+    <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:8px" data-i18n="simAddExtra">Add extra shifts</div>
     <div class="sim-slider-row">
-      <label>🌙 Late shifts (14:00–22:30)<br><span style="color:#aaa;font-size:10px">+€50 supplement next month · 2.5h night pay this month</span></label>
+      <label>🌙 <span data-i18n="simLateLabel">Late shifts (14:00–22:30)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simLateSub">+€50 supplement next month · 2.5h night pay this month</span></label>
       <input type="range" id="sim-late" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-late-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>🌅 Middle shifts (11:30–20:00)<br><span style="color:#aaa;font-size:10px">+€35.50 supplement next month</span></label>
+      <label>🌅 <span data-i18n="simMiddleLabel">Middle shifts (11:30–20:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simMiddleSub">+€35.50 supplement next month</span></label>
       <input type="range" id="sim-middle" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-middle-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>☀️ Early shifts (07:00–15:00)<br><span style="color:#aaa;font-size:10px">no supplements · base pay only</span></label>
+      <label>☀️ <span data-i18n="simEarlyLabel">Early shifts (07:00–15:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simEarlySub">no supplements · base pay only</span></label>
       <input type="range" id="sim-normal" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-normal-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>📟 Rufbereitschaft (4.5h weekday)<br><span style="color:#aaa;font-size:10px">standby pay, outside SV base</span></label>
+      <label>📟 <span data-i18n="simRufLabel">Rufbereitschaft (4.5h weekday)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simRufSub">standby pay, outside SV base</span></label>
       <input type="range" id="sim-ruf" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-ruf-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>🏖 Public holiday shifts (07:00–15:00)<br><span style="color:#aaa;font-size:10px">base pay now · 200% extra next month</span></label>
+      <label>🏖 <span data-i18n="simHolLabel">Public holiday shifts (07:00–15:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simHolSub">base pay now · 200% extra next month</span></label>
       <input type="range" id="sim-hol" min="0" max="5" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-hol-val">0</div>
     </div>
@@ -1398,7 +1399,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="sim-breakdown" id="sim-breakdown"></div>
       <div class="sim-verdict" id="sim-verdict"></div>
     </div>
-    <div style="font-size:10px;color:#aaa;margin-top:10px;line-height:1.5">⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.</div>
+    <div style="font-size:10px;color:#aaa;margin-top:10px;line-height:1.5" data-i18n="simFootnote">⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.</div>
   </div>
 
 <!-- ═══ ONBOARDING TUTORIAL ═══ -->
@@ -4275,6 +4276,94 @@ function renderHeatmap(){
   grid.innerHTML=gridHtml;
 }
 
+// ═══ I18N — DE/EN ═══
+var I18N={
+  en:{
+    appTitle:'Shift &amp; Salary Planner', appSub:'Austria · click any day to add or edit a shift',
+    today:'Today', print:'🖨 Print', icalBtn:'📅 iCal', copyPrevBtn:'📋 Copy prev',
+    legEarly:'Early 07–15', legMiddle:'Middle 11:30–20', legLate:'Late 14–22:30',
+    legLateNight:'Late+Night 14–22:30', legNightOnly:'+8% only', legHoliday:'Public holiday',
+    legLeave:'Urlaub', legOnCall:'On-call', legCallin:'Rufeinsatz', otLabel:'OT',
+    filterShifts:'🔍 Filter shifts…',
+    dowMon:'Mon',dowTue:'Tue',dowWed:'Wed',dowThu:'Thu',dowFri:'Fri',dowSat:'Sat',dowSun:'Sun',
+    tabReport:'Report', tabTaxCalc:'Tax Calc', tabSettings:'Settings', tabYear:'Year', tabCompare:'Compare', tabSim:'Sim',
+    lblGrossBreakdown:'Gross breakdown', lblWaterfall:'Pay waterfall', lblDeductions:'Deductions (Austrian 2026 rates)',
+    lblHoursSummary:'Hours summary', lblBruttoNetto:'Austrian 2026 Brutto → Netto Calculator',
+    lblMonthlyBreakdown:'Monthly breakdown', lblAnnualTotals:'Annual totals', lblEffRates:'Effective rates',
+    lblBrackets:'2026 Lohnsteuer brackets', lblSupplImpact:'Supplement &amp; on-call impact',
+    lblPendlerFam:'🚗 Pendlerpauschale &amp; Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Reverse Calculator',
+    lblInflation:'📈 Inflationsanpassung — Real Wage Check', lblSVTracker:'🏥 SV Jahrestracker',
+    lblYourSalary:'Your Salary', lblKVPreset:'🏛 Kollektivvertrag (KV) preset', lblFixedSuppl:'Fixed shift supplements',
+    lblSZ:'Sonderzahlungen (13th / 14th month)', lblOnCall:'On-call &amp; Standby',
+    lblSVRegional:'Social Insurance — Regional settings', lblBackup:'💾 Backup', lblTemplates:'📋 Shift Templates',
+    lblData:'Data', lblMonthComparison:'Month comparison',
+    simTitle:'What-if simulator', resetAll:'Reset all', simBaseline:'Current month baseline net',
+    simBasedOnShifts:'based on shifts entered', simAddExtra:'Add extra shifts',
+    simLateLabel:'Late shifts (14:00–22:30)', simLateSub:'+€50 supplement next month · 2.5h night pay this month',
+    simMiddleLabel:'Middle shifts (11:30–20:00)', simMiddleSub:'+€35.50 supplement next month',
+    simEarlyLabel:'Early shifts (07:00–15:00)', simEarlySub:'no supplements · base pay only',
+    simRufLabel:'Rufbereitschaft (4.5h weekday)', simRufSub:'standby pay, outside SV base',
+    simHolLabel:'Public holiday shifts (07:00–15:00)', simHolSub:'base pay now · 200% extra next month',
+    simFootnote:"⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month."
+  },
+  de:{
+    appTitle:'Dienstplan- &amp; Gehaltsrechner', appSub:'Österreich · auf einen Tag klicken, um eine Schicht hinzuzufügen',
+    today:'Heute', print:'🖨 Drucken', icalBtn:'📅 iCal', copyPrevBtn:'📋 Vormonat kopieren',
+    legEarly:'Früh 07–15', legMiddle:'Mittel 11:30–20', legLate:'Spät 14–22:30',
+    legLateNight:'Spät+Nacht 14–22:30', legNightOnly:'nur +8%', legHoliday:'Feiertag',
+    legLeave:'Urlaub', legOnCall:'Rufbereitschaft', legCallin:'Rufeinsatz', otLabel:'ÜStd',
+    filterShifts:'🔍 Schichten filtern…',
+    dowMon:'Mo',dowTue:'Di',dowWed:'Mi',dowThu:'Do',dowFri:'Fr',dowSat:'Sa',dowSun:'So',
+    tabReport:'Bericht', tabTaxCalc:'Steuerrechner', tabSettings:'Einstellungen', tabYear:'Jahr', tabCompare:'Vergleich', tabSim:'Simulator',
+    lblGrossBreakdown:'Brutto-Aufschlüsselung', lblWaterfall:'Gehaltsfluss', lblDeductions:'Abzüge (Österreich 2026)',
+    lblHoursSummary:'Stundenübersicht', lblBruttoNetto:'Österreich 2026 Brutto → Netto Rechner',
+    lblMonthlyBreakdown:'Monatliche Aufschlüsselung', lblAnnualTotals:'Jahressummen', lblEffRates:'Effektive Sätze',
+    lblBrackets:'Lohnsteuerstufen 2026', lblSupplImpact:'Zuschläge &amp; Rufbereitschaft – Auswirkung',
+    lblPendlerFam:'🚗 Pendlerpauschale &amp; Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Rückwärtsrechner',
+    lblInflation:'📈 Inflationsanpassung — Realeinkommen-Check', lblSVTracker:'🏥 SV Jahrestracker',
+    lblYourSalary:'Ihr Gehalt', lblKVPreset:'🏛 Kollektivvertrag (KV) – Vorlage', lblFixedSuppl:'Fixe Schichtzulagen',
+    lblSZ:'Sonderzahlungen (13./14. Gehalt)', lblOnCall:'Rufbereitschaft &amp; Bereitschaftsdienst',
+    lblSVRegional:'Sozialversicherung — regionale Einstellungen', lblBackup:'💾 Sicherung', lblTemplates:'📋 Schichtvorlagen',
+    lblData:'Daten', lblMonthComparison:'Monatsvergleich',
+    simTitle:'Was-wäre-wenn-Simulator', resetAll:'Alles zurücksetzen', simBaseline:'Aktueller Monats-Nettobasiswert',
+    simBasedOnShifts:'basierend auf eingetragenen Schichten', simAddExtra:'Zusätzliche Schichten hinzufügen',
+    simLateLabel:'Spätdienste (14:00–22:30)', simLateSub:'+€50 Zuschlag nächsten Monat · 2,5h Nachtzuschlag diesen Monat',
+    simMiddleLabel:'Mitteldienste (11:30–20:00)', simMiddleSub:'+€35,50 Zuschlag nächsten Monat',
+    simEarlyLabel:'Frühdienste (07:00–15:00)', simEarlySub:'keine Zuschläge · nur Grundgehalt',
+    simRufLabel:'Rufbereitschaft (4,5h Werktag)', simRufSub:'Bereitschaftsentgelt, außerhalb SV-Basis',
+    simHolLabel:'Feiertagsdienste (07:00–15:00)', simHolSub:'Grundgehalt jetzt · +200% nächsten Monat',
+    simFootnote:'⚠ Zuschläge (Spät/Mittel) werden im <em>Folgemonat</em> ausgezahlt. Der angezeigte Nettoeffekt betrifft diesen Monat. Nachtzuschlag 8% und Rufbereitschaft werden im selben Monat ausgezahlt.'
+  }
+};
+
+function getLang(){
+  try{return localStorage.getItem('sp_lang')||'en';}catch(e){return 'en';}
+}
+function toggleLang(){
+  var cur=getLang();
+  var next=cur==='en'?'de':'en';
+  try{localStorage.setItem('sp_lang',next);}catch(e){}
+  applyLang(next);
+}
+function applyLang(lang){
+  lang=lang||getLang();
+  var dict=I18N[lang]||I18N.en;
+  var fallback=I18N.en;
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key=el.getAttribute('data-i18n');
+    var text=dict[key]!=null?dict[key]:fallback[key];
+    if(text!=null) el.innerHTML=text;
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el){
+    var key=el.getAttribute('data-i18n-placeholder');
+    var text=dict[key]!=null?dict[key]:fallback[key];
+    if(text!=null) el.setAttribute('placeholder',text);
+  });
+  var btn=document.getElementById('lang-btn');
+  if(btn) btn.textContent=lang==='en'?'🌐 DE':'🌐 EN';
+  document.documentElement.lang=lang;
+}
+
 // ═══ KV PRESETS ═══
 var KV_PRESETS={
   // Healthcare
@@ -4338,7 +4427,7 @@ function renderAll(){
     _renderYearTimer=setTimeout(function(){yearTabYear=currentYear;renderYear();},200);
   }
 }
-loadData();loadTemplates();renderAll();renderTemplates();checkWizard();checkOnboarding();
+applyLang();loadData();loadTemplates();renderAll();renderTemplates();checkWizard();checkOnboarding();
 </script>
 <!-- Storage warning banner -->
 <div id="storage-warn" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#c0392b;color:#fff;font-size:12px;padding:8px 16px;text-align:center;z-index:500">⚠️ Storage approaching limit (4MB) — export a JSON backup and consider clearing old years.</div>
