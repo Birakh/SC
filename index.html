@@ -725,17 +725,17 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <div class="forecast-strip" id="forecast-strip"></div>
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblGrossBreakdown">Gross breakdown</div>
-      <div class="rrow"><span class="rl">Base salary</span><span class="rv" id="r-base">—</span></div>
-      <div class="rrow"><span class="rl">Night allowance 8% (this month's shifts)</span><span class="rv" id="r-shift">—</span></div>
-      <div class="rrow"><span class="rl">Middle shift supplement (×days, prev month)</span><span class="rv" id="r-middle">—</span></div>
-      <div class="rrow"><span class="rl">Late shift supplement (×days, prev month)</span><span class="rv" id="r-late">—</span></div>
-      <div class="rrow"><span class="rl">Late+Night 8% supplement (this month)</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
-      <div class="rrow"><span class="rl">Public holiday extra (200%, prev month)</span><span class="rv" id="r-hol">—</span></div>
-      <div class="rrow"><span class="rl">Annual leave (Urlaub)</span><span class="rv" id="r-leave">—</span></div>
-      <div class="rrow"><span class="rl">Rufbereitschaft standby</span><span class="rv" id="r-ruf">—</span></div>
-      <div class="rrow"><span class="rl">Rufeinsatz call-in</span><span class="rv" id="r-callin">—</span></div>
-      <div class="rrow"><span class="rl">Hazard allowance (tax-free)</span><span class="rv pos" id="r-hazard">€ 230,43</span></div>
-      <div class="rrow"><span class="rl">Works council (~0.3%)</span><span class="rv neg" id="r-br">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlBaseSalary">Base salary</span><span class="rv" id="r-base">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlNightAllowance">Night allowance 8% (this month's shifts)</span><span class="rv" id="r-shift">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlMiddleSuppl">Middle shift supplement (×days, prev month)</span><span class="rv" id="r-middle">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlLateSuppl">Late shift supplement (×days, prev month)</span><span class="rv" id="r-late">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlLateNightSuppl">Late+Night 8% supplement (this month)</span><span class="rv" id="r-latenightA">€ 0,00</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlHolidayExtra">Public holiday extra (200%, prev month)</span><span class="rv" id="r-hol">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlAnnualLeave">Annual leave (Urlaub)</span><span class="rv" id="r-leave">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlRufStandby">Rufbereitschaft standby</span><span class="rv" id="r-ruf">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlRufCallin">Rufeinsatz call-in</span><span class="rv" id="r-callin">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlHazard">Hazard allowance (tax-free)</span><span class="rv pos" id="r-hazard">€ 230,43</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlWorksCouncil">Works council (~0.3%)</span><span class="rv neg" id="r-br">—</span></div>
       <div class="rrow total-row"><span class="rl">Total gross</span><span class="rv" id="r-gross">—</span></div>
     </div>
     <div class="panel-section">
@@ -764,8 +764,8 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="rrow"><span class="rl">AV Arbeitslosenversicherung (2.95%)</span><span class="rv neg" id="r-av">—</span></div>
       <div class="rrow"><span class="rl">AK-Umlage (0.5%)</span><span class="rv neg" id="r-ak">—</span></div>
       <div class="rrow"><span class="rl">Wohnbauförderung NÖ (0.5%)</span><span class="rv neg" id="r-wbf">—</span></div>
-      <div class="rrow"><span class="rl">UV Unfallversicherung (employer)</span><span class="rv" style="color:#aaa">—</span></div>
-      <div class="rrow"><span class="rl">Lohnsteuer (progressive brackets)</span><span class="rv neg" id="r-lst">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlUVEmployer">UV Unfallversicherung (employer)</span><span class="rv" style="color:#aaa">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlLStProgressive">Lohnsteuer (progressive brackets)</span><span class="rv neg" id="r-lst">—</span></div>
       <div class="rrow total-row"><span class="rl">Net payout</span><span class="rv info" id="r-net">—</span></div>
     </div>
     <div id="r-employer-section" style="display:none">
@@ -780,13 +780,13 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblHoursSummary">Hours summary</div>
-      <div class="rrow"><span class="rl">Night hours (8% qualifying, this month)</span><span class="rv" id="r-nighth">—</span></div>
-      <div class="rrow"><span class="rl">Night hours YTD (Jan–now)</span><span class="rv" id="r-nighth-ytd">—</span></div>
-      <div class="rrow"><span class="rl">Middle shift days</span><span class="rv" id="r-middled">—</span></div>
-      <div class="rrow"><span class="rl">Late shift days</span><span class="rv" id="r-lated">—</span></div>
-      <div class="rrow"><span class="rl">Rufbereitschaft standby hours</span><span class="rv" id="r-rufh">—</span></div>
-      <div class="rrow"><span class="rl">Rufeinsatz call-in hours</span><span class="rv" id="r-callinh">—</span></div>
-      <div class="rrow"><span class="rl">Holiday hours worked</span><span class="rv" id="r-holh">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlNightHours">Night hours (8% qualifying, this month)</span><span class="rv" id="r-nighth">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlNightHoursYTD">Night hours YTD (Jan–now)</span><span class="rv" id="r-nighth-ytd">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlMiddleDays">Middle shift days</span><span class="rv" id="r-middled">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlLateDays">Late shift days</span><span class="rv" id="r-lated">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlRufHours">Rufbereitschaft standby hours</span><span class="rv" id="r-rufh">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlCallinHours">Rufeinsatz call-in hours</span><span class="rv" id="r-callinh">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlHolidayHours">Holiday hours worked</span><span class="rv" id="r-holh">—</span></div>
       <div class="rrow" id="r-leave-row">
         <span class="rl">Urlaub taken this year</span>
         <span class="rv" style="display:flex;align-items:center;gap:6px;min-width:140px">
@@ -804,7 +804,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
 
     <div class="ot-box" id="ot-box">
       <div class="ot-title">⏱ Overtime ledger</div>
-      <div class="rrow"><span class="rl">OT hours this month (&gt;48h/week)</span><span class="rv" id="ot-accrued">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlOTHours">OT hours this month (&gt;48h/week)</span><span class="rv" id="ot-accrued">—</span></div>
       <div class="rrow">
         <span class="rl">Hours taken as time-off (enter)</span>
         <span class="rv"><input type="number" id="ot-taken" min="0" step="0.5" placeholder="0" style="width:64px;padding:3px 6px;font-size:12px;border:.5px solid #ccc;border-radius:5px;text-align:right" oninput="saveOT()"></span>
@@ -824,9 +824,9 @@ body.dark .tc-extra-box{background:#2a2a2e}
 
     <div class="pension-box">
       <div class="pension-title">🏦 Pension contributions (PV) — YTD</div>
-      <div class="rrow"><span class="rl">PV paid this month</span><span class="rv info" id="pv-month">—</span></div>
-      <div class="rrow"><span class="rl">YTD total paid (est.)</span><span class="rv" id="pv-ytd">—</span></div>
-      <div class="rrow"><span class="rl">Annual cap (Höchstbeitragsgrundlage)</span><span class="rv" id="pv-cap-annual">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlPVMonth">PV paid this month</span><span class="rv info" id="pv-month">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlYTDPaid">YTD total paid (est.)</span><span class="rv" id="pv-ytd">—</span></div>
+      <div class="rrow"><span class="rl" data-i18n="rlAnnualCap">Annual cap (Höchstbeitragsgrundlage)</span><span class="rv" id="pv-cap-annual">—</span></div>
       <div style="font-size:10px;color:#aaa;margin-top:4px;margin-bottom:2px" id="pv-cap-label">Progress to annual ceiling</div>
       <div class="pension-bar-wrap"><div class="pension-bar-fill" id="pv-bar" style="width:0%"></div></div>
       <div style="font-size:10px;color:#aaa" id="pv-cap-note"></div>
@@ -1527,72 +1527,63 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ MODAL ═══ -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
 <div class="modal">
-  <div class="modal-title" id="modal-title">Edit shift</div>
-  <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Quick presets</div>
+  <div class="modal-title" id="modal-title" data-i18n="modalEditShift">Edit shift</div>
+  <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px" data-i18n="modalQuickPresets">Quick presets</div>
   <div class="presets-grid">
-    <button class="preset-btn" onclick="applyPreset('normal','07:00','15:00',this)">☀️ Early<br><span>07:00–15:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('middle','11:30','20:00',this)">🌤 Middle<br><span>11:30–20 +€35.50</span></button>
-    <button class="preset-btn" onclick="applyPreset('late','14:00','22:30',this)">🌙 Late<br><span>14:00–22:30 +€50</span></button>
-    <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙 Late 8%<br><span>14–22:30 8% only</span></button>
-    <button class="preset-btn" onclick="applyPreset('normal','22:00','06:00',this)">🌑 Night<br><span>22:00–06:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('normal','07:00','19:00',this)">⏳ Long<br><span>07:00–19:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('ruf','06:30','11:00',this)">📱 On-call 1<br><span>06:30–11:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('ruf','12:00','20:00',this)">📱 On-call 2<br><span>12:00–20:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('callin','00:00','01:00',this)">🚨 Rufeinsatz<br><span>set time ↓</span></button>
-    <button class="preset-btn" onclick="applyPreset('leave','07:00','15:00',this)">🏖 Urlaub<br><span>day off</span></button>
-    <button class="preset-btn" onclick="applyPreset('holiday','07:00','19:00',this)">🎉 Holiday<br><span>worked</span></button>
+    <button class="preset-btn" onclick="applyPreset('normal','07:00','15:00',this)">☀️ <span data-i18n="presetEarly">Early</span><br><span>07:00–15:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('middle','11:30','20:00',this)">🌤 <span data-i18n="presetMiddle">Middle</span><br><span>11:30–20 +€35.50</span></button>
+    <button class="preset-btn" onclick="applyPreset('late','14:00','22:30',this)">🌙 <span data-i18n="presetLate">Late</span><br><span>14:00–22:30 +€50</span></button>
+    <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙 <span data-i18n="presetLate8">Late 8%</span><br><span>14–22:30 8% only</span></button>
+    <button class="preset-btn" onclick="applyPreset('normal','22:00','06:00',this)">🌑 <span data-i18n="presetNight">Night</span><br><span>22:00–06:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('normal','07:00','19:00',this)">⏳ <span data-i18n="presetLong">Long</span><br><span>07:00–19:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('ruf','06:30','11:00',this)">📱 <span data-i18n="presetOnCall1">On-call 1</span><br><span>06:30–11:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('ruf','12:00','20:00',this)">📱 <span data-i18n="presetOnCall2">On-call 2</span><br><span>12:00–20:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('callin','00:00','01:00',this)">🚨 Rufeinsatz<br><span data-i18n="presetSetTime">set time ↓</span></button>
+    <button class="preset-btn" onclick="applyPreset('leave','07:00','15:00',this)">🏖 Urlaub<br><span data-i18n="presetDayOff">day off</span></button>
+    <button class="preset-btn" onclick="applyPreset('holiday','07:00','19:00',this)">🎉 <span data-i18n="presetHoliday">Holiday</span><br><span data-i18n="presetWorked">worked</span></button>
   </div>
-  <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">Manual entry</div>
+  <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px" data-i18n="modalManualEntry">Manual entry</div>
   <div class="mfield">
-    <label>Type</label>
+    <label data-i18n="modalType">Type</label>
     <select id="m-type" onchange="updateDuration();_markModalDirty()">
-      <option value="normal">☀️ Early / Normal shift</option>
-      <option value="middle">🌅 Middle shift</option>
-      <option value="late">🌙 Late shift</option>
-      <option value="latenight">🌙 Late + Night 8%</option>
-      <option value="holiday">🏖 Public holiday worked</option>
-      <option value="leave">🏝 Annual leave</option>
-      <option value="ruf">📟 On-call standby (Ruf)</option>
-      <option value="callin">🚨 Call-in (Rufeinsatz)</option>
+      <option value="normal" data-i18n="optEarly">☀️ Early / Normal shift</option>
+      <option value="middle" data-i18n="optMiddle">🌅 Middle shift</option>
+      <option value="late" data-i18n="optLate">🌙 Late shift</option>
+      <option value="latenight" data-i18n="optLateNight">🌙 Late + Night 8%</option>
+      <option value="holiday" data-i18n="optHoliday">🏖 Public holiday worked</option>
+      <option value="leave" data-i18n="optLeave">🏝 Annual leave</option>
+      <option value="ruf" data-i18n="optRuf">📟 On-call standby (Ruf)</option>
+      <option value="callin" data-i18n="optCallin">🚨 Call-in (Rufeinsatz)</option>
     </select>
-    <div style="font-size:10px;color:#aaa;margin-top:3px">
+    <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="modalTypeHelp">
       <strong>Early/Middle/Late:</strong> standard shifts at different times ·
       <strong>Late+Night 8%:</strong> late shift where the night allowance applies ·
       <strong>Standby:</strong> you're on call but not physically at work ·
       <strong>Call-in:</strong> called in during standby
     </div>
-      <option value="normal">Normal shift (8% night hours)</option>
-      <option value="middle">Middle shift — 11:30–20:00 (+€35.50 fixed)</option>
-      <option value="late">Late shift — 14:00–22:30 (+€50 fixed)</option>
-      <option value="latenight">Late+Night — 14:00–22:30 (8% night hours only, no €50)</option>
-      <option value="holiday">Public holiday worked (+100%)</option>
-      <option value="leave">Annual leave (Urlaub)</option>
-      <option value="ruf">Rufbereitschaft (standby)</option>
-      <option value="callin">Rufeinsatz (call-in work)</option>
-    </select>
   </div>
   <div class="time-grid">
-    <div class="mfield"><label>Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration();_markModalDirty()"></div>
-    <div class="mfield"><label>End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration();_markModalDirty()"></div>
+    <div class="mfield"><label data-i18n="modalStart">Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration();_markModalDirty()"></div>
+    <div class="mfield"><label data-i18n="modalEnd">End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration();_markModalDirty()"></div>
   </div>
   <div class="duration-pill" id="m-duration"></div>
   <div class="mfield">
-    <label>Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span></label>
-    <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px" oninput="_markModalDirty()">
+    <label data-i18n="modalNote">Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span></label>
+    <input type="text" id="m-note" placeholder="e.g. covering for Mayer, verbal OT agreed…" maxlength="60" style="font-size:12px" oninput="_markModalDirty()" data-i18n-placeholder="modalNotePlaceholder">
   </div>
   <div class="pattern-box">
-    <p>Apply this shift pattern to:</p>
+    <p data-i18n="modalApplyPattern">Apply this shift pattern to:</p>
     <div class="pattern-btns">
-      <button class="pat-btn" id="pat-week-btn" onclick="applyPattern('week')">All <span id="pat-weekday"></span>s this month</button>
-      <button class="pat-btn" onclick="applyPattern('monFri')">Mon–Fri this week</button>
-      <button class="pat-btn" onclick="applyPattern('allWeekdays')">All weekdays this month</button>
+      <button class="pat-btn" id="pat-week-btn" onclick="applyPattern('week')"><span data-i18n="modalAllOf">All</span> <span id="pat-weekday"></span><span data-i18n="modalSThisMonth">s this month</span></button>
+      <button class="pat-btn" onclick="applyPattern('monFri')" data-i18n="modalMonFri">Mon–Fri this week</button>
+      <button class="pat-btn" onclick="applyPattern('allWeekdays')" data-i18n="modalAllWeekdays">All weekdays this month</button>
     </div>
   </div>
-  <button class="dup-btn" onclick="duplicateToNextDay()">→ Save &amp; duplicate to next day</button>
+  <button class="dup-btn" onclick="duplicateToNextDay()" data-i18n="modalDuplicateNext">→ Save &amp; duplicate to next day</button>
   <div class="modal-actions">
-    <button class="mbtn danger" id="m-delete" onclick="deleteShift()">Remove</button>
-    <button class="mbtn" onclick="closeModal()">Cancel</button>
-    <button class="mbtn primary" onclick="saveShift()">Save</button>
+    <button class="mbtn danger" id="m-delete" onclick="deleteShift()" data-i18n="modalRemove">Remove</button>
+    <button class="mbtn" onclick="closeModal()" data-i18n="modalCancel">Cancel</button>
+    <button class="mbtn primary" onclick="saveShift()" data-i18n="modalSave">Save</button>
   </div>
 </div>
 </div>
@@ -4304,7 +4295,69 @@ var I18N={
     simEarlyLabel:'Early shifts (07:00–15:00)', simEarlySub:'no supplements · base pay only',
     simRufLabel:'Rufbereitschaft (4.5h weekday)', simRufSub:'standby pay, outside SV base',
     simHolLabel:'Public holiday shifts (07:00–15:00)', simHolSub:'base pay now · 200% extra next month',
-    simFootnote:"⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month."
+    simFootnote:"⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.",
+    modalEditShift:'Edit shift',
+    modalQuickPresets:'Quick presets',
+    modalManualEntry:'Manual entry',
+    modalType:'Type',
+    modalTypeHelp:'<strong>Early/Middle/Late:</strong> standard shifts at different times · <strong>Late+Night 8%:</strong> late shift where the night allowance applies · <strong>Standby:</strong> you’re on call but not physically at work · <strong>Call-in:</strong> called in during standby',
+    optEarly:'☀️ Early / Normal shift',
+    optMiddle:'🌅 Middle shift',
+    optLate:'🌙 Late shift',
+    optLateNight:'🌙 Late + Night 8%',
+    optHoliday:'🏖 Public holiday worked',
+    optLeave:'🏝 Annual leave',
+    optRuf:'📟 On-call standby (Ruf)',
+    optCallin:'🚨 Call-in (Rufeinsatz)',
+    modalStart:'Start',
+    modalEnd:'End',
+    modalNote:'Note <span style="font-weight:400;color:#bbb">(optional — shown on calendar)</span>',
+    modalNotePlaceholder:'e.g. covering for Mayer, verbal OT agreed…',
+    modalApplyPattern:'Apply this shift pattern to:',
+    modalAllOf:'All',
+    modalSThisMonth:'s this month',
+    modalMonFri:'Mon–Fri this week',
+    modalAllWeekdays:'All weekdays this month',
+    modalDuplicateNext:'→ Save &amp; duplicate to next day',
+    modalRemove:'Remove',
+    modalCancel:'Cancel',
+    modalSave:'Save',
+    presetEarly:'Early',
+    presetMiddle:'Middle',
+    presetLate:'Late',
+    presetLate8:'Late 8%',
+    presetNight:'Night',
+    presetLong:'Long',
+    presetOnCall1:'On-call 1',
+    presetOnCall2:'On-call 2',
+    presetSetTime:'set time ↓',
+    presetDayOff:'day off',
+    presetHoliday:'Holiday',
+    presetWorked:'worked',
+    rlBaseSalary:'Base salary',
+    rlNightAllowance:'Night allowance 8% (this month’s shifts)',
+    rlMiddleSuppl:'Middle shift supplement (×days, prev month)',
+    rlLateSuppl:'Late shift supplement (×days, prev month)',
+    rlLateNightSuppl:'Late+Night 8% supplement (this month)',
+    rlHolidayExtra:'Public holiday extra (200%, prev month)',
+    rlAnnualLeave:'Annual leave (Urlaub)',
+    rlRufStandby:'Rufbereitschaft standby',
+    rlRufCallin:'Rufeinsatz call-in',
+    rlHazard:'Hazard allowance (tax-free)',
+    rlWorksCouncil:'Works council (~0.3%)',
+    rlUVEmployer:'UV Unfallversicherung (employer)',
+    rlLStProgressive:'Lohnsteuer (progressive brackets)',
+    rlNightHours:'Night hours (8% qualifying, this month)',
+    rlNightHoursYTD:'Night hours YTD (Jan–now)',
+    rlMiddleDays:'Middle shift days',
+    rlLateDays:'Late shift days',
+    rlRufHours:'Rufbereitschaft standby hours',
+    rlCallinHours:'Rufeinsatz call-in hours',
+    rlHolidayHours:'Holiday hours worked',
+    rlOTHours:'OT hours this month (&gt;48h/week)',
+    rlPVMonth:'PV paid this month',
+    rlYTDPaid:'YTD total paid (est.)',
+    rlAnnualCap:'Annual cap (Höchstbeitragsgrundlage)'
   },
   de:{
     appTitle:'Dienstplan- &amp; Gehaltsrechner', appSub:'Österreich · auf einen Tag klicken, um eine Schicht hinzuzufügen',
@@ -4332,7 +4385,69 @@ var I18N={
     simEarlyLabel:'Frühdienste (07:00–15:00)', simEarlySub:'keine Zuschläge · nur Grundgehalt',
     simRufLabel:'Rufbereitschaft (4,5h Werktag)', simRufSub:'Bereitschaftsentgelt, außerhalb SV-Basis',
     simHolLabel:'Feiertagsdienste (07:00–15:00)', simHolSub:'Grundgehalt jetzt · +200% nächsten Monat',
-    simFootnote:'⚠ Zuschläge (Spät/Mittel) werden im <em>Folgemonat</em> ausgezahlt. Der angezeigte Nettoeffekt betrifft diesen Monat. Nachtzuschlag 8% und Rufbereitschaft werden im selben Monat ausgezahlt.'
+    simFootnote:'⚠ Zuschläge (Spät/Mittel) werden im <em>Folgemonat</em> ausgezahlt. Der angezeigte Nettoeffekt betrifft diesen Monat. Nachtzuschlag 8% und Rufbereitschaft werden im selben Monat ausgezahlt.',
+    modalEditShift:'Schicht bearbeiten',
+    modalQuickPresets:'Schnellauswahl',
+    modalManualEntry:'Manuelle Eingabe',
+    modalType:'Typ',
+    modalTypeHelp:'<strong>Früh/Mittel/Spät:</strong> Standardschichten zu unterschiedlichen Zeiten · <strong>Spät+Nacht 8%:</strong> Spätdienst mit Nachtzuschlag · <strong>Bereitschaft:</strong> Sie sind erreichbar, aber nicht vor Ort · <strong>Rufeinsatz:</strong> Einsatz während der Bereitschaft',
+    optEarly:'☀️ Früh-/Normaldienst',
+    optMiddle:'🌅 Mitteldienst',
+    optLate:'🌙 Spätdienst',
+    optLateNight:'🌙 Spät + Nachtzuschlag 8%',
+    optHoliday:'🏖 Feiertag gearbeitet',
+    optLeave:'🏝 Urlaub',
+    optRuf:'📟 Rufbereitschaft',
+    optCallin:'🚨 Rufeinsatz',
+    modalStart:'Beginn',
+    modalEnd:'Ende',
+    modalNote:'Notiz <span style="font-weight:400;color:#bbb">(optional — im Kalender sichtbar)</span>',
+    modalNotePlaceholder:'z. B. Vertretung für Mayer, mündlich vereinbarte ÜStd…',
+    modalApplyPattern:'Dieses Schichtmuster anwenden auf:',
+    modalAllOf:'Alle',
+    modalSThisMonth:'e diesen Monat',
+    modalMonFri:'Mo–Fr diese Woche',
+    modalAllWeekdays:'Alle Werktage diesen Monat',
+    modalDuplicateNext:'→ Speichern &amp; für nächsten Tag übernehmen',
+    modalRemove:'Entfernen',
+    modalCancel:'Abbrechen',
+    modalSave:'Speichern',
+    presetEarly:'Früh',
+    presetMiddle:'Mittel',
+    presetLate:'Spät',
+    presetLate8:'Spät 8%',
+    presetNight:'Nacht',
+    presetLong:'Lang',
+    presetOnCall1:'Bereitschaft 1',
+    presetOnCall2:'Bereitschaft 2',
+    presetSetTime:'Zeit eintragen ↓',
+    presetDayOff:'frei',
+    presetHoliday:'Feiertag',
+    presetWorked:'gearbeitet',
+    rlBaseSalary:'Grundgehalt',
+    rlNightAllowance:'Nachtzuschlag 8% (Schichten diesen Monat)',
+    rlMiddleSuppl:'Mitteldienst-Zuschlag (×Tage, Vormonat)',
+    rlLateSuppl:'Spätdienst-Zuschlag (×Tage, Vormonat)',
+    rlLateNightSuppl:'Spät+Nacht 8% Zuschlag (diesen Monat)',
+    rlHolidayExtra:'Feiertagszuschlag (200%, Vormonat)',
+    rlAnnualLeave:'Urlaub',
+    rlRufStandby:'Rufbereitschaft',
+    rlRufCallin:'Rufeinsatz',
+    rlHazard:'Erschwerniszulage (steuerfrei)',
+    rlWorksCouncil:'Betriebsratsumlage (~0,3%)',
+    rlUVEmployer:'UV Unfallversicherung (Arbeitgeber)',
+    rlLStProgressive:'Lohnsteuer (progressive Stufen)',
+    rlNightHours:'Nachtstunden (8%-fähig, diesen Monat)',
+    rlNightHoursYTD:'Nachtstunden Jahr (Jän–jetzt)',
+    rlMiddleDays:'Mitteldienst-Tage',
+    rlLateDays:'Spätdienst-Tage',
+    rlRufHours:'Rufbereitschaft-Stunden',
+    rlCallinHours:'Rufeinsatz-Stunden',
+    rlHolidayHours:'Geleistete Feiertagsstunden',
+    rlOTHours:'ÜStd diesen Monat (&gt;48h/Woche)',
+    rlPVMonth:'PV diesen Monat bezahlt',
+    rlYTDPaid:'Jahressumme bezahlt (geschätzt)',
+    rlAnnualCap:'Jahres-Höchstbetrag (Höchstbeitragsgrundlage)'
   }
 };
 
