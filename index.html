@@ -997,20 +997,20 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="panel-label" style="margin-top:12px" data-i18n="lblSupplImpact">Supplement & on-call impact</div>
       <div id="tc-supplement-rows"></div>
     </div>
-    <div id="tc-cap-notice" style="display:none;background:#eaf3de;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:11px;color:#3b6d11">✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.</div>
-    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.</p>
+    <div id="tc-cap-notice" style="display:none;background:#eaf3de;border-radius:6px;padding:8px 10px;margin:8px 0;font-size:11px;color:#3b6d11" data-i18n="tcCapNotice">✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.</div>
+    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5" data-i18n="tcFootnote">Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.</p>
 
     <!-- Pendlerpauschale + Familienbonus -->
     <div class="panel-label" style="margin-top:14px" data-i18n="lblPendlerFam">🚗 Pendlerpauschale &amp; Familienbonus Plus</div>
     <div class="tc-extra-box">
-      <div style="font-size:10px;color:#aaa;margin-bottom:10px;line-height:1.5">These reduce your annual Lohnsteuer directly. Enter what applies to you — the monthly LSt estimate above will update.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:10px;line-height:1.5" data-i18n="tcPendlerFamIntro">These reduce your annual Lohnsteuer directly. Enter what applies to you — the monthly LSt estimate above will update.</div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Pendlerpauschale — commuter deduction (€/year)
-          <span class="tip" title="Kleine Pendlerpauschale (public transport available): 372–1,476€/year. Große Pendlerpauschale (no public transport): 744–2,784€/year. Depends on distance and availability. Use the BMF Pendlerrechner to find your exact amount.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="tcPendlerLabel">Pendlerpauschale — commuter deduction (€/year)
+          <span class="tip" data-i18n-title="tcPendlerTip" title="Kleine Pendlerpauschale (public transport available): 372–1,476€/year. Große Pendlerpauschale (no public transport): 744–2,784€/year. Depends on distance and availability. Use the BMF Pendlerrechner to find your exact amount.">ℹ</span></label>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          <input type="number" id="tc-pendler" value="0" step="100" min="0" oninput="renderTaxCalc()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
+          <input type="number" id="tc-pendler" value="0" step="100" min="0" oninput="renderTaxCalc();renderJobCompare()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
           <select id="tc-pendler-preset" onchange="applyPendlerPreset()" style="font-size:11px;padding:4px 8px;border:.5px solid #ccc;border-radius:6px">
-            <option value="">Quick-pick distance…</option>
+            <option value="" data-i18n="tcPendlerQuickPick">Quick-pick distance…</option>
             <option value="372">Klein: 2–20 km (€372)</option>
             <option value="744">Klein: 20–40 km (€744)</option>
             <option value="1116">Klein: 40–60 km (€1,116)</option>
@@ -1021,15 +1021,15 @@ body.dark .tc-extra-box{background:#2a2a2e}
             <option value="2784">Groß: 60+ km (€2,784)</option>
           </select>
         </div>
-        <div style="font-size:10px;color:#aaa;margin-top:3px">Also adds <strong>Pendlereuro</strong> (€2/km × one-way distance per year) automatically if you enter a custom amount.</div>
+        <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="tcPendlereuroNote">Also adds <strong>Pendlereuro</strong> (€2/km × one-way distance per year) automatically if you enter a custom amount.</div>
       </div>
       <div style="margin-bottom:4px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Familienbonus Plus — children tax credit (€/year)
-          <span class="tip" title="€2,000/year per child under 18 in Austria (€166.68/month). €700/year for children 18+ in education. Shared 50/50 with partner or taken in full by one parent. Reduces Lohnsteuer directly — cannot go below €0.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="tcFambonusLabel">Familienbonus Plus — children tax credit (€/year)
+          <span class="tip" data-i18n-title="tcFambonusTip" title="€2,000/year per child under 18 in Austria (€166.68/month). €700/year for children 18+ in education. Shared 50/50 with partner or taken in full by one parent. Reduces Lohnsteuer directly — cannot go below €0.">ℹ</span></label>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          <input type="number" id="tc-fambonus" value="0" step="500" min="0" oninput="renderTaxCalc()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
+          <input type="number" id="tc-fambonus" value="0" step="500" min="0" oninput="renderTaxCalc();renderJobCompare()" style="width:120px;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
           <select id="tc-fambonus-preset" onchange="applyFambonusPreset()" style="font-size:11px;padding:4px 8px;border:.5px solid #ccc;border-radius:6px">
-            <option value="">Quick-pick children…</option>
+            <option value="" data-i18n="tcFambonusQuickPick">Quick-pick children…</option>
             <option value="2000">1 child under 18 (€2,000)</option>
             <option value="4000">2 children under 18 (€4,000)</option>
             <option value="6000">3 children under 18 (€6,000)</option>
@@ -1044,40 +1044,93 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <!-- Nettolohnrechner -->
     <div class="panel-label" style="margin-top:14px" data-i18n="lblNetto">🔄 Nettolohnrechner — Reverse Calculator</div>
     <div class="netto-box">
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Enter the net amount you want to take home. The app calculates the gross salary you would need to negotiate for.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="nettoIntro">Enter the net amount you want to take home. The app calculates the gross salary you would need to negotiate for.</div>
       <div style="display:flex;gap:8px;align-items:flex-end;margin-bottom:8px">
         <div style="flex:1">
-          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Target net per month (€)</label>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="nettoTargetLabel">Target net per month (€)</label>
           <input type="number" id="netto-target" placeholder="e.g. 2500" step="50" min="0" oninput="renderNetto()" style="width:100%;font-size:14px;padding:6px 8px;border:.5px solid #ccc;border-radius:6px">
         </div>
         <button class="mbtn" onclick="document.getElementById('netto-target').value='';renderNetto()" style="margin-bottom:1px">✕</button>
       </div>
-      <div id="netto-result" style="font-size:11px;color:#aaa">Enter a target net above.</div>
+      <div id="netto-result" style="font-size:11px;color:#aaa" data-i18n="nettoResultEmpty">Enter a target net above.</div>
     </div>
 
     <!-- Inflationsanpassung -->
     <div class="panel-label" style="margin-top:14px" data-i18n="lblInflation">📈 Inflationsanpassung — Real Wage Check</div>
     <div class="infl-box">
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Did your salary keep up with inflation? Enter last year's gross to find out.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="inflIntro">Did your salary keep up with inflation? Enter last year's gross to find out.</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
         <div>
-          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Last year's gross (€/month)</label>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="inflOldLabel">Last year's gross (€/month)</label>
           <input type="number" id="infl-old" placeholder="e.g. 3000" step="10" min="0" oninput="renderInflation()" style="width:100%;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
         </div>
         <div>
-          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Austrian inflation rate (%)
-            <span class="tip" title="Statistik Austria reports Austrian HICP inflation. 2024 average was ~3.5%. Update with the latest figure from statistik.at.">ℹ</span></label>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="inflRateLabel">Austrian inflation rate (%)
+            <span class="tip" data-i18n-title="inflRateTip" title="Statistik Austria reports Austrian HICP inflation. 2024 average was ~3.5%. Update with the latest figure from statistik.at.">ℹ</span></label>
           <input type="number" id="infl-rate" value="3.5" step="0.1" min="0" max="30" oninput="renderInflation()" style="width:100%;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
         </div>
       </div>
-      <div id="infl-result" style="font-size:11px;color:#aaa">Enter last year's salary above.</div>
+      <div id="infl-result" style="font-size:11px;color:#aaa" data-i18n="inflResultEmpty">Enter last year's salary above.</div>
     </div>
 
     <!-- SV Annual Tracker -->
     <div class="panel-label" style="margin-top:14px" data-i18n="lblSVTracker">🏥 SV Jahrestracker</div>
     <div class="sv-annual-box">
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Total social insurance you will pay this year at the current monthly gross. Almost all Austrians pay far below the theoretical maximum of ~€17,550/year.</div>
-      <div id="sv-annual-result" style="font-size:11px;color:#aaa">Enter a salary above to see your annual SV.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="svAnnualIntro">Total social insurance you will pay this year at the current monthly gross. Almost all Austrians pay far below the theoretical maximum of ~€17,550/year.</div>
+      <div id="sv-annual-result" style="font-size:11px;color:#aaa" data-i18n="svAnnualEmpty">Enter a salary above to see your annual SV.</div>
+    </div>
+
+    <!-- Job Offer Comparator -->
+    <div class="panel-label" style="margin-top:14px" data-i18n="lblJobCompare">💼 Job Offer Comparator</div>
+    <div style="font-size:10px;color:#aaa;margin-bottom:10px;line-height:1.5" data-i18n="jcIntro">Compare two gross salaries side by side — your current job vs a new offer, or two offers against each other. Uses the Pendlerpauschale &amp; Familienbonus entered above for both.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div style="background:#f5f5f0;border-radius:8px;padding:10px" id="jc-card-a">
+        <label style="font-size:11px;font-weight:600;color:#555;display:block;margin-bottom:6px" data-i18n="jcJobA">Job A (current)</label>
+        <input type="number" id="jc-gross-a" placeholder="Monthly gross €" step="50" min="0" oninput="renderJobCompare()" data-i18n-placeholder="jcGrossPlaceholder" style="width:100%;padding:6px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px;margin-bottom:6px">
+        <select id="jc-model-a" onchange="renderJobCompare()" style="width:100%;font-size:11px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px">
+          <option value="14" selected data-i18n="jcModel14">14 salaries</option>
+          <option value="13" data-i18n="jcModel13">13 salaries</option>
+          <option value="12" data-i18n="jcModel12">12 salaries</option>
+        </select>
+      </div>
+      <div style="background:#eaf3de;border-radius:8px;padding:10px" id="jc-card-b">
+        <label style="font-size:11px;font-weight:600;color:#3b6d11;display:block;margin-bottom:6px" data-i18n="jcJobB">Job B (offer)</label>
+        <input type="number" id="jc-gross-b" placeholder="Monthly gross €" step="50" min="0" oninput="renderJobCompare()" data-i18n-placeholder="jcGrossPlaceholder" style="width:100%;padding:6px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px;margin-bottom:6px">
+        <select id="jc-model-b" onchange="renderJobCompare()" style="width:100%;font-size:11px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px">
+          <option value="14" selected data-i18n="jcModel14">14 salaries</option>
+          <option value="13" data-i18n="jcModel13">13 salaries</option>
+          <option value="12" data-i18n="jcModel12">12 salaries</option>
+        </select>
+      </div>
+    </div>
+    <div id="jc-empty" style="font-size:11px;color:#aaa" data-i18n="jcEmpty">Enter a monthly gross salary for both jobs above.</div>
+    <div id="jc-result-wrap" style="display:none">
+      <div class="rrow" style="border-bottom:1px solid var(--border,#eee);padding-bottom:6px;margin-bottom:4px">
+        <span class="rl"></span>
+        <span class="rv" style="display:flex;gap:0;justify-content:flex-end">
+          <span style="width:90px;text-align:right;font-weight:600;color:#555" data-i18n="jcColA">Job A</span>
+          <span style="width:90px;text-align:right;font-weight:600;color:#3b6d11" data-i18n="jcColB">Job B</span>
+        </span>
+      </div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowMonthlyGross">Monthly gross</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-mgross" style="width:90px;text-align:right"></span><span id="jc-b-mgross" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowMonthlyNet">Monthly net</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-mnet" style="width:90px;text-align:right"></span><span id="jc-b-mnet" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowAnnualGross">Annual gross</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-agross" style="width:90px;text-align:right"></span><span id="jc-b-agross" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowAnnualNet">Annual net</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-anet" style="width:90px;text-align:right"></span><span id="jc-b-anet" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowEffRate">Effective LSt rate</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-eff" style="width:90px;text-align:right"></span><span id="jc-b-eff" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div class="rrow"><span class="rl" data-i18n="jcRowHourly">True hourly (net)</span><span class="rv" style="display:flex;gap:0;justify-content:flex-end"><span id="jc-a-hourly" style="width:90px;text-align:right"></span><span id="jc-b-hourly" style="width:90px;text-align:right;font-weight:500"></span></span></div>
+      <div id="jc-diff-box" style="margin-top:10px;padding:10px;border-radius:8px;text-align:center">
+        <div style="font-size:10px;color:#888;margin-bottom:2px">
+          <span id="jc-label-b" style="display:none" data-i18n="jcBBetter">Job B nets more per year</span>
+          <span id="jc-label-a" style="display:none" data-i18n="jcABetter">Job A nets more per year</span>
+          <span id="jc-label-tie" style="display:none" data-i18n="jcTie">Both jobs net the same</span>
+        </div>
+        <div id="jc-diff-amount" style="font-size:20px;font-weight:600">
+          <span id="jc-diff-num"></span> / <span data-i18n="jcPerYear">year</span>
+        </div>
+        <div style="font-size:11px;color:#aaa;margin-top:2px">
+          <span id="jc-diff-pct"></span> · <span id="jc-diff-month-num"></span>/<span data-i18n="jcPerMonth">month</span>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1086,100 +1139,100 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblYourSalary">Your Salary</div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Monthly gross salary (€) <span style="color:#aaa;font-weight:400">— find this on your payslip (Bruttobezug)</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setGrossSalary">Monthly gross salary (€) <span style="color:#aaa;font-weight:400">— find this on your payslip (Bruttobezug)</span></label>
         <input type="number" id="grade" step="0.01" min="0" placeholder="e.g. 3200.00" onchange="saveSettings();renderAll()" style="font-size:14px;padding:6px 8px;border:.5px solid #ccc;border-radius:6px;width:100%">
-        <div style="font-size:10px;color:#aaa;margin-top:3px">Regular monthly salary before tax and social insurance. Bonus months are handled separately below.</div>
+        <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="setGrossSalaryHint">Regular monthly salary before tax and social insurance. Bonus months are handled separately below.</div>
       </div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Night-work starts after
-          <span class="tip" title="Austrian law (§68 EStG) defines night hours for the 8% tax-free supplement. Check your collective agreement.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setNightStart">Night-work starts after
+          <span class="tip" data-i18n-title="tipNightStart" title="Austrian law (§68 EStG) defines night hours for the 8% tax-free supplement. Check your collective agreement.">ℹ</span></label>
         <select id="thresh" onchange="saveSettings();renderAll()">
           <option value="18">18:00</option>
           <option value="20" selected>20:00</option>
           <option value="22">22:00</option>
         </select>
-        <div style="font-size:10px;color:#aaa;margin-top:3px">Hours worked after this time qualify for the 8% night allowance.</div>
+        <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="setNightStartHint">Hours worked after this time qualify for the 8% night allowance.</div>
       </div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Special allowance — Zulage (€/month, tax-free)
-          <span class="tip" title="Any recurring tax-free allowance from your employer, e.g. hazard pay (Erschwerniszulage). Find it on your payslip. Set to 0 if none.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setAllowance">Special allowance — Zulage (€/month, tax-free)
+          <span class="tip" data-i18n-title="tipAllowance" title="Any recurring tax-free allowance from your employer, e.g. hazard pay (Erschwerniszulage). Find it on your payslip. Set to 0 if none.">ℹ</span></label>
         <input type="number" id="hazard-allow" value="0" step="0.01" min="0" onchange="saveSettings();renderAll()">
       </div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual leave entitlement (days)</label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setLeaveDays">Annual leave entitlement (days)</label>
         <input type="number" id="urlaub-days" value="25" step="1" min="0" max="60" onchange="saveSettings();renderAll()">
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
         <input type="checkbox" id="show-employer-costs" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
-        <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer">Show employer costs in Report (DB + DZ + MV + UV)</label>
+        <label for="show-employer-costs" style="font-size:11px;color:#888;cursor:pointer" data-i18n="setShowEmployerCosts">Show employer costs in Report (DB + DZ + MV + UV)</label>
       </div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Works council deduction — Betriebsratsumlage (%)
-          <span class="tip" title="A small deduction if you have a works council. Typically 0.25–0.5%. Check your payslip or ask HR. Set to 0 if unsure.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setBRRate">Works council deduction — Betriebsratsumlage (%)
+          <span class="tip" data-i18n-title="tipBRRate" title="A small deduction if you have a works council. Typically 0.25–0.5%. Check your payslip or ask HR. Set to 0 if unsure.">ℹ</span></label>
         <input type="number" id="br-rate" value="0" step="0.05" min="0" max="2" onchange="saveSettings();renderAll()">
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
-      <div class="panel-label">📋 Grade history <span style="font-weight:400;color:#bbb;font-size:9px;text-transform:none;letter-spacing:0">— past salary calc uses correct base per month</span></div>
+      <div class="panel-label"><span data-i18n="lblGradeHistory">📋 Grade history</span> <span style="font-weight:400;color:#bbb;font-size:9px;text-transform:none;letter-spacing:0" data-i18n="lblGradeHistorySub">— past salary calc uses correct base per month</span></div>
       <div id="grade-history-list"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:6px;margin-top:8px;align-items:end">
-        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px">From month</label>
+        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px" data-i18n="ghFromMonth">From month</label>
           <input type="month" id="gh-from" style="font-size:11px;padding:4px 6px"></div>
-        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px">Base salary (€)</label>
+        <div><label style="font-size:10px;color:#aaa;display:block;margin-bottom:2px" data-i18n="ghBaseSalary">Base salary (€)</label>
           <input type="number" id="gh-base" step="0.01" placeholder="4376.33" style="font-size:11px;padding:4px 6px"></div>
-        <button class="mbtn primary" style="padding:5px 10px;flex:none;white-space:nowrap" onclick="addGradeEntry()">Add</button>
+        <button class="mbtn primary" style="padding:5px 10px;flex:none;white-space:nowrap" onclick="addGradeEntry()" data-i18n="ghAdd">Add</button>
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblKVPreset">🏛 Kollektivvertrag (KV) preset</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.</p>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="kvIntro">Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.</p>
       <select class="kv-select" id="kv-preset" onchange="applyKVPreset()">
-        <option value="">— Select your sector —</option>
-        <optgroup label="Healthcare &amp; Social">
+        <option value="" data-i18n="kvSelectSector">— Select your sector —</option>
+        <optgroup label="Healthcare &amp; Social" data-i18n-label="kvGroupHealth">
           <option value="gesundheit_kh">Krankenanstalten (hospitals) — KAKuG</option>
           <option value="gesundheit_pflege">Pflege &amp; Sozialberufe — BAGS</option>
           <option value="rotes_kreuz">Rotes Kreuz</option>
         </optgroup>
-        <optgroup label="Industry &amp; Trade">
+        <optgroup label="Industry &amp; Trade" data-i18n-label="kvGroupIndustry">
           <option value="metall">Metalltechnische Industrie</option>
           <option value="elektro">Elektroindustrie</option>
           <option value="chemie">Chemische Industrie</option>
         </optgroup>
-        <optgroup label="Retail &amp; Hospitality">
+        <optgroup label="Retail &amp; Hospitality" data-i18n-label="kvGroupRetail">
           <option value="handel">Handel (retail)</option>
           <option value="gastgewerbe">Gastgewerbe (hospitality)</option>
         </optgroup>
-        <optgroup label="Public &amp; Tech">
+        <optgroup label="Public &amp; Tech" data-i18n-label="kvGroupPublic">
           <option value="oeffentlich">Öffentlicher Dienst (Bund)</option>
           <option value="it">IT / EDV-Dienstleistungen</option>
         </optgroup>
-        <optgroup label="Other">
+        <optgroup label="Other" data-i18n-label="kvGroupOther">
           <option value="bewachung">Bewachungsgewerbe (security)</option>
           <option value="transport">Transport &amp; Verkehr</option>
         </optgroup>
       </select>
-      <div class="kv-applied" id="kv-applied">✓ KV preset applied — review and adjust below if needed</div>
-      <div class="kv-note">Values are typical approximations. Always verify with your actual contract or HR. <a href="https://www.wko.at/service/kollektivvertrag" target="_blank" rel="noopener" style="color:#185fa5">Find your KV ↗</a></div>
+      <div class="kv-applied" id="kv-applied" data-i18n="kvApplied">✓ KV preset applied — review and adjust below if needed</div>
+      <div class="kv-note"><span data-i18n="kvNote">Values are typical approximations. Always verify with your actual contract or HR.</span> <a href="https://www.wko.at/service/kollektivvertrag" target="_blank" rel="noopener" style="color:#185fa5" data-i18n="kvFindLink">Find your KV ↗</a></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblFixedSuppl">Fixed shift supplements</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Check your <strong style="color:#555">collective agreement (Kollektivvertrag)</strong> or payslip for your actual supplement amounts. These vary widely between employers and sectors. If you have no shift supplements, set both to 0.</p>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Middle shift supplement (€/day)
-        <span class="tip" title="A fixed bonus paid for each middle-shift day worked (e.g. 11:30–20:00). Paid the following month. Check your contract — many employees have €0 here.">ℹ</span></label>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="supplIntro">Check your <strong style="color:#555">collective agreement (Kollektivvertrag)</strong> or payslip for your actual supplement amounts. These vary widely between employers and sectors. If you have no shift supplements, set both to 0.</p>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setMiddleSuppl">Middle shift supplement (€/day)
+        <span class="tip" data-i18n-title="tipMiddleSuppl" title="A fixed bonus paid for each middle-shift day worked (e.g. 11:30–20:00). Paid the following month. Check your contract — many employees have €0 here.">ℹ</span></label>
         <input type="number" id="middle-suppl" value="0" step="0.10" min="0" onchange="saveSettings();renderAll()"></div>
-      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Late shift supplement (€/day)
-        <span class="tip" title="A fixed bonus paid for each late-shift day worked (e.g. 14:00–22:30). Paid the following month. Check your contract — many employees have €0 here.">ℹ</span></label>
+      <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setLateSuppl">Late shift supplement (€/day)
+        <span class="tip" data-i18n-title="tipLateSuppl" title="A fixed bonus paid for each late-shift day worked (e.g. 14:00–22:30). Paid the following month. Check your contract — many employees have €0 here.">ℹ</span></label>
         <input type="number" id="late-suppl" value="0" step="0.10" min="0" onchange="saveSettings();renderAll()"></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblSZ">Sonderzahlungen (13th / 14th month)</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.</p>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="szIntro">Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">
-        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">13th month (Urlaubsgeld)</label>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="sz13th">13th month (Urlaubsgeld)</label>
           <select id="sz-month1" onchange="saveSettings();renderYear();checkSZConflict()">
             <option value="-1">— disabled —</option>
             <option value="5" selected>June</option>
@@ -1187,7 +1240,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
             <option value="4">May</option>
             <option value="3">April</option>
           </select></div>
-        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">14th month (Weihnachtsgeld)</label>
+        <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="sz14th">14th month (Weihnachtsgeld)</label>
           <select id="sz-month2" onchange="saveSettings();renderYear();checkSZConflict()">
             <option value="-1">— disabled —</option>
             <option value="11" selected>December</option>
@@ -1195,64 +1248,64 @@ body.dark .tc-extra-box{background:#2a2a2e}
             <option value="9">October</option>
           </select></div>
       </div>
-      <div class="sz-warn" id="sz-warn">⚠ Both Sonderzahlung months are set to the same month — one will be ignored.</div>
-      <div style="font-size:10px;color:#aaa">Amount = 1× base salary each. First ~€620 tax-free; remainder at 6% flat.</div>
-      <div style="margin-top:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Annual salary model</label>
+      <div class="sz-warn" id="sz-warn" data-i18n="szWarn">⚠ Both Sonderzahlung months are set to the same month — one will be ignored.</div>
+      <div style="font-size:10px;color:#aaa" data-i18n="szAmountNote">Amount = 1× base salary each. First ~€620 tax-free; remainder at 6% flat.</div>
+      <div style="margin-top:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="szSalaryModel">Annual salary model</label>
         <select id="salary-model" onchange="saveSettings();renderAll()">
-          <option value="12">12 — no Sonderzahlung</option>
-          <option value="13">13 — one SZ (Urlaubsgeld or Weihnachtsgeld)</option>
-          <option value="14" selected>14 — standard Austria (Urlaubsgeld + Weihnachtsgeld)</option>
+          <option value="12" data-i18n="szModel12">12 — no Sonderzahlung</option>
+          <option value="13" data-i18n="szModel13">13 — one SZ (Urlaubsgeld or Weihnachtsgeld)</option>
+          <option value="14" selected data-i18n="szModel14">14 — standard Austria (Urlaubsgeld + Weihnachtsgeld)</option>
         </select>
-        <div style="font-size:10px;color:#aaa;margin-top:3px">Used for annual gross/net estimates and the true hourly rate. Individual month deductions are unaffected.</div>
+        <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="szModelHint">Used for annual gross/net estimates and the true hourly rate. Individual month deductions are unaffected.</div>
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblOnCall">On-call &amp; Standby</div>
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Configure if you work standby shifts (Rufbereitschaft) or get called in outside your normal hours.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="oncallIntro">Configure if you work standby shifts (Rufbereitschaft) or get called in outside your normal hours.</div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Standby flat rate (€/hour)
-          <span class="tip" title="The hourly rate you receive for being on standby (Rufbereitschaft). Find this in your contract or collective agreement.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setRufRate">Standby flat rate (€/hour)
+          <span class="tip" data-i18n-title="tipRufRate" title="The hourly rate you receive for being on standby (Rufbereitschaft). Find this in your contract or collective agreement.">ℹ</span></label>
         <input type="number" id="ruf-rate" value="0" step="0.01" min="0" onchange="saveSettings();renderAll()"></div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Call-in overtime rate</label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setCallinRate">Call-in overtime rate</label>
         <select id="callin-mult" onchange="saveSettings();renderAll()">
-          <option value="1.5">+50% (standard overtime)</option>
-          <option value="2.0">+100% (double time)</option>
-          <option value="1.0">Normal rate</option>
+          <option value="1.5" data-i18n="callin150">+50% (standard overtime)</option>
+          <option value="2.0" data-i18n="callin200">+100% (double time)</option>
+          <option value="1.0" data-i18n="callinNormal">Normal rate</option>
         </select></div>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <input type="checkbox" id="ruf-sv-base" onchange="saveSettings();renderAll()" style="width:auto;margin:0">
-        <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer">Include standby pay in social insurance base
-          <span class="tip" title="In some contracts standby pay is included in the SV calculation base, in others it is not. Ask your HR or payroll office.">ℹ</span></label>
+        <label for="ruf-sv-base" style="font-size:11px;color:#888;cursor:pointer" data-i18n="setRufSVBase">Include standby pay in social insurance base
+          <span class="tip" data-i18n-title="tipRufSVBase" title="In some contracts standby pay is included in the SV calculation base, in others it is not. Ask your HR or payroll office.">ℹ</span></label>
       </div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Weekend / holiday standby multiplier</label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setRufWknd">Weekend / holiday standby multiplier</label>
         <select id="ruf-wknd" onchange="saveSettings();renderAll()">
-          <option value="1">× 1 — same as weekday</option>
-          <option value="2">× 2 — double</option>
-          <option value="4">× 4 — quadruple</option>
+          <option value="1" data-i18n="rufWknd1">× 1 — same as weekday</option>
+          <option value="2" data-i18n="rufWknd2">× 2 — double</option>
+          <option value="4" data-i18n="rufWknd4">× 4 — quadruple</option>
         </select>
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblSVRegional">Social Insurance — Regional settings</div>
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Most rates are set by Austrian federal law. The Wohnbauförderungsbeitrag varies by state (Bundesland). Confirm with your payslip.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="svRegionalIntro">Most rates are set by Austrian federal law. The Wohnbauförderungsbeitrag varies by state (Bundesland). Confirm with your payslip.</div>
       <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Housing subsidy contribution — WBF (% of gross)
-          <span class="tip" title="Wohnbauförderungsbeitrag — a state-level SV contribution. Lower Austria (NÖ): 0.5%. Vienna: 0.5%. Other states may differ. Check your payslip.">ℹ</span></label>
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="setWBFRate">Housing subsidy contribution — WBF (% of gross)
+          <span class="tip" data-i18n-title="tipWBFRate" title="Wohnbauförderungsbeitrag — a state-level SV contribution. Lower Austria (NÖ): 0.5%. Vienna: 0.5%. Other states may differ. Check your payslip.">ℹ</span></label>
         <input type="number" id="wbf-rate" value="0.5" step="0.1" min="0" max="1" onchange="saveSettings();renderAll()">
       </div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblBackup">💾 Backup</div>
-      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Export a backup file regularly. Your data lives only in this browser — no automatic cloud backup unless you set up sync below.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="backupIntro">Export a backup file regularly. Your data lives only in this browser — no automatic cloud backup unless you set up sync below.</div>
       <div style="display:flex;gap:6px;margin-bottom:6px">
-        <button class="mbtn" style="flex:1" onclick="exportJSON()">📤 Export JSON</button>
-        <button class="mbtn" style="flex:1" onclick="exportXLSX()">📊 Export Excel</button>
-        <button class="mbtn" style="flex:1" onclick="document.getElementById('import-file').click()">📥 Import JSON</button>
+        <button class="mbtn" style="flex:1" onclick="exportJSON()" data-i18n="btnExportJSON">📤 Export JSON</button>
+        <button class="mbtn" style="flex:1" onclick="exportXLSX()" data-i18n="btnExportXLSX">📊 Export Excel</button>
+        <button class="mbtn" style="flex:1" onclick="document.getElementById('import-file').click()" data-i18n="btnImportJSON">📥 Import JSON</button>
       </div>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(this)">
     </div>
@@ -1260,29 +1313,29 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <div class="panel-section">
       <!-- Advanced accordion -->
       <div class="adv-header" onclick="toggleAdv()">
-        <span>☁️ Sync between devices</span>
+        <span data-i18n="syncHeader">☁️ Sync between devices</span>
         <span id="adv-arrow">▸</span>
       </div>
-      <div style="font-size:10px;color:#aaa;margin-bottom:6px">Use the same data on your phone and computer — encrypted sync via a private GitHub repo. Tap to set up.</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:6px" data-i18n="syncSubtitle">Use the same data on your phone and computer — encrypted sync via a private GitHub repo. Tap to set up.</div>
       <div class="adv-content" id="adv-content">
-        <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.6">
+        <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.6" data-i18n="syncSteps">
           <strong style="color:#555">Optional.</strong> Sync your data to a private GitHub repository — encrypted on your device before upload.<br><br>
           <strong>Step 1:</strong> Create a private GitHub repo (free).<br>
           <strong>Step 2:</strong> Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">fine-grained PAT ↗</a> with <em>Contents: Read &amp; Write</em> for that repo only.<br>
           <strong>Step 3:</strong> Choose a strong sync password. <strong>Write it down</strong> — without it your data cannot be decrypted.<br>
           <strong>Step 4:</strong> Fill in the fields below and press Push.
         </p>
-        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">GitHub Personal Access Token (PAT)</label>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="syncPATLabel">GitHub Personal Access Token (PAT)</label>
           <input type="password" id="sync-pat" placeholder="ghp_…" autocomplete="off" oninput="saveSyncConfig()"></div>
-        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Repository <span style="color:#bbb">(owner/repo-name)</span></label>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="syncRepoLabel">Repository <span style="color:#bbb">(owner/repo-name)</span></label>
           <input type="text" id="sync-repo" placeholder="e.g. yourname/my-planner" autocomplete="off" oninput="saveSyncConfig()"></div>
-        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Branch</label>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="syncBranchLabel">Branch</label>
           <input type="text" id="sync-branch" placeholder="main" autocomplete="off" oninput="saveSyncConfig()" style="width:120px"></div>
-        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Sync Password <span style="color:#bbb">(never stored — enter each session)</span></label>
-          <input type="password" id="sync-password" placeholder="Your encryption passphrase" autocomplete="new-password"></div>
+        <div style="margin-bottom:8px"><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="syncPasswordLabel">Sync Password <span style="color:#bbb">(never stored — enter each session)</span></label>
+          <input type="password" id="sync-password" placeholder="Your encryption passphrase" autocomplete="new-password" data-i18n-placeholder="syncPasswordPlaceholder"></div>
         <div style="display:flex;gap:6px;margin-bottom:4px">
-          <button class="mbtn primary" style="flex:1" onclick="syncToRepo()">⬆ Push<span class="sync-dirty-dot" id="dirty-dot" title="Unsynced changes"></span></button>
-          <button class="mbtn" style="flex:1" onclick="syncFromRepo()">⬇ Pull</button>
+          <button class="mbtn primary" style="flex:1" onclick="syncToRepo()" data-i18n="syncPush">⬆ Push<span class="sync-dirty-dot" id="dirty-dot" data-i18n-title="syncDirtyTip" title="Unsynced changes"></span></button>
+          <button class="mbtn" style="flex:1" onclick="syncFromRepo()" data-i18n="syncPull">⬇ Pull</button>
         </div>
         <div id="sync-status" style="font-size:11px;color:#888;text-align:center;min-height:18px;margin-top:4px"></div>
         <div id="sync-last" style="font-size:10px;color:#aaa;text-align:center;margin-top:3px"></div>
@@ -1291,55 +1344,55 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblTemplates">📋 Shift Templates</div>
-      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Save a shift pattern as a template. Apply it to fill Mon–Fri of any week in one tap.</p>
+      <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="tplIntro">Save a shift pattern as a template. Apply it to fill Mon–Fri of any week in one tap.</p>
       <div class="tpl-list" id="tpl-list"></div>
       <div style="display:flex;gap:6px;align-items:center">
-        <input type="text" id="tpl-name-input" placeholder="Template name (e.g. Standard week)" maxlength="30" style="flex:1;font-size:12px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px">
-        <button class="mbtn primary" onclick="saveTemplate()" style="white-space:nowrap">💾 Save current</button>
+        <input type="text" id="tpl-name-input" placeholder="Template name (e.g. Standard week)" maxlength="30" style="flex:1;font-size:12px;padding:5px 8px;border:.5px solid #ccc;border-radius:6px" data-i18n-placeholder="tplNamePlaceholder">
+        <button class="mbtn primary" onclick="saveTemplate()" style="white-space:nowrap" data-i18n="tplSaveCurrent">💾 Save current</button>
       </div>
-      <div style="font-size:10px;color:#aaa;margin-top:6px">Opens the last-used modal type, times and note as the template.</div>
+      <div style="font-size:10px;color:#aaa;margin-top:6px" data-i18n="tplHint">Opens the last-used modal type, times and note as the template.</div>
     </div>
     <hr class="divider">
     <div class="panel-section">
       <div class="panel-label" data-i18n="lblData">Data</div>
-      <button class="mbtn" onclick="clearMonth()" style="margin-bottom:6px;width:100%">🗑 Clear current month</button>
-      <button class="mbtn danger" onclick="clearAll()" style="width:100%">⚠️ Clear all data</button>
+      <button class="mbtn" onclick="clearMonth()" style="margin-bottom:6px;width:100%" data-i18n="dataClearMonth">🗑 Clear current month</button>
+      <button class="mbtn danger" onclick="clearAll()" style="width:100%" data-i18n="dataClearAll">⚠️ Clear all data</button>
     </div>
   </div>
 
   <!-- ── YEAR ── -->
   <div class="rpanel" id="tab-year" style="display:none">
     <div class="year-nav">
-      <button onclick="changeYearTab(-1)">‹ prev</button>
+      <button onclick="changeYearTab(-1)" data-i18n="yearPrev">‹ prev</button>
       <div style="font-weight:500;font-size:13px" id="year-label-tab"></div>
-      <button onclick="changeYearTab(1)">next ›</button>
+      <button onclick="changeYearTab(1)" data-i18n="yearNext">next ›</button>
     </div>
     <table class="year-table">
-      <thead><tr><th>Month</th><th>Gross</th><th>Net est.</th><th>OT h</th><th>Actual</th><th>Diff</th><th>YTD net</th></tr></thead>
+      <thead><tr><th data-i18n="yearColMonth">Month</th><th data-i18n="yearColGross">Gross</th><th data-i18n="yearColNetEst">Net est.</th><th data-i18n="yearColOT">OT h</th><th data-i18n="yearColActual">Actual</th><th data-i18n="yearColDiff">Diff</th><th data-i18n="yearColYTD">YTD net</th></tr></thead>
       <tbody id="year-tbody"></tbody>
       <tfoot><tr id="year-tfoot"></tr></tfoot>
     </table>
-    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5">Click month to navigate. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Amber</span> = today's month · <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low · <span style="color:#9b8fd8">●</span> SZ month.</p>
+    <p style="font-size:10px;color:#bbb;margin-top:10px;line-height:1.5" data-i18n="yearLegend">Click month to navigate. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Amber</span> = today's month · <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low · <span style="color:#9b8fd8">●</span> SZ month.</p>
     <div class="av-box" id="av-summary">
-      <div class="av-title">📋 Arbeitnehmerveranlagung helper — <span id="av-year-label"></span></div>
+      <div class="av-title"><span data-i18n="avTitle">📋 Arbeitnehmerveranlagung helper</span> — <span id="av-year-label"></span></div>
       <div id="av-fields"></div>
-      <p style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.5">Estimated values based on planned shifts. Use actual payslips for the official L1 form. Not legal/tax advice.</p>
+      <p style="font-size:10px;color:#aaa;margin-top:6px;line-height:1.5" data-i18n="avFootnote">Estimated values based on planned shifts. Use actual payslips for the official L1 form. Not legal/tax advice.</p>
     </div>
-    <div class="panel-label" style="margin-top:12px">Shift heatmap <span style="font-size:10px;color:#aaa;font-weight:400" id="hm-year-label"></span></div>
+    <div class="panel-label" style="margin-top:12px"><span data-i18n="lblHeatmap">Shift heatmap</span> <span style="font-size:10px;color:#aaa;font-weight:400" id="hm-year-label"></span></div>
     <div class="hm-wrap">
       <div class="hm-month-labels" id="hm-month-labels"></div>
       <div class="hm-grid" id="hm-grid"></div>
     </div>
     <div class="hm-legend">
-      <span><span class="hm-dot" style="background:#5b9bd5"></span>Early</span>
-      <span><span class="hm-dot" style="background:#f5a623"></span>Middle</span>
-      <span><span class="hm-dot" style="background:#9b8fd8"></span>Late</span>
-      <span><span class="hm-dot" style="background:#6c5fb5"></span>Late+Night</span>
-      <span><span class="hm-dot" style="background:#e24b4a"></span>Holiday</span>
-      <span><span class="hm-dot" style="background:#27ae60"></span>Leave</span>
-      <span><span class="hm-dot" style="background:#f0c040"></span>Standby</span>
-      <span><span class="hm-dot" style="background:#e8854a"></span>Call-in</span>
-      <span><span class="hm-dot" style="background:#e8e8e4"></span>No shift</span>
+      <span><span class="hm-dot" style="background:#5b9bd5"></span><span data-i18n="hmLegEarly">Early</span></span>
+      <span><span class="hm-dot" style="background:#f5a623"></span><span data-i18n="hmLegMiddle">Middle</span></span>
+      <span><span class="hm-dot" style="background:#9b8fd8"></span><span data-i18n="hmLegLate">Late</span></span>
+      <span><span class="hm-dot" style="background:#6c5fb5"></span><span data-i18n="hmLegLateNight">Late+Night</span></span>
+      <span><span class="hm-dot" style="background:#e24b4a"></span><span data-i18n="hmLegHoliday">Holiday</span></span>
+      <span><span class="hm-dot" style="background:#27ae60"></span><span data-i18n="hmLegLeave">Leave</span></span>
+      <span><span class="hm-dot" style="background:#f0c040"></span><span data-i18n="hmLegStandby">Standby</span></span>
+      <span><span class="hm-dot" style="background:#e8854a"></span><span data-i18n="hmLegCallin">Call-in</span></span>
+      <span><span class="hm-dot" style="background:#e8e8e4"></span><span data-i18n="hmLegNone">No shift</span></span>
     </div>
   </div>
 
@@ -1347,9 +1400,9 @@ body.dark .tc-extra-box{background:#2a2a2e}
   <div class="rpanel" id="tab-compare" style="display:none">
     <div class="panel-label" style="margin-bottom:8px" data-i18n="lblMonthComparison">Month comparison</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-      <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Month A</label>
+      <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="cmpMonthA">Month A</label>
         <select id="cmp-a" onchange="renderCompare()"></select></div>
-      <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px">Month B</label>
+      <div><label style="font-size:11px;color:#888;display:block;margin-bottom:3px" data-i18n="cmpMonthB">Month B</label>
         <select id="cmp-b" onchange="renderCompare()"></select></div>
     </div>
     <div id="compare-body"></div>
@@ -1413,24 +1466,24 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <!-- Step 1 -->
     <div class="onb-step active" id="onb-step-0">
       <div class="onb-icon">📅</div>
-      <div class="onb-title">Tap any day to add a shift</div>
-      <div class="onb-body">Choose your shift type, set the start and end time. The app automatically calculates your night hours, supplements, and estimated net pay.</div>
+      <div class="onb-title" data-i18n="onbTitle0">Tap any day to add a shift</div>
+      <div class="onb-body" data-i18n="onbBody0">Choose your shift type, set the start and end time. The app automatically calculates your night hours, supplements, and estimated net pay.</div>
     </div>
     <!-- Step 2 -->
     <div class="onb-step" id="onb-step-1">
       <div class="onb-icon">💶</div>
-      <div class="onb-title">See your estimated net instantly</div>
-      <div class="onb-body">The Report tab shows your estimated net payout, deduction breakdown, and how much social insurance you've paid this year. Compare it with your actual payslip to catch errors.</div>
+      <div class="onb-title" data-i18n="onbTitle1">See your estimated net instantly</div>
+      <div class="onb-body" data-i18n="onbBody1">The Report tab shows your estimated net payout, deduction breakdown, and how much social insurance you’ve paid this year. Compare it with your actual payslip to catch errors.</div>
     </div>
     <!-- Step 3 -->
     <div class="onb-step" id="onb-step-2">
       <div class="onb-icon">💾</div>
-      <div class="onb-title">Your data stays on your device</div>
-      <div class="onb-body">Nothing is sent to any server. Export a JSON or Excel backup monthly — or use the Advanced sync in Settings to back up securely to your own private GitHub repository.</div>
+      <div class="onb-title" data-i18n="onbTitle2">Your data stays on your device</div>
+      <div class="onb-body" data-i18n="onbBody2">Nothing is sent to any server. Export a JSON or Excel backup monthly — or use the Advanced sync in Settings to back up securely to your own private GitHub repository.</div>
     </div>
     <div class="onb-actions">
-      <button class="mbtn" id="onb-back" onclick="onbNav(-1)" style="display:none">← Back</button>
-      <button class="mbtn primary" id="onb-next" onclick="onbNav(1)" style="flex:1">Next →</button>
+      <button class="mbtn" id="onb-back" onclick="onbNav(-1)" style="display:none" data-i18n="onbBack">← Back</button>
+      <button class="mbtn primary" id="onb-next" onclick="onbNav(1)" style="flex:1" data-i18n="onbNext">Next →</button>
     </div>
   </div>
 </div>
@@ -1438,52 +1491,52 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ FIRST-RUN WIZARD ═══ -->
 <div class="cs-overlay" id="wizard-overlay">
   <div class="cs-box" style="max-width:380px">
-    <div style="font-size:18px;margin-bottom:4px">👋 Welcome to Shift & Salary Planner</div>
-    <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6">A free, private Austrian shift calculator. Your data never leaves your device. Let's set up the three things we need.</div>
+    <div style="font-size:18px;margin-bottom:4px" data-i18n="wizWelcome">👋 Welcome to Shift &amp; Salary Planner</div>
+    <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6" data-i18n="wizIntro">A free, private Austrian shift calculator. Your data never leaves your device. Let’s set up the three things we need.</div>
     <div style="margin-bottom:12px">
-      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">1. Your monthly gross salary (€)</label>
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ1">1. Your monthly gross salary (€)</label>
       <input type="number" id="wiz-salary" placeholder="e.g. 3200.00" step="0.01" min="0" style="width:100%;font-size:14px;padding:7px 10px;border:.5px solid #ccc;border-radius:7px">
-      <div style="font-size:10px;color:#aaa;margin-top:3px">Find this on your payslip (Bruttobezug). You can change it later.</div>
+      <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="wizQ1Hint">Find this on your payslip (Bruttobezug). You can change it later.</div>
     </div>
     <div style="margin-bottom:12px">
-      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">2. Do you receive bonus months?</label>
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ2">2. Do you receive bonus months?</label>
       <select id="wiz-model" style="width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px">
-        <option value="14">Yes — 13th and 14th salary (standard in Austria)</option>
-        <option value="13">Yes — one bonus month</option>
-        <option value="12">No — 12 salaries only</option>
+        <option value="14" data-i18n="wizQ2Opt14">Yes — 13th and 14th salary (standard in Austria)</option>
+        <option value="13" data-i18n="wizQ2Opt13">Yes — one bonus month</option>
+        <option value="12" data-i18n="wizQ2Opt12">No — 12 salaries only</option>
       </select>
-      <div style="font-size:10px;color:#aaa;margin-top:3px">Most Austrian employees receive Urlaubsgeld (June) + Weihnachtsgeld (November).</div>
+      <div style="font-size:10px;color:#aaa;margin-top:3px" data-i18n="wizQ2Hint">Most Austrian employees receive Urlaubsgeld (June) + Weihnachtsgeld (November).</div>
     </div>
     <div style="margin-bottom:12px">
-      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">3. Do you work shift or on-call hours?</label>
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ3">3. Do you work shift or on-call hours?</label>
       <select id="wiz-shifts" style="width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px">
-        <option value="yes">Yes — I work shifts (early, late, nights, weekends)</option>
-        <option value="no">No — regular office hours only</option>
+        <option value="yes" data-i18n="wizQ3OptYes">Yes — I work shifts (early, late, nights, weekends)</option>
+        <option value="no" data-i18n="wizQ3OptNo">No — regular office hours only</option>
       </select>
     </div>
     <div style="margin-bottom:16px" id="wiz-suppl-block">
-      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">4. Do you receive fixed shift supplements?</label>
+      <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ4">4. Do you receive fixed shift supplements?</label>
       <select id="wiz-suppl" style="width:100%;padding:7px 10px;font-size:13px;border:.5px solid #ccc;border-radius:7px" onchange="wizSupplChange()">
-        <option value="unknown">I'm not sure — I'll check my payslip later</option>
-        <option value="yes">Yes — I receive a bonus for middle/late shifts</option>
-        <option value="no">No — no fixed shift supplements</option>
+        <option value="unknown" data-i18n="wizQ4OptUnknown">I’m not sure — I’ll check my payslip later</option>
+        <option value="yes" data-i18n="wizQ4OptYes">Yes — I receive a bonus for middle/late shifts</option>
+        <option value="no" data-i18n="wizQ4OptNo">No — no fixed shift supplements</option>
       </select>
       <div id="wiz-suppl-fields" style="display:none;margin-top:8px;background:#f5f5f0;border-radius:7px;padding:10px">
-        <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5">Enter the fixed supplement per shift day. Find this in your contract or collective agreement (Kollektivvertrag). You can change these later in Settings.</div>
+        <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="wizSupplHint">Enter the fixed supplement per shift day. Find this in your contract or collective agreement (Kollektivvertrag). You can change these later in Settings.</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <div>
-            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Middle shift (€/day)</label>
+            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px" data-i18n="wizMiddleLabel">Middle shift (€/day)</label>
             <input type="number" id="wiz-middle" value="0" step="0.50" min="0" style="width:100%;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
           </div>
           <div>
-            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px">Late shift (€/day)</label>
+            <label style="font-size:11px;color:#666;display:block;margin-bottom:3px" data-i18n="wizLateLabel">Late shift (€/day)</label>
             <input type="number" id="wiz-late" value="0" step="0.50" min="0" style="width:100%;padding:5px 8px;font-size:13px;border:.5px solid #ccc;border-radius:6px">
           </div>
         </div>
       </div>
     </div>
-    <button class="mbtn primary" style="width:100%;padding:10px;font-size:13px" onclick="finishWizard()">Get started →</button>
-    <div style="font-size:10px;color:#aaa;margin-top:10px;text-align:center">All settings can be changed later in the Settings tab.</div>
+    <button class="mbtn primary" style="width:100%;padding:10px;font-size:13px" onclick="finishWizard()" data-i18n="wizGetStarted">Get started →</button>
+    <div style="font-size:10px;color:#aaa;margin-top:10px;text-align:center" data-i18n="wizFooter">All settings can be changed later in the Settings tab.</div>
   </div>
 </div>
 
@@ -1502,18 +1555,18 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ CHEAT SHEET ═══ -->
 <div class="cs-overlay" id="cs-overlay" onclick="if(event.target===this)closeCheatSheet()">
   <div class="cs-box">
-    <h3>⌨️ Keyboard shortcuts</h3>
-    <div class="cs-row"><span>Navigate months</span><span><span class="cs-key">←</span> <span class="cs-key">→</span></span></div>
-    <div class="cs-row"><span>Go to today</span><span class="cs-key">T</span></div>
-    <div class="cs-row"><span>Go back (last view)</span><span class="cs-key">G</span></div>
-    <div class="cs-row"><span>Report tab</span><span class="cs-key">R</span></div>
-    <div class="cs-row"><span>Settings tab</span><span class="cs-key">S</span></div>
-    <div class="cs-row"><span>Year tab</span><span class="cs-key">Y</span></div>
-    <div class="cs-row"><span>Save shift in modal</span><span class="cs-key">Enter</span></div>
-    <div class="cs-row"><span>Close modal / picker</span><span class="cs-key">Esc</span></div>
-    <div class="cs-row"><span>This cheat sheet</span><span class="cs-key">?</span></div>
-    <div style="margin-top:12px;font-size:11px;color:#aaa">📱 Swipe left/right on calendar to change month. Long-press a cell to quick-delete.</div>
-    <button class="mbtn" style="width:100%;margin-top:12px" onclick="closeCheatSheet()">Close</button>
+    <h3 data-i18n="csTitle">⌨️ Keyboard shortcuts</h3>
+    <div class="cs-row"><span data-i18n="csNavMonths">Navigate months</span><span><span class="cs-key">←</span> <span class="cs-key">→</span></span></div>
+    <div class="cs-row"><span data-i18n="csGoToday">Go to today</span><span class="cs-key">T</span></div>
+    <div class="cs-row"><span data-i18n="csGoBack">Go back (last view)</span><span class="cs-key">G</span></div>
+    <div class="cs-row"><span data-i18n="csReportTab">Report tab</span><span class="cs-key">R</span></div>
+    <div class="cs-row"><span data-i18n="csSettingsTab">Settings tab</span><span class="cs-key">S</span></div>
+    <div class="cs-row"><span data-i18n="csYearTab">Year tab</span><span class="cs-key">Y</span></div>
+    <div class="cs-row"><span data-i18n="csSaveShift">Save shift in modal</span><span class="cs-key">Enter</span></div>
+    <div class="cs-row"><span data-i18n="csCloseModal">Close modal / picker</span><span class="cs-key">Esc</span></div>
+    <div class="cs-row"><span data-i18n="csThisSheet">This cheat sheet</span><span class="cs-key">?</span></div>
+    <div style="margin-top:12px;font-size:11px;color:#aaa" data-i18n="csSwipeHint">📱 Swipe left/right on calendar to change month. Long-press a cell to quick-delete.</div>
+    <button class="mbtn" style="width:100%;margin-top:12px" onclick="closeCheatSheet()" data-i18n="csClose">Close</button>
   </div>
 </div>
 <!-- ═══ MONTH SUMMARY TOOLTIP ═══ -->
@@ -1920,6 +1973,91 @@ function calcSonderzahlung(base, wbfRate){
   var svAmount=calcSVMonthly(base, wbfRate).total; // respects AV threshold and cap
   var lst=Math.max(0,base-620)*0.06;
   return {gross:base, sv:svAmount, lst:lst, net:base-svAmount-lst};
+}
+
+// Reusable: full-year scenario for a given monthly gross + salary model (12/13/14)
+// Used by both the main Tax Calc card and the Job Offer Comparator — same methodology, same numbers.
+function calcAnnualScenario(monthlyGross, salaryModel, pendler, fambonus, wbfRate){
+  var sv=calcSVMonthly(monthlyGross, wbfRate);
+  var annualSV=sv.total*12;
+  var annualAfterSV=monthlyGross*12-annualSV;
+  var annualLST=calcLohnsteuerAnnual(annualAfterSV, pendler, fambonus);
+  var monthlyLST=annualLST/12;
+  var monthlyNet=monthlyGross-sv.total-monthlyLST;
+  var szCount=salaryModel===14?2:(salaryModel===13?1:0);
+  var szGrossTotal=0,szSVTotal=0,szLSTTotal=0,szNetTotal=0;
+  for(var i=0;i<szCount;i++){
+    var sz=calcSonderzahlung(monthlyGross, wbfRate);
+    szGrossTotal+=sz.gross;szSVTotal+=sz.sv;szLSTTotal+=sz.lst;szNetTotal+=sz.net;
+  }
+  var annualGrossTotal=monthlyGross*12+szGrossTotal;
+  var annualNetTotal=monthlyNet*12+szNetTotal;
+  var annualSVTotal=annualSV+szSVTotal;
+  var annualLSTTotal=annualLST+szLSTTotal;
+  var effRate=annualGrossTotal>0?annualLSTTotal/annualGrossTotal*100:0;
+  var totRate=annualGrossTotal>0?(annualSVTotal+annualLSTTotal)/annualGrossTotal*100:0;
+  var trueHourly=annualNetTotal/2080; // 40h × 52 weeks
+  return {monthlyGross:monthlyGross,monthlyNet:monthlyNet,annualGrossTotal:annualGrossTotal,
+    annualNetTotal:annualNetTotal,annualSVTotal:annualSVTotal,annualLSTTotal:annualLSTTotal,
+    effRate:effRate,totRate:totRate,trueHourly:trueHourly,szCount:szCount};
+}
+
+// ═══ JOB OFFER COMPARATOR ═══
+function renderJobCompare(){
+  var emptyEl=document.getElementById('jc-empty');
+  var wrapEl=document.getElementById('jc-result-wrap');
+  if(!emptyEl||!wrapEl)return;
+  var grossA=parseFloat(document.getElementById('jc-gross-a').value);
+  var grossB=parseFloat(document.getElementById('jc-gross-b').value);
+  if(isNaN(grossA)||grossA<=0||isNaN(grossB)||grossB<=0){
+    emptyEl.style.display='';
+    wrapEl.style.display='none';
+    return;
+  }
+  emptyEl.style.display='none';
+  wrapEl.style.display='';
+
+  var modelA=parseInt(document.getElementById('jc-model-a').value)||14;
+  var modelB=parseInt(document.getElementById('jc-model-b').value)||14;
+  var s=getSettings();
+  var pendlerEl=document.getElementById('tc-pendler');
+  var fambonusEl=document.getElementById('tc-fambonus');
+  var pendler=pendlerEl?(parseFloat(pendlerEl.value)||0):0;
+  var fambonus=fambonusEl?(parseFloat(fambonusEl.value)||0):0;
+
+  var a=calcAnnualScenario(grossA,modelA,pendler,fambonus,s.wbfRate);
+  var b=calcAnnualScenario(grossB,modelB,pendler,fambonus,s.wbfRate);
+  var diff=b.annualNetTotal-a.annualNetTotal;
+  var diffPct=a.annualNetTotal>0?(diff/a.annualNetTotal*100):0;
+
+  document.getElementById('jc-a-mgross').textContent=fmt(a.monthlyGross);
+  document.getElementById('jc-b-mgross').textContent=fmt(b.monthlyGross);
+  document.getElementById('jc-a-mnet').textContent=fmt(a.monthlyNet);
+  document.getElementById('jc-b-mnet').textContent=fmt(b.monthlyNet);
+  document.getElementById('jc-a-agross').textContent=fmt(a.annualGrossTotal);
+  document.getElementById('jc-b-agross').textContent=fmt(b.annualGrossTotal);
+  document.getElementById('jc-a-anet').textContent=fmt(a.annualNetTotal);
+  document.getElementById('jc-b-anet').textContent=fmt(b.annualNetTotal);
+  document.getElementById('jc-a-eff').textContent=a.effRate.toFixed(1)+'%';
+  document.getElementById('jc-b-eff').textContent=b.effRate.toFixed(1)+'%';
+  document.getElementById('jc-a-hourly').textContent='€'+a.trueHourly.toFixed(2);
+  document.getElementById('jc-b-hourly').textContent='€'+b.trueHourly.toFixed(2);
+
+  var labelB=document.getElementById('jc-label-b');
+  var labelA=document.getElementById('jc-label-a');
+  var labelTie=document.getElementById('jc-label-tie');
+  labelB.style.display=diff>0.5?'':'none';
+  labelA.style.display=diff<-0.5?'':'none';
+  labelTie.style.display=Math.abs(diff)<=0.5?'':'none';
+
+  var diffBox=document.getElementById('jc-diff-box');
+  var diffColor=diff>0.5?'#27ae60':(diff<-0.5?'#e24b4a':'#888');
+  diffBox.style.background=diff>=0?'#eaf3de':'#fdeeee';
+  document.getElementById('jc-diff-amount').style.color=diffColor;
+  var diffSign=diff>0?'+':(diff<0?'\u2212':'');
+  document.getElementById('jc-diff-num').textContent=diffSign+fmt(Math.abs(diff));
+  document.getElementById('jc-diff-pct').textContent=diffSign+Math.abs(diffPct).toFixed(1)+'%';
+  document.getElementById('jc-diff-month-num').textContent=diffSign+fmt(Math.abs(diff)/12);
 }
 
 function renderReport(){
@@ -2381,6 +2519,7 @@ function renderTaxCalc(){
   renderSVAnnual();
   renderNetto();
   renderInflation();
+  renderJobCompare();
 }
 
 // ═══ CALENDAR ═══
@@ -4357,7 +4496,192 @@ var I18N={
     rlOTHours:'OT hours this month (&gt;48h/week)',
     rlPVMonth:'PV paid this month',
     rlYTDPaid:'YTD total paid (est.)',
-    rlAnnualCap:'Annual cap (Höchstbeitragsgrundlage)'
+    rlAnnualCap:'Annual cap (Höchstbeitragsgrundlage)',
+    setGrossSalary:'Monthly gross salary (€) <span style="color:#aaa;font-weight:400">— find this on your payslip (Bruttobezug)</span>',
+    setGrossSalaryHint:'Regular monthly salary before tax and social insurance. Bonus months are handled separately below.',
+    setNightStart:'Night-work starts after',
+    tipNightStart:'Austrian law (§68 EStG) defines night hours for the 8% tax-free supplement. Check your collective agreement.',
+    setNightStartHint:'Hours worked after this time qualify for the 8% night allowance.',
+    setAllowance:'Special allowance — Zulage (€/month, tax-free)',
+    tipAllowance:'Any recurring tax-free allowance from your employer, e.g. hazard pay (Erschwerniszulage). Find it on your payslip. Set to 0 if none.',
+    setLeaveDays:'Annual leave entitlement (days)',
+    setShowEmployerCosts:'Show employer costs in Report (DB + DZ + MV + UV)',
+    setBRRate:'Works council deduction — Betriebsratsumlage (%)',
+    tipBRRate:'A small deduction if you have a works council. Typically 0.25–0.5%. Check your payslip or ask HR. Set to 0 if unsure.',
+    lblGradeHistory:'📋 Grade history',
+    lblGradeHistorySub:'— past salary calc uses correct base per month',
+    ghFromMonth:'From month',
+    ghBaseSalary:'Base salary (€)',
+    ghAdd:'Add',
+    kvIntro:'Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.',
+    kvSelectSector:'— Select your sector —',
+    kvGroupHealth:'Healthcare &amp; Social',
+    kvGroupIndustry:'Industry &amp; Trade',
+    kvGroupRetail:'Retail &amp; Hospitality',
+    kvGroupPublic:'Public &amp; Tech',
+    kvGroupOther:'Other',
+    kvApplied:'✓ KV preset applied — review and adjust below if needed',
+    kvNote:'Values are typical approximations. Always verify with your actual contract or HR.',
+    kvFindLink:'Find your KV ↗',
+    supplIntro:'Check your <strong style="color:#555">collective agreement (Kollektivvertrag)</strong> or payslip for your actual supplement amounts. These vary widely between employers and sectors. If you have no shift supplements, set both to 0.',
+    setMiddleSuppl:'Middle shift supplement (€/day)',
+    tipMiddleSuppl:'A fixed bonus paid for each middle-shift day worked (e.g. 11:30–20:00). Paid the following month. Check your contract — many employees have €0 here.',
+    setLateSuppl:'Late shift supplement (€/day)',
+    tipLateSuppl:'A fixed bonus paid for each late-shift day worked (e.g. 14:00–22:30). Paid the following month. Check your contract — many employees have €0 here.',
+    szIntro:'Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.',
+    sz13th:'13th month (Urlaubsgeld)',
+    sz14th:'14th month (Weihnachtsgeld)',
+    szWarn:'⚠ Both Sonderzahlung months are set to the same month — one will be ignored.',
+    szAmountNote:'Amount = 1× base salary each. First ~€620 tax-free; remainder at 6% flat.',
+    szSalaryModel:'Annual salary model',
+    szModel12:'12 — no Sonderzahlung',
+    szModel13:'13 — one SZ (Urlaubsgeld or Weihnachtsgeld)',
+    szModel14:'14 — standard Austria (Urlaubsgeld + Weihnachtsgeld)',
+    szModelHint:'Used for annual gross/net estimates and the true hourly rate. Individual month deductions are unaffected.',
+    oncallIntro:'Configure if you work standby shifts (Rufbereitschaft) or get called in outside your normal hours.',
+    setRufRate:'Standby flat rate (€/hour)',
+    tipRufRate:'The hourly rate you receive for being on standby (Rufbereitschaft). Find this in your contract or collective agreement.',
+    setCallinRate:'Call-in overtime rate',
+    callin150:'+50% (standard overtime)',
+    callin200:'+100% (double time)',
+    callinNormal:'Normal rate',
+    setRufSVBase:'Include standby pay in social insurance base',
+    tipRufSVBase:'In some contracts standby pay is included in the SV calculation base, in others it is not. Ask your HR or payroll office.',
+    setRufWknd:'Weekend / holiday standby multiplier',
+    rufWknd1:'× 1 — same as weekday',
+    rufWknd2:'× 2 — double',
+    rufWknd4:'× 4 — quadruple',
+    svRegionalIntro:'Most rates are set by Austrian federal law. The Wohnbauförderungsbeitrag varies by state (Bundesland). Confirm with your payslip.',
+    setWBFRate:'Housing subsidy contribution — WBF (% of gross)',
+    tipWBFRate:'Wohnbauförderungsbeitrag — a state-level SV contribution. Lower Austria (NÖ): 0.5%. Vienna: 0.5%. Other states may differ. Check your payslip.',
+    backupIntro:'Export a backup file regularly. Your data lives only in this browser — no automatic cloud backup unless you set up sync below.',
+    btnExportJSON:'📤 Export JSON',
+    btnExportXLSX:'📊 Export Excel',
+    btnImportJSON:'📥 Import JSON',
+    onbTitle0:'Tap any day to add a shift',
+    onbBody0:'Choose your shift type, set the start and end time. The app automatically calculates your night hours, supplements, and estimated net pay.',
+    onbTitle1:'See your estimated net instantly',
+    onbBody1:'The Report tab shows your estimated net payout, deduction breakdown, and how much social insurance you’ve paid this year. Compare it with your actual payslip to catch errors.',
+    onbTitle2:'Your data stays on your device',
+    onbBody2:'Nothing is sent to any server. Export a JSON or Excel backup monthly — or use the Advanced sync in Settings to back up securely to your own private GitHub repository.',
+    onbBack:'← Back',
+    onbNext:'Next →',
+    wizWelcome:'👋 Welcome to Shift &amp; Salary Planner',
+    wizIntro:'A free, private Austrian shift calculator. Your data never leaves your device. Let’s set up the three things we need.',
+    wizQ1:'1. Your monthly gross salary (€)',
+    wizQ1Hint:'Find this on your payslip (Bruttobezug). You can change it later.',
+    wizQ2:'2. Do you receive bonus months?',
+    wizQ2Opt14:'Yes — 13th and 14th salary (standard in Austria)',
+    wizQ2Opt13:'Yes — one bonus month',
+    wizQ2Opt12:'No — 12 salaries only',
+    wizQ2Hint:'Most Austrian employees receive Urlaubsgeld (June) + Weihnachtsgeld (November).',
+    wizQ3:'3. Do you work shift or on-call hours?',
+    wizQ3OptYes:'Yes — I work shifts (early, late, nights, weekends)',
+    wizQ3OptNo:'No — regular office hours only',
+    wizQ4:'4. Do you receive fixed shift supplements?',
+    wizQ4OptUnknown:'I’m not sure — I’ll check my payslip later',
+    wizQ4OptYes:'Yes — I receive a bonus for middle/late shifts',
+    wizQ4OptNo:'No — no fixed shift supplements',
+    wizSupplHint:'Enter the fixed supplement per shift day. Find this in your contract or collective agreement (Kollektivvertrag). You can change these later in Settings.',
+    wizMiddleLabel:'Middle shift (€/day)',
+    wizLateLabel:'Late shift (€/day)',
+    wizGetStarted:'Get started →',
+    wizFooter:'All settings can be changed later in the Settings tab.',
+    tcCapNotice:'✓ <strong>SV cap reached:</strong> Social insurance is capped at €6,930/month (Höchstbeitragsgrundlage 2026 = €97,020/year). Income above this limit is exempt from SV — only Lohnsteuer applies.',
+    tcFootnote:'Enter your <strong>regular monthly gross</strong>. Regular salary is annualised at ×12 per §66 EStG — never ×14. Sonderzahlungen are calculated separately above using §67 flat rate. UV is employer-only. Confirm with your payroll office.',
+    tcPendlerFamIntro:'These reduce your annual Lohnsteuer directly. Enter what applies to you — the monthly LSt estimate above will update.',
+    tcPendlerLabel:'Pendlerpauschale — commuter deduction (€/year)',
+    tcPendlerTip:'Kleine Pendlerpauschale (public transport available): 372–1,476€/year. Große Pendlerpauschale (no public transport): 744–2,784€/year. Depends on distance and availability. Use the BMF Pendlerrechner to find your exact amount.',
+    tcPendlerQuickPick:'Quick-pick distance…',
+    tcPendlereuroNote:'Also adds <strong>Pendlereuro</strong> (€2/km × one-way distance per year) automatically if you enter a custom amount.',
+    tcFambonusLabel:'Familienbonus Plus — children tax credit (€/year)',
+    tcFambonusTip:'€2,000/year per child under 18 in Austria (€166.68/month). €700/year for children 18+ in education. Shared 50/50 with partner or taken in full by one parent. Reduces Lohnsteuer directly — cannot go below €0.',
+    tcFambonusQuickPick:'Quick-pick children…',
+    nettoIntro:'Enter the net amount you want to take home. The app calculates the gross salary you would need to negotiate for.',
+    nettoTargetLabel:'Target net per month (€)',
+    nettoResultEmpty:'Enter a target net above.',
+    inflIntro:'Did your salary keep up with inflation? Enter last year’s gross to find out.',
+    inflOldLabel:'Last year’s gross (€/month)',
+    inflRateLabel:'Austrian inflation rate (%)',
+    inflRateTip:'Statistik Austria reports Austrian HICP inflation. 2024 average was ~3.5%. Update with the latest figure from statistik.at.',
+    inflResultEmpty:'Enter last year’s salary above.',
+    svAnnualIntro:'Total social insurance you will pay this year at the current monthly gross. Almost all Austrians pay far below the theoretical maximum of ~€17,550/year.',
+    svAnnualEmpty:'Enter a salary above to see your annual SV.',
+    yearPrev:'‹ prev',
+    yearNext:'next ›',
+    yearColMonth:'Month',
+    yearColGross:'Gross',
+    yearColNetEst:'Net est.',
+    yearColOT:'OT h',
+    yearColActual:'Actual',
+    yearColDiff:'Diff',
+    yearColYTD:'YTD net',
+    yearLegend:'Click month to navigate. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Amber</span> = today’s month · <span style="color:#6fa8dc">●</span> high · <span style="color:#c8943a">●</span> low · <span style="color:#9b8fd8">●</span> SZ month.',
+    avTitle:'📋 Arbeitnehmerveranlagung helper',
+    avFootnote:'Estimated values based on planned shifts. Use actual payslips for the official L1 form. Not legal/tax advice.',
+    lblHeatmap:'Shift heatmap',
+    hmLegEarly:'Early',
+    hmLegMiddle:'Middle',
+    hmLegLate:'Late',
+    hmLegLateNight:'Late+Night',
+    hmLegHoliday:'Holiday',
+    hmLegLeave:'Leave',
+    hmLegStandby:'Standby',
+    hmLegCallin:'Call-in',
+    hmLegNone:'No shift',
+    cmpMonthA:'Month A',
+    cmpMonthB:'Month B',
+    syncHeader:'☁️ Sync between devices',
+    syncSubtitle:'Use the same data on your phone and computer — encrypted sync via a private GitHub repo. Tap to set up.',
+    syncSteps:'<strong style="color:#555">Optional.</strong> Sync your data to a private GitHub repository — encrypted on your device before upload.<br><br><strong>Step 1:</strong> Create a private GitHub repo (free).<br><strong>Step 2:</strong> Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">fine-grained PAT ↗</a> with <em>Contents: Read &amp; Write</em> for that repo only.<br><strong>Step 3:</strong> Choose a strong sync password. <strong>Write it down</strong> — without it your data cannot be decrypted.<br><strong>Step 4:</strong> Fill in the fields below and press Push.',
+    syncPATLabel:'GitHub Personal Access Token (PAT)',
+    syncRepoLabel:'Repository <span style="color:#bbb">(owner/repo-name)</span>',
+    syncBranchLabel:'Branch',
+    syncPasswordLabel:'Sync Password <span style="color:#bbb">(never stored — enter each session)</span>',
+    syncPasswordPlaceholder:'Your encryption passphrase',
+    syncPush:'⬆ Push',
+    syncDirtyTip:'Unsynced changes',
+    syncPull:'⬇ Pull',
+    tplIntro:'Save a shift pattern as a template. Apply it to fill Mon–Fri of any week in one tap.',
+    tplNamePlaceholder:'Template name (e.g. Standard week)',
+    tplSaveCurrent:'💾 Save current',
+    tplHint:'Opens the last-used modal type, times and note as the template.',
+    dataClearMonth:'🗑 Clear current month',
+    dataClearAll:'⚠️ Clear all data',
+    csTitle:'⌨️ Keyboard shortcuts',
+    csNavMonths:'Navigate months',
+    csGoToday:'Go to today',
+    csGoBack:'Go back (last view)',
+    csReportTab:'Report tab',
+    csSettingsTab:'Settings tab',
+    csYearTab:'Year tab',
+    csSaveShift:'Save shift in modal',
+    csCloseModal:'Close modal / picker',
+    csThisSheet:'This cheat sheet',
+    csSwipeHint:'📱 Swipe left/right on calendar to change month. Long-press a cell to quick-delete.',
+    csClose:'Close',
+    lblJobCompare:'💼 Job Offer Comparator',
+    jcIntro:'Compare two gross salaries side by side — your current job vs a new offer, or two offers against each other. Uses the Pendlerpauschale &amp; Familienbonus entered above for both.',
+    jcJobA:'Job A (current)',
+    jcJobB:'Job B (offer)',
+    jcGrossPlaceholder:'Monthly gross €',
+    jcModel14:'14 salaries',
+    jcModel13:'13 salaries',
+    jcModel12:'12 salaries',
+    jcEmpty:'Enter a monthly gross salary for both jobs above.',
+    jcColA:'Job A',
+    jcColB:'Job B',
+    jcRowMonthlyGross:'Monthly gross',
+    jcRowMonthlyNet:'Monthly net',
+    jcRowAnnualGross:'Annual gross',
+    jcRowAnnualNet:'Annual net',
+    jcRowEffRate:'Effective LSt rate',
+    jcRowHourly:'True hourly (net)',
+    jcBBetter:'Job B nets more per year',
+    jcABetter:'Job A nets more per year',
+    jcTie:'Both jobs net the same',
+    jcPerYear:'year',
+    jcPerMonth:'month'
   },
   de:{
     appTitle:'Dienstplan- &amp; Gehaltsrechner', appSub:'Österreich · auf einen Tag klicken, um eine Schicht hinzuzufügen',
@@ -4447,7 +4771,192 @@ var I18N={
     rlOTHours:'ÜStd diesen Monat (&gt;48h/Woche)',
     rlPVMonth:'PV diesen Monat bezahlt',
     rlYTDPaid:'Jahressumme bezahlt (geschätzt)',
-    rlAnnualCap:'Jahres-Höchstbetrag (Höchstbeitragsgrundlage)'
+    rlAnnualCap:'Jahres-Höchstbetrag (Höchstbeitragsgrundlage)',
+    setGrossSalary:'Monatliches Bruttogehalt (€) <span style="color:#aaa;font-weight:400">— siehe Lohnzettel (Bruttobezug)</span>',
+    setGrossSalaryHint:'Reguläres Monatsgehalt vor Steuern und Sozialversicherung. Sonderzahlungen werden unten separat behandelt.',
+    setNightStart:'Nachtarbeit beginnt nach',
+    tipNightStart:'Das österreichische Recht (§68 EStG) definiert Nachtstunden für den 8% steuerfreien Zuschlag. Prüfen Sie Ihren Kollektivvertrag.',
+    setNightStartHint:'Stunden nach dieser Uhrzeit gelten für den 8% Nachtzuschlag.',
+    setAllowance:'Sonderzulage (€/Monat, steuerfrei)',
+    tipAllowance:'Eine regelmäßige steuerfreie Zulage Ihres Arbeitgebers, z. B. Erschwerniszulage. Siehe Lohnzettel. Bei keiner Zulage 0 eintragen.',
+    setLeaveDays:'Jahresurlaub (Tage)',
+    setShowEmployerCosts:'Arbeitgeberkosten im Bericht anzeigen (DB + DZ + MV + UV)',
+    setBRRate:'Betriebsratsumlage (%)',
+    tipBRRate:'Ein kleiner Abzug, falls ein Betriebsrat existiert. Typisch 0,25–0,5%. Siehe Lohnzettel oder HR fragen. Bei Unsicherheit 0 eintragen.',
+    lblGradeHistory:'📋 Gehaltsverlauf',
+    lblGradeHistorySub:'— frühere Berechnungen verwenden das jeweils korrekte Gehalt',
+    ghFromMonth:'Ab Monat',
+    ghBaseSalary:'Grundgehalt (€)',
+    ghAdd:'Hinzufügen',
+    kvIntro:'Wählen Sie Ihren Kollektivvertrag, um typische Zuschläge, Nachtgrenze und Bereitschaftsentgelt automatisch einzutragen. Sie können alles danach noch anpassen.',
+    kvSelectSector:'— Branche wählen —',
+    kvGroupHealth:'Gesundheit &amp; Soziales',
+    kvGroupIndustry:'Industrie &amp; Gewerbe',
+    kvGroupRetail:'Handel &amp; Gastgewerbe',
+    kvGroupPublic:'Öffentlicher Dienst &amp; IT',
+    kvGroupOther:'Sonstige',
+    kvApplied:'✓ KV-Vorlage angewendet — unten prüfen und ggf. anpassen',
+    kvNote:'Die Werte sind typische Näherungswerte. Bitte immer mit dem tatsächlichen Vertrag oder HR abgleichen.',
+    kvFindLink:'KV finden ↗',
+    supplIntro:'Prüfen Sie Ihren <strong style="color:#555">Kollektivvertrag</strong> oder Lohnzettel für Ihre tatsächlichen Zuschlagsbeträge. Diese variieren stark zwischen Arbeitgebern und Branchen. Ohne Schichtzuschläge beide auf 0 setzen.',
+    setMiddleSuppl:'Mitteldienst-Zuschlag (€/Tag)',
+    tipMiddleSuppl:'Ein fixer Zuschlag pro Mitteldienst (z. B. 11:30–20:00). Wird im Folgemonat ausgezahlt. Prüfen Sie Ihren Vertrag — oft €0.',
+    setLateSuppl:'Spätdienst-Zuschlag (€/Tag)',
+    tipLateSuppl:'Ein fixer Zuschlag pro Spätdienst (z. B. 14:00–22:30). Wird im Folgemonat ausgezahlt. Prüfen Sie Ihren Vertrag — oft €0.',
+    szIntro:'Versteuert mit pauschal 6% + SV. Wählen Sie den Auszahlungsmonat — meist Juni &amp; Dezember, kann aber variieren.',
+    sz13th:'13. Gehalt (Urlaubsgeld)',
+    sz14th:'14. Gehalt (Weihnachtsgeld)',
+    szWarn:'⚠ Beide Sonderzahlungs-Monate sind gleich — einer wird ignoriert.',
+    szAmountNote:'Betrag = jeweils 1× Grundgehalt. Erste ~€620 steuerfrei, Rest pauschal 6%.',
+    szSalaryModel:'Jahresgehaltsmodell',
+    szModel12:'12 — keine Sonderzahlung',
+    szModel13:'13 — eine SZ (Urlaubs- oder Weihnachtsgeld)',
+    szModel14:'14 — Standard Österreich (Urlaubs- + Weihnachtsgeld)',
+    szModelHint:'Wird für Jahres-Brutto/Netto-Schätzungen und den wahren Stundenlohn verwendet. Monatliche Abzüge bleiben unverändert.',
+    oncallIntro:'Hier einstellen, ob Sie Rufbereitschaft leisten oder außerhalb Ihrer regulären Stunden eingesetzt werden.',
+    setRufRate:'Bereitschaftspauschale (€/Stunde)',
+    tipRufRate:'Der Stundensatz für Rufbereitschaft. Siehe Vertrag oder Kollektivvertrag.',
+    setCallinRate:'Rufeinsatz-Überstundensatz',
+    callin150:'+50% (normale Überstunde)',
+    callin200:'+100% (doppelter Satz)',
+    callinNormal:'Normalsatz',
+    setRufSVBase:'Bereitschaftsentgelt in SV-Basis einbeziehen',
+    tipRufSVBase:'In manchen Verträgen ist Bereitschaftsentgelt Teil der SV-Bemessungsgrundlage, in anderen nicht. HR oder Lohnverrechnung fragen.',
+    setRufWknd:'Wochenend-/Feiertags-Multiplikator',
+    rufWknd1:'× 1 — wie Werktag',
+    rufWknd2:'× 2 — doppelt',
+    rufWknd4:'× 4 — vierfach',
+    svRegionalIntro:'Die meisten Sätze sind bundesweit geregelt. Der Wohnbauförderungsbeitrag variiert je Bundesland. Mit Lohnzettel abgleichen.',
+    setWBFRate:'Wohnbauförderungsbeitrag — WBF (% vom Brutto)',
+    tipWBFRate:'Wohnbauförderungsbeitrag — ein landesabhängiger SV-Beitrag. Niederösterreich: 0,5%. Wien: 0,5%. Andere Bundesländer können abweichen. Lohnzettel prüfen.',
+    backupIntro:'Exportieren Sie regelmäßig eine Sicherung. Ihre Daten liegen nur in diesem Browser — keine automatische Cloud-Sicherung ohne Sync unten.',
+    btnExportJSON:'📤 JSON exportieren',
+    btnExportXLSX:'📊 Excel exportieren',
+    btnImportJSON:'📥 JSON importieren',
+    onbTitle0:'Auf einen Tag tippen, um eine Schicht hinzuzufügen',
+    onbBody0:'Wählen Sie den Schichttyp und die Start-/Endzeit. Die App berechnet automatisch Ihre Nachtstunden, Zuschläge und Ihr geschätztes Nettogehalt.',
+    onbTitle1:'Sehen Sie Ihr geschätztes Netto sofort',
+    onbBody1:'Der Bericht zeigt Ihr geschätztes Nettogehalt, die Abzüge im Detail und Ihre bisher gezahlte Sozialversicherung in diesem Jahr. Vergleichen Sie mit Ihrem Lohnzettel, um Fehler zu finden.',
+    onbTitle2:'Ihre Daten bleiben auf Ihrem Gerät',
+    onbBody2:'Es wird nichts an einen Server gesendet. Exportieren Sie monatlich ein JSON- oder Excel-Backup — oder nutzen Sie den erweiterten Sync in den Einstellungen für eine sichere Sicherung in Ihr eigenes privates GitHub-Repository.',
+    onbBack:'← Zurück',
+    onbNext:'Weiter →',
+    wizWelcome:'👋 Willkommen beim Dienstplan- &amp; Gehaltsrechner',
+    wizIntro:'Ein kostenloser, privater österreichischer Schichtrechner. Ihre Daten verlassen nie Ihr Gerät. Richten wir die drei wichtigsten Dinge ein.',
+    wizQ1:'1. Ihr monatliches Bruttogehalt (€)',
+    wizQ1Hint:'Siehe Lohnzettel (Bruttobezug). Sie können es später ändern.',
+    wizQ2:'2. Erhalten Sie Sonderzahlungen?',
+    wizQ2Opt14:'Ja — 13. und 14. Gehalt (Standard in Österreich)',
+    wizQ2Opt13:'Ja — eine Sonderzahlung',
+    wizQ2Opt12:'Nein — nur 12 Gehälter',
+    wizQ2Hint:'Die meisten österreichischen Arbeitnehmer erhalten Urlaubsgeld (Juni) + Weihnachtsgeld (November).',
+    wizQ3:'3. Arbeiten Sie im Schicht- oder Bereitschaftsdienst?',
+    wizQ3OptYes:'Ja — ich arbeite in Schichten (Früh, Spät, Nacht, Wochenende)',
+    wizQ3OptNo:'Nein — nur reguläre Bürozeiten',
+    wizQ4:'4. Bekommen Sie feste Schichtzuschläge?',
+    wizQ4OptUnknown:'Ich bin nicht sicher — ich prüfe das später im Lohnzettel',
+    wizQ4OptYes:'Ja — ich bekomme einen Zuschlag für Mittel-/Spätdienste',
+    wizQ4OptNo:'Nein — keine festen Schichtzuschläge',
+    wizSupplHint:'Geben Sie den festen Zuschlag pro Schichttag ein. Siehe Vertrag oder Kollektivvertrag. Später in den Einstellungen änderbar.',
+    wizMiddleLabel:'Mitteldienst (€/Tag)',
+    wizLateLabel:'Spätdienst (€/Tag)',
+    wizGetStarted:'Los geht’s →',
+    wizFooter:'Alle Einstellungen können später in den Einstellungen geändert werden.',
+    tcCapNotice:'✓ <strong>SV-Höchstgrenze erreicht:</strong> Die Sozialversicherung ist auf €6.930/Monat begrenzt (Höchstbeitragsgrundlage 2026 = €97.020/Jahr). Einkommen darüber ist SV-frei — nur Lohnsteuer fällt an.',
+    tcFootnote:'Geben Sie Ihr <strong>reguläres Monatsbrutto</strong> ein. Das reguläre Gehalt wird mit ×12 nach §66 EStG hochgerechnet — nie ×14. Sonderzahlungen werden oben separat mit dem §67 Pauschalsatz berechnet. UV ist nur Arbeitgeberanteil. Mit Lohnverrechnung abgleichen.',
+    tcPendlerFamIntro:'Diese reduzieren Ihre Jahres-Lohnsteuer direkt. Tragen Sie ein, was für Sie zutrifft — die LSt-Schätzung oben aktualisiert sich.',
+    tcPendlerLabel:'Pendlerpauschale (€/Jahr)',
+    tcPendlerTip:'Kleine Pendlerpauschale (ÖPNV verfügbar): 372–1.476€/Jahr. Große Pendlerpauschale (kein ÖPNV zumutbar): 744–2.784€/Jahr. Abhängig von Entfernung und Verfügbarkeit. Genauen Betrag im BMF-Pendlerrechner ermitteln.',
+    tcPendlerQuickPick:'Entfernung auswählen…',
+    tcPendlereuroNote:'Fügt bei eigenem Betrag automatisch den <strong>Pendlereuro</strong> hinzu (€2/km × einfache Strecke pro Jahr).',
+    tcFambonusLabel:'Familienbonus Plus (€/Jahr)',
+    tcFambonusTip:'€2.000/Jahr pro Kind unter 18 in Österreich (€166,68/Monat). €700/Jahr für Kinder 18+ in Ausbildung. 50/50 mit Partner geteilt oder zur Gänze bei einem Elternteil. Reduziert die Lohnsteuer direkt — kann nicht unter €0 gehen.',
+    tcFambonusQuickPick:'Kinder auswählen…',
+    nettoIntro:'Geben Sie den gewünschten Netto-Betrag ein. Die App berechnet das dazu nötige Bruttogehalt für Ihre Verhandlung.',
+    nettoTargetLabel:'Ziel-Netto pro Monat (€)',
+    nettoResultEmpty:'Geben Sie oben ein Ziel-Netto ein.',
+    inflIntro:'Hat Ihr Gehalt mit der Inflation Schritt gehalten? Geben Sie das Bruttogehalt des Vorjahres ein.',
+    inflOldLabel:'Bruttogehalt Vorjahr (€/Monat)',
+    inflRateLabel:'Österreichische Inflationsrate (%)',
+    inflRateTip:'Statistik Austria meldet die österreichische HVPI-Inflation. 2024 lag der Durchschnitt bei ~3,5%. Aktuellen Wert von statistik.at verwenden.',
+    inflResultEmpty:'Geben Sie oben das Gehalt des Vorjahres ein.',
+    svAnnualIntro:'Gesamte Sozialversicherung, die Sie dieses Jahr beim aktuellen Monatsbrutto zahlen. Fast alle Österreicher liegen weit unter dem theoretischen Maximum von ~€17.550/Jahr.',
+    svAnnualEmpty:'Geben Sie oben ein Gehalt ein, um die Jahres-SV zu sehen.',
+    yearPrev:'‹ zurük',
+    yearNext:'weiter ›',
+    yearColMonth:'Monat',
+    yearColGross:'Brutto',
+    yearColNetEst:'Netto (gesch.)',
+    yearColOT:'ÜStd h',
+    yearColActual:'Tatsächlich',
+    yearColDiff:'Diff.',
+    yearColYTD:'Jahr Netto',
+    yearLegend:'Monat anklicken zum Navigieren. <span style="background:#fff8e8;padding:0 3px;border-radius:2px">Gelb</span> = aktueller Monat · <span style="color:#6fa8dc">●</span> hoch · <span style="color:#c8943a">●</span> niedrig · <span style="color:#9b8fd8">●</span> SZ-Monat.',
+    avTitle:'📋 Arbeitnehmerveranlagung-Hilfe',
+    avFootnote:'Geschätzte Werte basierend auf geplanten Schichten. Für das offizielle L1-Formular die tatsächlichen Lohnzettel verwenden. Keine Rechts- oder Steuerberatung.',
+    lblHeatmap:'Schicht-Heatmap',
+    hmLegEarly:'Früh',
+    hmLegMiddle:'Mittel',
+    hmLegLate:'Spät',
+    hmLegLateNight:'Spät+Nacht',
+    hmLegHoliday:'Feiertag',
+    hmLegLeave:'Urlaub',
+    hmLegStandby:'Bereitschaft',
+    hmLegCallin:'Rufeinsatz',
+    hmLegNone:'Keine Schicht',
+    cmpMonthA:'Monat A',
+    cmpMonthB:'Monat B',
+    syncHeader:'☁️ Geräte-Synchronisation',
+    syncSubtitle:'Nutzen Sie dieselben Daten auf Handy und Computer — verschlüsselte Synchronisation über ein privates GitHub-Repo. Zum Einrichten antippen.',
+    syncSteps:'<strong style="color:#555">Optional.</strong> Synchronisieren Sie Ihre Daten mit einem privaten GitHub-Repository — vor dem Upload auf Ihrem Gerät verschlüsselt.<br><br><strong>Schritt 1:</strong> Privates GitHub-Repo erstellen (kostenlos).<br><strong>Schritt 2:</strong> <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">Fine-grained PAT ↗</a> mit <em>Contents: Read &amp; Write</em> nur für dieses Repo erstellen.<br><strong>Schritt 3:</strong> Starkes Sync-Passwort wählen. <strong>Notieren Sie es</strong> — ohne es können Ihre Daten nicht entschlüsselt werden.<br><strong>Schritt 4:</strong> Felder unten ausfüllen und Push drücken.',
+    syncPATLabel:'GitHub Personal Access Token (PAT)',
+    syncRepoLabel:'Repository <span style="color:#bbb">(Besitzer/Repo-Name)</span>',
+    syncBranchLabel:'Branch',
+    syncPasswordLabel:'Sync-Passwort <span style="color:#bbb">(wird nie gespeichert — jede Sitzung neu eingeben)</span>',
+    syncPasswordPlaceholder:'Ihre Verschlüsselungs-Passphrase',
+    syncPush:'⬆ Hochladen',
+    syncDirtyTip:'Nicht synchronisierte Änderungen',
+    syncPull:'⬇ Herunterladen',
+    tplIntro:'Speichern Sie ein Schichtmuster als Vorlage. Wenden Sie es an, um Mo–Fr einer beliebigen Woche mit einem Tipp zu füllen.',
+    tplNamePlaceholder:'Vorlagenname (z. B. Standardwoche)',
+    tplSaveCurrent:'💾 Aktuelle speichern',
+    tplHint:'Öffnet den zuletzt verwendeten Modaltyp, Zeiten und Notiz als Vorlage.',
+    dataClearMonth:'🗑 Aktuellen Monat löschen',
+    dataClearAll:'⚠️ Alle Daten löschen',
+    csTitle:'⌨️ Tastenkürzel',
+    csNavMonths:'Monate navigieren',
+    csGoToday:'Zu heute springen',
+    csGoBack:'Zurück (letzte Ansicht)',
+    csReportTab:'Bericht-Tab',
+    csSettingsTab:'Einstellungen-Tab',
+    csYearTab:'Jahr-Tab',
+    csSaveShift:'Schicht im Dialog speichern',
+    csCloseModal:'Dialog/Auswahl schließen',
+    csThisSheet:'Diese Übersicht',
+    csSwipeHint:'📱 Im Kalender nach links/rechts wischen, um den Monat zu wechseln. Lange auf eine Zelle drücken zum Schnell-Löschen.',
+    csClose:'Schließen',
+    lblJobCompare:'💼 Job-Angebot-Vergleich',
+    jcIntro:'Vergleichen Sie zwei Bruttogehälter direkt nebeneinander — Ihren aktuellen Job gegen ein neues Angebot, oder zwei Angebote gegeneinander. Verwendet die oben eingegebene Pendlerpauschale &amp; den Familienbonus für beide.',
+    jcJobA:'Job A (aktuell)',
+    jcJobB:'Job B (Angebot)',
+    jcGrossPlaceholder:'Monatsbrutto €',
+    jcModel14:'14 Gehälter',
+    jcModel13:'13 Gehälter',
+    jcModel12:'12 Gehälter',
+    jcEmpty:'Geben Sie oben für beide Jobs ein Monatsbrutto ein.',
+    jcColA:'Job A',
+    jcColB:'Job B',
+    jcRowMonthlyGross:'Monatsbrutto',
+    jcRowMonthlyNet:'Monatsnetto',
+    jcRowAnnualGross:'Jahresbrutto',
+    jcRowAnnualNet:'Jahresnetto',
+    jcRowEffRate:'Effektiver LSt-Satz',
+    jcRowHourly:'Wahrer Stundenlohn (netto)',
+    jcBBetter:'Job B bringt mehr Netto pro Jahr',
+    jcABetter:'Job A bringt mehr Netto pro Jahr',
+    jcTie:'Beide Jobs bringen gleich viel Netto',
+    jcPerYear:'Jahr',
+    jcPerMonth:'Monat'
   }
 };
 
@@ -4473,6 +4982,16 @@ function applyLang(lang){
     var key=el.getAttribute('data-i18n-placeholder');
     var text=dict[key]!=null?dict[key]:fallback[key];
     if(text!=null) el.setAttribute('placeholder',text);
+  });
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){
+    var key=el.getAttribute('data-i18n-title');
+    var text=dict[key]!=null?dict[key]:fallback[key];
+    if(text!=null) el.setAttribute('title',text);
+  });
+  document.querySelectorAll('[data-i18n-label]').forEach(function(el){
+    var key=el.getAttribute('data-i18n-label');
+    var text=dict[key]!=null?dict[key]:fallback[key];
+    if(text!=null) el.setAttribute('label',text);
   });
   var btn=document.getElementById('lang-btn');
   if(btn) btn.textContent=lang==='en'?'🌐 DE':'🌐 EN';
@@ -4521,6 +5040,7 @@ function applyPendlerPreset(){
   document.getElementById('tc-pendler').value=val;
   sel.value='';
   renderTaxCalc();
+  renderJobCompare();
 }
 function applyFambonusPreset(){
   var sel=document.getElementById('tc-fambonus-preset');
@@ -4529,6 +5049,7 @@ function applyFambonusPreset(){
   document.getElementById('tc-fambonus').value=val;
   sel.value='';
   renderTaxCalc();
+  renderJobCompare();
 }
 
 // ═══ BOOT ═══
