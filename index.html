@@ -1358,6 +1358,12 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <button class="mbtn" onclick="clearMonth()" style="margin-bottom:6px;width:100%" data-i18n="dataClearMonth">🗑 Clear current month</button>
       <button class="mbtn danger" onclick="clearAll()" style="width:100%" data-i18n="dataClearAll">⚠️ Clear all data</button>
     </div>
+    <hr class="divider">
+    <div class="panel-section">
+      <div class="panel-label" data-i18n="lblSupport">❤️ Support this project</div>
+      <div style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="supportIntro">This app is free, private, and ad-free — no account, no tracking. If it saved you time or helped catch a payslip error, you can buy me a coffee.</div>
+      <a href="https://buymeacoffee.com/anisbirakhm" target="_blank" rel="noopener" class="mbtn primary" style="display:block;text-align:center;text-decoration:none" data-i18n="supportBtn">☕ Buy me a coffee</a>
+    </div>
   </div>
 
   <!-- ── YEAR ── -->
@@ -1458,6 +1464,9 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ ONBOARDING TUTORIAL ═══ -->
 <div class="onb-overlay" id="onb-overlay">
   <div class="onb-box">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+      <button onclick="toggleLang()" id="onb-lang-btn" style="font-size:11px;padding:3px 8px;border:.5px solid #ccc;border-radius:5px;background:#f5f5f0;cursor:pointer">🌐 DE</button>
+    </div>
     <div class="onb-dots">
       <div class="onb-dot active" id="onb-dot-0"></div>
       <div class="onb-dot" id="onb-dot-1"></div>
@@ -1491,7 +1500,10 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <!-- ═══ FIRST-RUN WIZARD ═══ -->
 <div class="cs-overlay" id="wizard-overlay">
   <div class="cs-box" style="max-width:380px">
-    <div style="font-size:18px;margin-bottom:4px" data-i18n="wizWelcome">👋 Welcome to Shift &amp; Salary Planner</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+      <div style="font-size:18px" data-i18n="wizWelcome">👋 Welcome to Shift &amp; Salary Planner</div>
+      <button onclick="toggleLang()" id="wiz-lang-btn" style="font-size:11px;padding:3px 8px;border:.5px solid #ccc;border-radius:5px;background:#f5f5f0;cursor:pointer;flex-shrink:0;margin-left:8px">🌐 DE</button>
+    </div>
     <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6" data-i18n="wizIntro">A free, private Austrian shift calculator. Your data never leaves your device. Let’s set up the three things we need.</div>
     <div style="margin-bottom:12px">
       <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ1">1. Your monthly gross salary (€)</label>
@@ -4681,7 +4693,10 @@ var I18N={
     jcABetter:'Job A nets more per year',
     jcTie:'Both jobs net the same',
     jcPerYear:'year',
-    jcPerMonth:'month'
+    jcPerMonth:'month',
+    lblSupport:'❤️ Support this project',
+    supportIntro:'This app is free, private, and ad-free — no account, no tracking. If it saved you time or helped catch a payslip error, you can buy me a coffee.',
+    supportBtn:'☕ Buy me a coffee'
   },
   de:{
     appTitle:'Dienstplan- &amp; Gehaltsrechner', appSub:'Österreich · auf einen Tag klicken, um eine Schicht hinzuzufügen',
@@ -4956,7 +4971,10 @@ var I18N={
     jcABetter:'Job A bringt mehr Netto pro Jahr',
     jcTie:'Beide Jobs bringen gleich viel Netto',
     jcPerYear:'Jahr',
-    jcPerMonth:'Monat'
+    jcPerMonth:'Monat',
+    lblSupport:'❤️ Projekt unterstützen',
+    supportIntro:'Diese App ist kostenlos, privat und werbefrei — kein Account, kein Tracking. Wenn sie Ihnen Zeit gespart oder einen Lohnzettel-Fehler gefunden hat, können Sie mir einen Kaffee spendieren.',
+    supportBtn:'☕ Kaffee spendieren'
   }
 };
 
@@ -4995,6 +5013,10 @@ function applyLang(lang){
   });
   var btn=document.getElementById('lang-btn');
   if(btn) btn.textContent=lang==='en'?'🌐 DE':'🌐 EN';
+  var wizBtn=document.getElementById('wiz-lang-btn');
+  if(wizBtn) wizBtn.textContent=lang==='en'?'🌐 DE':'🌐 EN';
+  var onbBtn=document.getElementById('onb-lang-btn');
+  if(onbBtn) onbBtn.textContent=lang==='en'?'🌐 DE':'🌐 EN';
   document.documentElement.lang=lang;
 }
 
