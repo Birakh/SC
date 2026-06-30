@@ -847,8 +847,9 @@ body.dark .tc-extra-box{background:#2a2a2e}
           <option value="latenight">Late 8% (8h, night hours only)</option>
           <option value="ruf_weekday">Rufbereitschaft weekday (4.5h)</option>
           <option value="ruf_wknd">Rufbereitschaft weekend (4.5h)</option>
-          <option value="callin">Rufeinsatz call-in (1h)</option>
-          <option value="holiday">Public holiday worked (8h)</option>
+          <option value="callin">Rufeinsatz call-in, normal day (1h)</option>
+          <option value="callin_holiday">Rufeinsatz call-in, on holiday (1h, 200%)</option>
+          <option value="holiday">Public holiday worked (8h, 200% total)</option>
         </select>
       </div>
       <div class="marginal-result" id="marginal-result">—</div>
@@ -1432,7 +1433,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     </div>
     <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;font-weight:500;margin-bottom:8px" data-i18n="simAddExtra">Add extra shifts</div>
     <div class="sim-slider-row">
-      <label>🌙 <span data-i18n="simLateLabel">Late shifts (14:00–22:30)</span><br>
+      <label>🌙 <span data-i18n="simLateLabel">Late shifts (14:00–22:30 · 8h paid)</span><br>
         <span style="color:#aaa;font-size:10px" id="sim-late-sub" data-i18n="simLateSub">+€50 supplement next month</span><br>
         <label style="font-size:10px;color:#888;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-top:2px">
           <input type="checkbox" id="sim-night-pay" onchange="renderSim()" style="cursor:pointer">
@@ -1443,12 +1444,12 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="sim-count" id="sim-late-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>🌅 <span data-i18n="simMiddleLabel">Middle shifts (11:30–20:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simMiddleSub">+€35.50 supplement next month</span></label>
+      <label>🌅 <span data-i18n="simMiddleLabel">Middle shifts (11:30–20:00 · 8h paid)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simMiddleSub">+€35.50 supplement next month</span></label>
       <input type="range" id="sim-middle" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-middle-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>☀️ <span data-i18n="simEarlyLabel">Early shifts (07:00–15:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simEarlySub">no supplements · base pay only</span></label>
+      <label>☀️ <span data-i18n="simEarlyLabel">Early shifts (07:00–15:30 · 8h paid)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simEarlySub">no supplements · base pay only</span></label>
       <input type="range" id="sim-normal" min="0" max="15" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-normal-val">0</div>
     </div>
@@ -1458,7 +1459,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="sim-count" id="sim-ruf-val">0</div>
     </div>
     <div class="sim-slider-row">
-      <label>🏖 <span data-i18n="simHolLabel">Public holiday shifts (07:00–15:00)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simHolSub">base pay now · 200% extra next month</span></label>
+      <label>🏖 <span data-i18n="simHolLabel">Public holiday shifts (07:00–15:30 · 8h paid)</span><br><span style="color:#aaa;font-size:10px" data-i18n="simHolSub">base pay now · 200% extra next month</span></label>
       <input type="range" id="sim-hol" min="0" max="5" value="0" oninput="renderSim()">
       <div class="sim-count" id="sim-hol-val">0</div>
     </div>
@@ -1664,7 +1665,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
   <div class="modal-title" id="modal-title" data-i18n="modalEditShift">Edit shift</div>
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px" data-i18n="modalQuickPresets">Quick presets</div>
   <div class="presets-grid">
-    <button class="preset-btn" onclick="applyPreset('normal','07:00','15:00',this)">☀️ <span data-i18n="presetEarly">Early</span><br><span>07:00–15:00</span></button>
+    <button class="preset-btn" onclick="applyPreset('normal','07:00','15:30',this)">☀️ <span data-i18n="presetEarly">Early</span><br><span>07:00–15:30</span></button>
     <button class="preset-btn" onclick="applyPreset('middle','11:30','20:00',this)">🌤 <span data-i18n="presetMiddle">Middle</span><br><span>11:30–20 +€35.50</span></button>
     <button class="preset-btn" onclick="applyPreset('late','14:00','22:30',this)">🌙 <span data-i18n="presetLate">Late</span><br><span>14:00–22:30 +€50</span></button>
     <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙 <span data-i18n="presetLate8">Late 8%</span><br><span>14–22:30 8% only</span></button>
@@ -1673,7 +1674,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
     <button class="preset-btn" onclick="applyPreset('ruf','06:30','11:00',this)">📱 <span data-i18n="presetOnCall1">On-call 1</span><br><span>06:30–11:00</span></button>
     <button class="preset-btn" onclick="applyPreset('ruf','12:00','20:00',this)">📱 <span data-i18n="presetOnCall2">On-call 2</span><br><span>12:00–20:00</span></button>
     <button class="preset-btn" onclick="applyPreset('callin','00:00','01:00',this)">🚨 Rufeinsatz<br><span data-i18n="presetSetTime">set time ↓</span></button>
-    <button class="preset-btn" onclick="applyPreset('leave','07:00','15:00',this)">🏖 Urlaub<br><span data-i18n="presetDayOff">day off</span></button>
+    <button class="preset-btn" onclick="applyPreset('leave','07:00','15:30',this)">🏖 Urlaub<br><span data-i18n="presetDayOff">day off</span></button>
     <button class="preset-btn" onclick="applyPreset('holiday','07:00','19:00',this)">🎉 <span data-i18n="presetHoliday">Holiday</span><br><span data-i18n="presetWorked">worked</span></button>
   </div>
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px" data-i18n="modalManualEntry">Manual entry</div>
@@ -1698,7 +1699,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
   </div>
   <div class="time-grid">
     <div class="mfield"><label data-i18n="modalStart">Start</label><input type="time" id="m-start" value="07:00" oninput="updateDuration();_markModalDirty()"></div>
-    <div class="mfield"><label data-i18n="modalEnd">End</label><input type="time" id="m-end" value="15:00" oninput="updateDuration();_markModalDirty()"></div>
+    <div class="mfield"><label data-i18n="modalEnd">End</label><input type="time" id="m-end" value="15:30" oninput="updateDuration();_markModalDirty()"></div>
   </div>
   <div class="duration-pill" id="m-duration"></div>
   <div class="mfield">
@@ -1935,23 +1936,31 @@ function calcEarnedSupplements(year,month){
   var s=getSettings();
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
-  var holH=0;
-  var middleDays=0,lateDays=0;
+  var holH=0; // includes both type='holiday' shifts AND call-ins (type='callin') that land on a public holiday
+  var middleDays=0,lateDays=0;       // shift counts — kept for display ("×N days")
+  var middleH=0,lateH=0;             // actual paid hours — drives the real payout
   var pfx=monthKey(year,month);
+  // KV rate: middleS/lateS are defined as the amount for a standard 8h paid shift.
+  // Real payslip (validated): rate/hour = flat€ / 8h, applied to ACTUAL paid hours
+  // (so a slightly longer or shorter shift pays proportionally more/less, matching
+  // 'RT Nachmittag kurz/lang' line items which bill per hour, not per shift).
+  var middleHourlyRate = s.middleS/8;
+  var lateHourlyRate   = s.lateS/8;
   Object.keys(shifts).forEach(function(k){
     if(k.substring(0,7)!==pfx) return;
     var sh=shifts[k];
     if(sh.type==='holiday')     { var h=calcHours(sh.start,sh.end,s.thresh); holH+=h.paid; }
-    else if(sh.type==='middle') middleDays++;
-    else if(sh.type==='late')   lateDays++;
+    else if(sh.type==='middle') { var h=calcHours(sh.start,sh.end,s.thresh); middleH+=h.paid; middleDays++; }
+    else if(sh.type==='late')   { var h=calcHours(sh.start,sh.end,s.thresh); lateH+=h.paid; lateDays++; }
+    else if(sh.type==='callin'&&isHol(k)) { var h=calcHours(sh.start,sh.end,s.thresh); holH+=h.paid; }
   });
   return {
-    middleP:  s.middleS*middleDays,
-    lateP:    s.lateS*lateDays,
+    middleP:  middleHourlyRate*middleH,
+    lateP:    lateHourlyRate*lateH,
     holExtraBase: hourly*holH,    // base pay for holiday hours — taxable (SV + LSt)
     holExtraSuppl: hourly*holH,   // §68(1) Feiertagszuschlag 100% supplement — SV applies, LSt exempt
     holExtra: hourly*2*holH,      // combined total (kept for display compatibility)
-    middleDays, lateDays, holH
+    middleDays, lateDays, middleH, lateH, holH
   };
 }
 
@@ -1976,7 +1985,7 @@ function calcSalary(year,month){
   var s=getSettings();
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
-  var holH=0,leaveH=0,rufH=0,rufWH=0,callinH=0;
+  var leaveH=0,rufH=0,rufWH=0,callinH=0,callinHolH=0;
   var pfx=monthKey(year,month);
   Object.keys(shifts).forEach(function(k){
     if(k.substring(0,7)!==pfx) return;
@@ -1984,22 +1993,29 @@ function calcSalary(year,month){
     var d=parseInt(k.split('-')[2]);
     var h=calcHours(sh.start,sh.end,s.thresh);
     var special=isHol(k)||isWknd(year,month,d);
-    if(sh.type==='holiday')     holH+=h.paid; // paid hours (break deducted)
-    else if(sh.type==='leave')  leaveH+=8; // Urlaub always paid as 8h standard day (AZG §2)
+    // NOTE: holiday hours (type='holiday') are NOT accumulated here — the full 200%
+    // (base+100% supplement) is deferred and paid next month via calcEarnedSupplements
+    // (validated against payslip: 'ÜStd. Grundvergütung' + 'ÜStd. Zuschl. 100%' both
+    // land in the following month's payslip).
+    if(sh.type==='leave')  leaveH+=8; // Urlaub always paid as 8h standard day (AZG §2)
     else if(sh.type==='ruf')  { if(special) rufWH+=h.total; else rufH+=h.total; } // ruf: clock hours per agreement
-    else if(sh.type==='callin') callinH+=h.paid; // paid hours (break deducted)
+    else if(sh.type==='callin') {
+      // Call-in (Rufeinsatz): paid at the NORMAL full hourly rate, same as a regular
+      // shift on that day. If the call-in falls on a public holiday, the same 200%
+      // rule applies as a worked holiday shift (deferred to next month like 'holiday').
+      if(isHol(k)) callinHolH+=h.paid; else callinH+=h.paid;
+    }
   });
 
-  // Night 8% paid THIS month; fixed supplements (middle/late/holiday extra) paid next month
+  // Night 8% paid THIS month; fixed supplements (middle/late/holiday/call-in-holiday 200%) paid next month
   var night    = calcNightAllowance(year,month);  // same month
   var prevM=month-1, prevY=year;
   if(prevM<0){prevM=11;prevY--;}
   var prevSuppl= calcEarnedSupplements(prevY,prevM); // prev month's deferred supplements
 
-  var holBasePay = hourly*holH;
   var leavePay   = hourly*leaveH;
   var rufPay     = s.rufRate*rufH + s.rufRate*s.rufWknd*rufWH;
-  var callinP    = hourly*s.callinM*callinH;
+  var callinP    = hourly*s.callinM*callinH; // normal-day call-in: configured rate (default: normal rate)
 
   // §68 EStG split:
   // SV base: all earnings (night, holiday base+supplement, supplements)
@@ -2008,14 +2024,14 @@ function calcSalary(year,month){
     + night.shiftA + night.lateNightA
     + prevSuppl.middleP + prevSuppl.lateP
     + (prevSuppl.holExtraBase||0) + (prevSuppl.holExtraSuppl||0)
-    + holBasePay + leavePay + callinP
+    + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var lstTaxable = base
     // night pay EXCLUDED — §68(1) Nachtzulage tax-free
     + prevSuppl.middleP + prevSuppl.lateP
     + (prevSuppl.holExtraBase||0)   // base pay for holiday hours — taxable
     // holExtraSuppl EXCLUDED — §68(1) Feiertagszuschlag 100% supplement tax-free
-    + holBasePay + leavePay + callinP
+    + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var taxable = svTaxable; // keep 'taxable' for backward compat (SV base)
   var br  = svTaxable*s.brRate;
@@ -2037,24 +2053,26 @@ function calcSalary(year,month){
     middleP:prevSuppl.middleP, lateP:prevSuppl.lateP,
     holExtra:prevSuppl.holExtra,
     // Current month base pays:
-    holBasePay, leavePay, rufPay, callinP,
+    leavePay, rufPay, callinP,
     taxable,lstTaxable,br,gross,svM,lst,net,hazard:s.hazard,
     // Hours for display:
-    nightH:night.nightH, lateNightH:night.lateNightH, holH, leaveH,
-    rufH:rufH+rufWH, rufH_raw:rufH, rufWH:rufWH, callinH,
+    nightH:night.nightH, lateNightH:night.lateNightH, leaveH,
+    rufH:rufH+rufWH, rufH_raw:rufH, rufWH:rufWH, callinH, callinHolH,
     middleDays:prevSuppl.middleDays, lateDays:prevSuppl.lateDays,
     oncallDays:Math.round(rufH+rufWH),
-    // Earned this month — deferred to next month (middle/late/hol extra only):
+    // Earned this month — deferred to next month (middle/late/holiday 200% total):
     earnedMiddleP:earned.middleP, earnedLateP:earned.lateP,
-    earnedHolExtra:earned.holExtra,
+    earnedHolExtra:earned.holExtra, earnedHolH:earned.holH,
     earnedMiddleDays:earned.middleDays, earnedLateDays:earned.lateDays,
   };
 }
 
 function calcSonderzahlung(base, wbfRate){
-  // Austrian §67 taxation: up to €620 Freibetrag, remainder at fixed 6%; SV on full amount
+  // Austrian §67 Abs.1 EStG taxation: SV is deducted FIRST, then the €620 Freibetrag
+  // and 6% flat rate apply to the SV-reduced amount (validated against real MedAustron payslip).
   var svAmount=calcSVMonthly(base, wbfRate).total; // respects AV threshold and cap
-  var lst=Math.max(0,base-620)*0.06;
+  var afterSV=base-svAmount;
+  var lst=Math.max(0,afterSV-620)*0.06;
   return {gross:base, sv:svAmount, lst:lst, net:base-svAmount-lst};
 }
 
@@ -2146,7 +2164,6 @@ function renderJobCompare(){
 function renderReport(){
   var r=calcSalary(currentYear,currentMonth);
   var s=getSettings(); // single settings read for the whole function
-  document.getElementById('net-out').textContent=fmt(r.net);
   // Net-box subtitle: month label + SZ reminder if applicable
   var isSZMonth=(s.szMonth1>=0&&currentMonth===s.szMonth1)||(s.szMonth2>=0&&currentMonth===s.szMonth2);
   var subLabel=MONTH_NAMES[currentMonth]+' '+currentYear+(isSZMonth?' · 🎁 Sonderzahlung month':'');
@@ -2154,7 +2171,11 @@ function renderReport(){
   // Hourly strip — compute SZ once, derive annual figures from salaryModel
   var baseHourly=r.base/173.33;
   var netHourly=r.net/173.33;
-  var szCalc=calcSonderzahlung(r.base);
+  var szCalc=calcSonderzahlung(r.base, s.wbfRate);
+  // Headline net payout: include Sonderzahlung net in SZ months, so it matches
+  // the actual payslip "Auszahlung" total instead of just the regular monthly net.
+  var displayNet=isSZMonth ? r.net+szCalc.net : r.net;
+  document.getElementById('net-out').textContent=fmt(displayNet);
   // How many SZ payouts per year, capped by what's actually configured
   var configuredSZ=(s.szMonth1>=0?1:0)+(s.szMonth2>=0&&s.szMonth2!==s.szMonth1?1:0);
   var szCount=Math.min(s.salaryModel-12, configuredSZ); // 0,1,2
@@ -2173,7 +2194,7 @@ function renderReport(){
   document.getElementById('r-middle').textContent=fmt(r.middleP)+' ('+r.middleDays+'d prev month)';
   document.getElementById('r-late').textContent=fmt(r.lateP)+' ('+r.lateDays+'d prev month)';
   document.getElementById('r-latenightA').textContent=r.lateNightA>0?fmt(r.lateNightA)+' ('+r.lateNightH.toFixed(1)+'h)':'€ 0,00';
-  document.getElementById('r-hol').textContent=fmt(r.holBasePay+r.holExtra)+(r.holExtra>0?' (base+200% extra, prev month)':'');
+  document.getElementById('r-hol').textContent=fmt(r.holExtra)+(r.holExtra>0?' (200% total, prev month)':'');
   document.getElementById('r-leave').textContent=fmt(r.leavePay);
   document.getElementById('r-ruf').textContent=fmt(r.rufPay);
   document.getElementById('r-callin').textContent=fmt(r.callinP);
@@ -2245,7 +2266,7 @@ function renderReport(){
   document.getElementById('r-rufh').textContent=
     r.rufH.toFixed(2)+' h'+(r.rufWH>0?' ('+r.rufH_raw.toFixed(1)+'h weekday + '+r.rufWH.toFixed(1)+'h wknd/hol)':'');
   document.getElementById('r-callinh').textContent=r.callinH.toFixed(2)+' h';
-  document.getElementById('r-holh').textContent=r.holH.toFixed(2)+' h';
+  document.getElementById('r-holh').textContent=r.earnedHolH.toFixed(2)+' h';
   // Pension YTD — compute directly from base+SV_PV per month (no full calcSalary needed)
   var pvMonth=r.svM.pv;
   var pvYTD=0;
@@ -2541,8 +2562,8 @@ function renderTaxCalc(){
   if(szSection) szSection.style.display=includeSZ?'':'none';
   if(includeSZ){
     var szBase=annual/12; // 1× monthly base per SZ (not including supplements)
-    var sz1=calcSonderzahlung(szBase);  // one SZ payout
-    var sz2=calcSonderzahlung(szBase);  // second SZ payout (same base)
+    var sz1=calcSonderzahlung(szBase, s.wbfRate);  // one SZ payout
+    var sz2=calcSonderzahlung(szBase, s.wbfRate);  // second SZ payout (same base)
     var szGrossTotal=sz1.gross+sz2.gross;
     var szSVTotal=sz1.sv+sz2.sv;
     var szLSTTotal=sz1.lst+sz2.lst;
@@ -2717,7 +2738,7 @@ function renderYear(){
   for(var m=0;m<12;m++){
     var r=allResults[m];
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-    var szData=isSZ?calcSonderzahlung(r.base):null;
+    var szData=isSZ?calcSonderzahlung(r.base, s.wbfRate):null;
     var monthOT=getOTAccrued(yearTabYear,m);
     tg+=r.gross+(szData?szData.gross:0);
     var estNet=r.net+(szData?szData.net:0);
@@ -2774,7 +2795,7 @@ function saveActual(inp){
   var r=calcSalary(parseInt(parts[0]),m);
   var s=getSettings();
   var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-  var szData=isSZ?calcSonderzahlung(r.base):null;
+  var szData=isSZ?calcSonderzahlung(r.base, s.wbfRate):null;
   var estNet=r.net+(szData?szData.net:0);
   var diff=!isNaN(v)?v-estNet:null;
   var row=inp.closest('tr');
@@ -2815,7 +2836,7 @@ function renderCompare(){
     '<div style="color:#185fa5">'+MONTH_NAMES[mb].substring(0,3)+' '+currentYear+'</div></div>'+
     row('Base',ra.base,rb.base)+row('Night 8%',ra.shiftA,rb.shiftA)+
     row('Middle suppl.',ra.middleP,rb.middleP)+row('Late suppl.',ra.lateP,rb.lateP)+
-    row('Holiday pay',ra.holBasePay+ra.holExtra,rb.holBasePay+rb.holExtra)+row('Rufbereitschaft',ra.rufPay,rb.rufPay)+
+    row('Holiday pay',ra.holExtra,rb.holExtra)+row('Rufbereitschaft',ra.rufPay,rb.rufPay)+
     row('Total gross',ra.gross,rb.gross)+
     row('SV total',ra.svM.total,rb.svM.total,function(n){return '− '+fmt(n);})+
     row('Lohnsteuer',ra.lst,rb.lst,function(n){return '− '+fmt(n);})+
@@ -2840,7 +2861,7 @@ function openModal(k){
   document.getElementById('modal-title').textContent=dow+', '+mName+' '+d+(hol?' — '+getHolName(k):'');
   document.getElementById('m-type').value=sh?sh.type:(hol?'holiday':'normal');
   document.getElementById('m-start').value=sh?sh.start:'07:00';
-  document.getElementById('m-end').value=sh?sh.end:'15:00';
+  document.getElementById('m-end').value=sh?sh.end:'15:30';
   document.getElementById('m-note').value=sh&&sh.note?sh.note:'';
   document.getElementById('m-delete').style.display=sh?'':'none';
   document.getElementById('pat-weekday').textContent=dow;
@@ -3275,7 +3296,7 @@ async function analysePayslip(){
       middleSuppl:r.middleP.toFixed(2),
       lateSuppl:r.lateP.toFixed(2),
       lateNight8pct:r.lateNightA.toFixed(2),
-      holidayPay:(r.holBasePay+r.holExtra).toFixed(2),
+      holidayPay:(r.holExtra).toFixed(2),
       rufbereitschaft:r.rufPay.toFixed(2),
       rufeinsatz:r.callinP.toFixed(2),
       hazard:r.hazard.toFixed(2),
@@ -3373,8 +3394,8 @@ function renderMarginal(){
   // Current month night allowance
   var nightA=calcNightAllowance(currentYear,currentMonth);
   // §68: night allowance in SV base but NOT in LSt base
-  var svTaxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+prevS.holExtra;
-  var lstTaxableBase=base+prevS.middleP+prevS.lateP; // holExtra excluded (§68 Feiertagszuschlag)
+  var svTaxable=base+nightA.shiftA+nightA.lateNightA+prevS.middleP+prevS.lateP+(prevS.holExtraBase||0)+(prevS.holExtraSuppl||0);
+  var lstTaxableBase=base+prevS.middleP+prevS.lateP+(prevS.holExtraBase||0); // holExtraSuppl excluded (§68 Feiertagszuschlag 100% supplement tax-free)
 
   var extraGross=0, extraLabel='', isNightPay=false;
   if(type==='normal_night'){
@@ -3394,9 +3415,11 @@ function renderMarginal(){
     extraGross=s.rufRate*s.rufWknd*4.5;
     extraLabel='4.5h wknd standby @ €'+(s.rufRate*s.rufWknd).toFixed(2)+'/h (×'+s.rufWknd+')';
   } else if(type==='callin'){
-    extraGross=hourly*s.callinM; extraLabel='1h call-in @ '+s.callinM+'× hourly';
+    extraGross=hourly*s.callinM; extraLabel='1h call-in @ '+s.callinM+'× hourly (normal day)';
+  } else if(type==='callin_holiday'){
+    extraGross=hourly*2; extraLabel='1h holiday call-in @ 200%';
   } else if(type==='holiday'){
-    extraGross=hourly*2*8; extraLabel='8h holiday · base + 200% extra';
+    extraGross=hourly*2*8; extraLabel='8h holiday shift · 200% total (paid next month)';
   }
   var isRuf=(type==='ruf_weekday'||type==='ruf_wknd');
   // For SV: add to svTaxable. For LSt: only add if not night pay (§68 exempt)
@@ -3428,7 +3451,7 @@ function renderForecast(){
     if(m>11){m-=12;y++;}
     var r=calcSalary(y,m);
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-    var szNet=isSZ?calcSonderzahlung(r.base).net:0;
+    var szNet=isSZ?calcSonderzahlung(r.base, s.wbfRate).net:0;
     var totalNet=r.net+szNet;
     var hasShifts=Object.keys(shifts).some(function(k){return k.substring(0,7)===monthKey(y,m);});
     html+='<div class="fcard'+(i===0?' fc-cur':'')+'">'+
@@ -3524,7 +3547,7 @@ function renderAVSummary(){
     totalWBF+=r.svM.wbf;
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
     if(isSZ){
-      var sz=calcSonderzahlung(r.base);
+      var sz=calcSonderzahlung(r.base, s.wbfRate);
       szMonths++;
       szGross+=sz.gross; szSV+=sz.sv; szLSt+=sz.lst;
       totalGross+=sz.gross; totalSV+=sz.sv; totalLSt+=sz.lst;
@@ -3579,7 +3602,7 @@ async function analysePayslipPhoto(input){
       base:r.base.toFixed(2),nightAllowance:r.shiftA.toFixed(2),
       middleSuppl:r.middleP.toFixed(2),lateSuppl:r.lateP.toFixed(2),
       lateNight8pct:r.lateNightA.toFixed(2),
-      holidayPay:(r.holBasePay+r.holExtra).toFixed(2),
+      holidayPay:(r.holExtra).toFixed(2),
       rufbereitschaft:r.rufPay.toFixed(2),rufeinsatz:r.callinP.toFixed(2),
       hazard:r.hazard.toFixed(2),worksBR:r.br.toFixed(2),
       totalGross:r.gross.toFixed(2),kv:r.svM.kv.toFixed(2),
@@ -3692,7 +3715,10 @@ function _doUpdateDuration(){
   if(type==='middle')   parts.push('+'+fmt(s.middleS)+' supplement (paid next month)');
   if(type==='late')     parts.push('+'+fmt(s.lateS)+' supplement (paid next month)');
   if(type==='ruf')      parts.push(fmt(s.rufRate*h.total)+' standby pay');
-  if(type==='callin')   parts.push(fmt(hourly*s.callinM*h.total)+' call-in pay');
+  if(type==='callin'){
+    if(editingDate&&isHol(editingDate)) parts.push(fmt(hourly*2*h.paid)+' holiday call-in — 200% (paid next month)');
+    else parts.push(fmt(hourly*s.callinM*h.total)+' call-in pay');
+  }
   if(type==='holiday')  parts.push(fmt(hourly*2*h.total)+' extra (paid next month)');
   if(type==='leave')    parts.push('8h paid (standard day)');
   pill.className='duration-pill show';
@@ -3770,7 +3796,7 @@ function msttShow(e,y,m){
   var r=calcSalary(y,m);
   var s=getSettings();
   var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-  var szData=isSZ?calcSonderzahlung(r.base):null;
+  var szData=isSZ?calcSonderzahlung(r.base, s.wbfRate):null;
   var estNet=r.net+(szData?szData.net:0);
   var act=actuals[monthKey(y,m)];
   tt.innerHTML=
@@ -3806,7 +3832,7 @@ function getForecastAccuracy(y,m){
   var r=calcSalary(y,m);
   var s=getSettings();
   var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-  var szNet=isSZ?calcSonderzahlung(r.base).net:0;
+  var szNet=isSZ?calcSonderzahlung(r.base, s.wbfRate).net:0;
   var est=r.net+szNet;
   return {diff:act-est,pct:est>0?((act-est)/est*100):0};
 }
@@ -3827,7 +3853,7 @@ function exportXLSX(){
   for(var m=0;m<12;m++){
     var r=calcSalary(exportYear,m);
     var isSZ=(s.szMonth1>=0&&m===s.szMonth1)||(s.szMonth2>=0&&m===s.szMonth2);
-    var szData=isSZ?calcSonderzahlung(r.base):null;
+    var szData=isSZ?calcSonderzahlung(r.base, s.wbfRate):null;
     var szNet=szData?szData.net:0;
     var estNet=r.net+szNet;
     ytdNet+=estNet;
@@ -3938,7 +3964,7 @@ function saveTemplate(){
     name:name,
     type:document.getElementById('m-type').value||'normal',
     start:document.getElementById('m-start').value||'07:00',
-    end:document.getElementById('m-end').value||'15:00',
+    end:document.getElementById('m-end').value||'15:30',
     note:(document.getElementById('m-note').value||'').trim()
   };
   // Overwrite if name already exists
@@ -4142,7 +4168,7 @@ function renderSim(){
   var middleTotalNet   = middleSupplNet;
 
   // ══════════════════════════════════════════════════════════
-  // EXTRA EARLY (07:00–15:00) — ADDITIONAL shift
+  // EXTRA EARLY (07:00–15:30) — ADDITIONAL shift
   //   This month: 8h × hourly base pay (fully taxable)
   // ══════════════════════════════════════════════════════════
   var normalGross = hourly*8 * nNormal;
@@ -4158,7 +4184,7 @@ function renderSim(){
     : (rufGross - (calcMonthlyLSt(r.lstTaxable+rufGross, s.wbfRate)-calcMonthlyLSt(r.lstTaxable, s.wbfRate)));
 
   // ══════════════════════════════════════════════════════════
-  // HOLIDAY SHIFT (07:00–15:00) — ADDITIONAL
+  // HOLIDAY SHIFT (07:00–15:30) — ADDITIONAL
   //   This month: 8h base pay
   //   Next month: 200% extra (= 2× hourly × 8h)
   // ══════════════════════════════════════════════════════════
@@ -4606,11 +4632,11 @@ var I18N={
     lblData:'Data', lblMonthComparison:'Month comparison',
     simTitle:'What-if simulator', resetAll:'Reset all', simBaseline:'Current month baseline net',
     simBasedOnShifts:'based on shifts entered', simAddExtra:'Add extra shifts',
-    simLateLabel:'Late shifts (14:00–22:30)', simLateSub:'+€50 supplement next month', simNightPayLabel:'Also includes 2.5h night pay (§68, LSt-free)',
-    simMiddleLabel:'Middle shifts (11:30–20:00)', simMiddleSub:'+€35.50 supplement next month',
-    simEarlyLabel:'Early shifts (07:00–15:00)', simEarlySub:'no supplements · base pay only',
+    simLateLabel:'Late shifts (14:00–22:30 · 8h paid)', simLateSub:'+€50 supplement next month', simNightPayLabel:'Also includes 2.5h night pay (§68, LSt-free)',
+    simMiddleLabel:'Middle shifts (11:30–20:00 · 8h paid)', simMiddleSub:'+€35.50 supplement next month',
+    simEarlyLabel:'Early shifts (07:00–15:30 · 8h paid)', simEarlySub:'no supplements · base pay only',
     simRufLabel:'Rufbereitschaft (4.5h weekday)', simRufSub:'standby pay, outside SV base',
-    simHolLabel:'Public holiday shifts (07:00–15:00)', simHolSub:'base pay now · 200% extra next month',
+    simHolLabel:'Public holiday shifts (07:00–15:30 · 8h paid)', simHolSub:'base pay now · 200% extra next month',
     simFootnote:"⚠ Supplements (late/middle) are paid the <em>following</em> month. The net gain shown is this month's actual cash impact. Night 8% and Ruf pay are same-month.",
     modalEditShift:'Edit shift',
     modalQuickPresets:'Quick presets',
@@ -4892,11 +4918,11 @@ var I18N={
     lblData:'Daten', lblMonthComparison:'Monatsvergleich',
     simTitle:'Was-wäre-wenn-Simulator', resetAll:'Alles zurücksetzen', simBaseline:'Aktueller Monats-Nettobasiswert',
     simBasedOnShifts:'basierend auf eingetragenen Schichten', simAddExtra:'Zusätzliche Schichten hinzufügen',
-    simLateLabel:'Spätdienste (14:00–22:30)', simLateSub:'+€50 Zuschlag nächsten Monat', simNightPayLabel:'Inkl. 2,5h Nachtzuschlag (§68, LSt-frei)',
-    simMiddleLabel:'Mitteldienste (11:30–20:00)', simMiddleSub:'+€35,50 Zuschlag nächsten Monat',
-    simEarlyLabel:'Frühdienste (07:00–15:00)', simEarlySub:'keine Zuschläge · nur Grundgehalt',
+    simLateLabel:'Spätdienste (14:00–22:30 · 8h bezahlt)', simLateSub:'+€50 Zuschlag nächsten Monat', simNightPayLabel:'Inkl. 2,5h Nachtzuschlag (§68, LSt-frei)',
+    simMiddleLabel:'Mitteldienste (11:30–20:00 · 8h bezahlt)', simMiddleSub:'+€35,50 Zuschlag nächsten Monat',
+    simEarlyLabel:'Frühdienste (07:00–15:30 · 8h bezahlt)', simEarlySub:'keine Zuschläge · nur Grundgehalt',
     simRufLabel:'Rufbereitschaft (4,5h Werktag)', simRufSub:'Bereitschaftsentgelt, außerhalb SV-Basis',
-    simHolLabel:'Feiertagsdienste (07:00–15:00)', simHolSub:'Grundgehalt jetzt · +200% nächsten Monat',
+    simHolLabel:'Feiertagsdienste (07:00–15:30 · 8h bezahlt)', simHolSub:'Grundgehalt jetzt · +200% nächsten Monat',
     simFootnote:'⚠ Zuschläge (Spät/Mittel) werden im <em>Folgemonat</em> ausgezahlt. Der angezeigte Nettoeffekt betrifft diesen Monat. Nachtzuschlag 8% und Rufbereitschaft werden im selben Monat ausgezahlt.',
     modalEditShift:'Schicht bearbeiten',
     modalQuickPresets:'Schnellauswahl',
