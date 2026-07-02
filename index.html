@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ShiftPlanner">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23185fa5'/><text y='.9em' font-size='70' x='50%' text-anchor='middle'>📅</text></svg>">
-<title>Austrian Shift &amp; Salary Planner</title>
+<title>Paychecker Austria</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0efea;color:#1a1a1a;font-size:14px;line-height:1.5}
@@ -638,6 +638,13 @@ body.dark .kv-select{background:#2a2a2e;border-color:#3a3a3e;color:#e2e2dc}
 /* Pendlerpauschale + Familienbonus */
 .tc-extra-box{background:#f5f5f0;border-radius:8px;padding:10px 12px;margin-bottom:10px}
 body.dark .tc-extra-box{background:#2a2a2e}
+/* ── KV BADGE ── */
+.kv-badge-verified{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 9px;border-radius:20px;background:#e8f5e9;color:#2e7d32;border:.5px solid #a5d6a7;white-space:nowrap}
+.kv-badge-unverified{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:500;padding:2px 9px;border-radius:20px;background:#fff8e1;color:#f57f17;border:.5px solid #ffe082;white-space:nowrap}
+.kv-badge-none{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:400;padding:2px 9px;border-radius:20px;background:rgba(128,128,128,.1);color:#aaa;border:.5px solid rgba(128,128,128,.2);white-space:nowrap}
+body.dark .kv-badge-verified{background:#1b3a1f;color:#81c784;border-color:#388e3c}
+body.dark .kv-badge-unverified{background:#3a2e00;color:#ffca28;border-color:#f9a825}
+body.dark .kv-badge-none{background:rgba(255,255,255,.06);color:#666;border-color:#444}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
@@ -648,7 +655,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <div class="left">
   <div class="app-header">
     <div>
-      <div class="app-title" data-i18n="appTitle">Shift &amp; Salary Planner</div>
+      <div class="app-title" data-i18n="appTitle">Paychecker Austria</div>
       <div class="app-sub" data-i18n="appSub">Austria · click any day to add or edit a shift</div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -719,6 +726,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <div class="net-label">Estimated net payout</div>
       <div class="net-val" id="net-out">—</div>
       <div class="net-sub" id="net-month-lbl"></div>
+      <div id="kv-badge" onclick="showTab('settings',null)" title="Change collective agreement in Settings" style="margin-top:7px;cursor:pointer"></div>
     </div>
     <div class="hourly-strip">
       <div class="hcard"><div class="hl">Base hourly (gross)</div><div class="hv" id="r-hourly-base">—</div></div>
@@ -1196,6 +1204,9 @@ body.dark .tc-extra-box{background:#2a2a2e}
       <p style="font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5" data-i18n="kvIntro">Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.</p>
       <select class="kv-select" id="kv-preset" onchange="applyKVPreset()">
         <option value="" data-i18n="kvSelectSector">— Select your sector —</option>
+        <optgroup label="✓ Verified (validated against real payslips)" data-i18n-label="kvGroupVerified">
+          <option value="medaustron_rt">Krankenanstalten – Radiologietechnologie ✓</option>
+        </optgroup>
         <optgroup label="Healthcare &amp; Social" data-i18n-label="kvGroupHealth">
           <option value="gesundheit_kh">Krankenanstalten (hospitals) — KAKuG</option>
           <option value="gesundheit_pflege">Pflege &amp; Sozialberufe — BAGS</option>
@@ -1220,7 +1231,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
         </optgroup>
       </select>
       <div class="kv-applied" id="kv-applied" data-i18n="kvApplied">✓ KV preset applied — review and adjust below if needed</div>
-      <div class="kv-note"><span data-i18n="kvNote">Values are typical approximations. Always verify with your actual contract or HR.</span> <a href="https://www.wko.at/service/kollektivvertrag" target="_blank" rel="noopener" style="color:#185fa5" data-i18n="kvFindLink">Find your KV ↗</a></div>
+      <div class="kv-note"><span data-i18n="kvNote">⚠ Only the Krankenanstalten – Radiologietechnologie template has been validated cent-for-cent against a real payslip. All other templates are best-effort estimates from public KV text — always verify against your own Abrechnung.</span> <a href="https://www.wko.at/service/kollektivvertrag" target="_blank" rel="noopener" style="color:#185fa5" data-i18n="kvFindLink">Find your KV ↗</a></div>
     </div>
     <hr class="divider">
     <div class="panel-section">
@@ -1571,10 +1582,10 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <div class="cs-overlay" id="wizard-overlay">
   <div class="cs-box" style="max-width:380px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-      <div style="font-size:18px" data-i18n="wizWelcome">👋 Welcome to Shift &amp; Salary Planner</div>
+      <div style="font-size:18px" data-i18n="wizWelcome">👋 Paychecker Austria</div>
       <button onclick="toggleLang()" id="wiz-lang-btn" style="font-size:11px;padding:3px 8px;border:.5px solid #ccc;border-radius:5px;background:#f5f5f0;cursor:pointer;flex-shrink:0;margin-left:8px">🌐 DE</button>
     </div>
-    <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6" data-i18n="wizIntro">A free, private Austrian shift calculator. Your data never leaves your device. Let’s set up the three things we need.</div>
+    <div style="font-size:11px;color:#888;margin-bottom:16px;line-height:1.6" data-i18n="wizIntro">A free, private Austrian salary &amp; shift calculator. Your data never leaves your device. Let’s set up the three things we need.</div>
     <div style="margin-bottom:12px">
       <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px" data-i18n="wizQ1">1. Your monthly gross salary (€)</label>
       <input type="number" id="wiz-salary" placeholder="e.g. 3200.00" step="0.01" min="0" style="width:100%;font-size:14px;padding:7px 10px;border:.5px solid #ccc;border-radius:7px">
@@ -1664,19 +1675,7 @@ body.dark .tc-extra-box{background:#2a2a2e}
 <div class="modal">
   <div class="modal-title" id="modal-title" data-i18n="modalEditShift">Edit shift</div>
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px" data-i18n="modalQuickPresets">Quick presets</div>
-  <div class="presets-grid">
-    <button class="preset-btn" onclick="applyPreset('normal','07:00','15:30',this)">☀️ <span data-i18n="presetEarly">Early</span><br><span>07:00–15:30</span></button>
-    <button class="preset-btn" onclick="applyPreset('middle','11:30','20:00',this)">🌤 <span data-i18n="presetMiddle">Middle</span><br><span>11:30–20 +€35.50</span></button>
-    <button class="preset-btn" onclick="applyPreset('late','14:00','22:30',this)">🌙 <span data-i18n="presetLate">Late</span><br><span>14:00–22:30 +€50</span></button>
-    <button class="preset-btn" onclick="applyPreset('latenight','14:00','22:30',this)">🌙 <span data-i18n="presetLate8">Late 8%</span><br><span>14–22:30 8% only</span></button>
-    <button class="preset-btn" onclick="applyPreset('normal','22:00','06:00',this)">🌑 <span data-i18n="presetNight">Night</span><br><span>22:00–06:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('normal','07:00','19:00',this)">⏳ <span data-i18n="presetLong">Long</span><br><span>07:00–19:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('ruf','06:30','11:00',this)">📱 <span data-i18n="presetOnCall1">On-call 1</span><br><span>06:30–11:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('ruf','12:00','20:00',this)">📱 <span data-i18n="presetOnCall2">On-call 2</span><br><span>12:00–20:00</span></button>
-    <button class="preset-btn" onclick="applyPreset('callin','00:00','01:00',this)">🚨 Rufeinsatz<br><span data-i18n="presetSetTime">set time ↓</span></button>
-    <button class="preset-btn" onclick="applyPreset('leave','07:00','15:30',this)">🏖 Urlaub<br><span data-i18n="presetDayOff">day off</span></button>
-    <button class="preset-btn" onclick="applyPreset('holiday','07:00','19:00',this)">🎉 <span data-i18n="presetHoliday">Holiday</span><br><span data-i18n="presetWorked">worked</span></button>
-  </div>
+  <div class="presets-grid" id="modal-presets-grid"></div>
   <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px" data-i18n="modalManualEntry">Manual entry</div>
   <div class="mfield">
     <label data-i18n="modalType">Type</label>
@@ -1912,14 +1911,20 @@ function getSettings(){
   };
 }
 
-function calcHours(s,e,thresh){
+function calcHours(s,e,thresh,kvRules){
+  // kvRules is optional — if omitted, falls back to DEFAULT_KV_RULES via getActiveKVRules().
+  // Passing it explicitly avoids repeated DOM reads in tight loops (year-tab scan etc.).
+  var rules=kvRules||getActiveKVRules();
   var sp=s.split(':'),ep=e.split(':');
   var sm=parseInt(sp[0])*60+parseInt(sp[1]);
   var em=parseInt(ep[0])*60+parseInt(ep[1]);
   if(em<=sm) em+=1440;
   var total=(em-sm)/60;
-  // 30-min unpaid break deducted for shifts >= 6h (KV rule)
-  var paid=total>=6?total-0.5:total;
+  // Unpaid break: deducted from shifts >= 6h only when the active KV specifies it.
+  // breakDeductionMin=30 is the validated KH-Radiologietechnologie / standard Austrian KV default.
+  // breakDeductionMin=0 means no break deduction (e.g. very short shifts, IT KV, etc.)
+  var breakH=(rules.breakDeductionMin||0)/60;
+  var paid=total>=6?total-breakH:total;
   var ns=thresh*60,nightMins=0;
   if(em>1440){
     nightMins+=Math.max(0,Math.min(1440,em)-Math.max(ns,sm));
@@ -1934,39 +1939,64 @@ function calcHours(s,e,thresh){
 // Night 8% is paid in the SAME month it is earned (not deferred).
 function calcEarnedSupplements(year,month){
   var s=getSettings();
+  var rules=getActiveKVRules();
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
-  var holH=0; // includes both type='holiday' shifts AND call-ins (type='callin') that land on a public holiday
-  var middleDays=0,lateDays=0;       // shift counts — kept for display ("×N days")
-  var middleH=0,lateH=0;             // actual paid hours — drives the real payout
+  var holH=0; // includes both type='holiday' shifts AND call-ins on public holidays
+  var middleDays=0,lateDays=0;
+  var middleH=0,lateH=0;
   var pfx=monthKey(year,month);
-  // KV rate: middleS/lateS are defined as the amount for a standard 8h paid shift.
-  // Real payslip (validated): rate/hour = flat€ / 8h, applied to ACTUAL paid hours
-  // (so a slightly longer or shorter shift pays proportionally more/less, matching
-  // 'RT Nachmittag kurz/lang' line items which bill per hour, not per shift).
+  // KV rate: middleS/lateS are the flat amount for a standard 8h paid shift.
+  // Hourly rate = flat / 8, applied to actual paid hours (validated against payslip).
   var middleHourlyRate = s.middleS/8;
   var lateHourlyRate   = s.lateS/8;
   Object.keys(shifts).forEach(function(k){
     if(k.substring(0,7)!==pfx) return;
     var sh=shifts[k];
-    if(sh.type==='holiday')     { var h=calcHours(sh.start,sh.end,s.thresh); holH+=h.paid; }
-    else if(sh.type==='middle') { var h=calcHours(sh.start,sh.end,s.thresh); middleH+=h.paid; middleDays++; }
-    else if(sh.type==='late')   { var h=calcHours(sh.start,sh.end,s.thresh); lateH+=h.paid; lateDays++; }
-    else if(sh.type==='callin'&&isHol(k)) { var h=calcHours(sh.start,sh.end,s.thresh); holH+=h.paid; }
+    if(sh.type==='holiday'){
+      var h=calcHours(sh.start,sh.end,s.thresh,rules); holH+=h.paid;
+    } else if(sh.type==='middle'){
+      var h=calcHours(sh.start,sh.end,s.thresh,rules); middleH+=h.paid; middleDays++;
+    } else if(sh.type==='late'){
+      var h=calcHours(sh.start,sh.end,s.thresh,rules); lateH+=h.paid; lateDays++;
+    } else if(sh.type==='callin'&&isHol(k)){
+      var h=calcHours(sh.start,sh.end,s.thresh,rules); holH+=h.paid;
+    }
   });
+
+  // Holiday pay model depends on active KV template:
+  //   '200_deferred' (validated KH-RT): full 200% paid NEXT month — base=suppl=hourly*holH
+  //   '150_same':  150% paid SAME month (handled in calcSalary, not here) — here we only
+  //                carry holH for the deferred Feiertagszuschlag 50% supplement portion
+  //   'none':      no special holiday-worked premium modeled
+  var hMode=rules.holidayMode||'200_deferred';
+  var holBase   = hMode==='200_deferred' ? hourly*holH : (hMode==='150_same' ? 0 : 0);
+  var holSuppl  = hMode==='200_deferred' ? hourly*holH : (hMode==='150_same' ? hourly*0.5*holH : 0);
+  var holTotal  = holBase + holSuppl;
+
+  // Middle/late supplement timing: deferSupplements=true → paid next month (here)
+  //                                deferSupplements=false → paid same month (handled in calcSalary)
+  var defer=rules.deferSupplements!==false;
   return {
-    middleP:  middleHourlyRate*middleH,
-    lateP:    lateHourlyRate*lateH,
-    holExtraBase: hourly*holH,    // base pay for holiday hours — taxable (SV + LSt)
-    holExtraSuppl: hourly*holH,   // §68(1) Feiertagszuschlag 100% supplement — SV applies, LSt exempt
-    holExtra: hourly*2*holH,      // combined total (kept for display compatibility)
-    middleDays, lateDays, middleH, lateH, holH
+    middleP:  defer ? middleHourlyRate*middleH : 0,
+    lateP:    defer ? lateHourlyRate*lateH     : 0,
+    // Same-month values for when deferSupplements=false (read by calcSalary directly)
+    middlePSame:  defer ? 0 : middleHourlyRate*middleH,
+    latePSame:    defer ? 0 : lateHourlyRate*lateH,
+    holExtraBase: holBase,
+    holExtraSuppl: holSuppl,
+    holExtra: holTotal,
+    middleDays, lateDays, middleH, lateH, holH,
+    rules
   };
 }
 
-// Compute night hours (8%) for a given month — paid SAME month
+// Compute night hours (8%) for a given month — paid SAME month.
+// nightAllowancePct comes from the active KV template (0.08 for healthcare/RT, 0 for office KVs).
 function calcNightAllowance(year,month){
   var s=getSettings();
+  var rules=getActiveKVRules();
+  var nightPct=rules.nightAllowancePct!=null?rules.nightAllowancePct:0.08;
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
   var nightH=0,lateNightH=0;
@@ -1974,15 +2004,16 @@ function calcNightAllowance(year,month){
   Object.keys(shifts).forEach(function(k){
     if(k.substring(0,7)!==pfx) return;
     var sh=shifts[k];
-    var h=calcHours(sh.start,sh.end,s.thresh);
+    var h=calcHours(sh.start,sh.end,s.thresh,rules);
     if(sh.type==='latenight') lateNightH+=h.night;
     else if(sh.type==='normal'||sh.type==='callin') nightH+=h.night;
   });
-  return {shiftA:hourly*0.08*nightH, lateNightA:hourly*0.08*lateNightH, nightH, lateNightH};
+  return {shiftA:hourly*nightPct*nightH, lateNightA:hourly*nightPct*lateNightH, nightH, lateNightH};
 }
 
 function calcSalary(year,month){
   var s=getSettings();
+  var rules=getActiveKVRules();
   var base=getBaseForMonth(year,month);
   var hourly=base/173.33;
   var leaveH=0,rufH=0,rufWH=0,callinH=0,callinHolH=0;
@@ -1991,7 +2022,7 @@ function calcSalary(year,month){
     if(k.substring(0,7)!==pfx) return;
     var sh=shifts[k];
     var d=parseInt(k.split('-')[2]);
-    var h=calcHours(sh.start,sh.end,s.thresh);
+    var h=calcHours(sh.start,sh.end,s.thresh,rules);
     var special=isHol(k)||isWknd(year,month,d);
     // NOTE: holiday hours (type='holiday') are NOT accumulated here — the full 200%
     // (base+100% supplement) is deferred and paid next month via calcEarnedSupplements
@@ -2015,22 +2046,37 @@ function calcSalary(year,month){
 
   var leavePay   = hourly*leaveH;
   var rufPay     = s.rufRate*rufH + s.rufRate*s.rufWknd*rufWH;
-  var callinP    = hourly*s.callinM*callinH; // normal-day call-in: configured rate (default: normal rate)
+  var callinRate = rules.callinNormalRate!=null?rules.callinNormalRate:(s.callinM||1.0);
+  var callinP    = hourly*callinRate*callinH; // normal-day call-in: KV-configured rate
+  // For KVs that pay supplements same-month (deferSupplements=false), read them here
+  // from the CURRENT month's earned supplements rather than the previous month's.
+  // For deferring KVs, these are already in prevSuppl.middleP / prevSuppl.lateP.
+  var currEarned=calcEarnedSupplements(year,month);
+  var sameMonthMiddleP=currEarned.middlePSame||0;
+  var sameMonthLateP  =currEarned.latePSame  ||0;
+  // For '150_same' holidays: 150% paid same month (base already in monthly salary,
+  // so we add the 50% supplement portion here as same-month LSt-exempt component).
+  var hMode=rules.holidayMode||'200_deferred';
+  var sameMonthHolSuppl=(hMode==='150_same')?(hourly*0.5*currEarned.holH):0;
 
   // §68 EStG split:
   // SV base: all earnings (night, holiday base+supplement, supplements)
   // LSt base: excludes §68 tax-free components (night 8%, Feiertagszuschlag 100% supplement)
   var svTaxable = base
     + night.shiftA + night.lateNightA
-    + prevSuppl.middleP + prevSuppl.lateP
+    + prevSuppl.middleP + prevSuppl.lateP           // deferred supplements from prev month
+    + sameMonthMiddleP + sameMonthLateP              // same-month supplements (deferSupplements=false KVs)
     + (prevSuppl.holExtraBase||0) + (prevSuppl.holExtraSuppl||0)
+    + sameMonthHolSuppl                              // same-month holiday 50% suppl (150_same KVs)
     + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var lstTaxable = base
-    // night pay EXCLUDED — §68(1) Nachtzulage tax-free
+    // night pay EXCLUDED — §68(1) Nachtzulage tax-free for qualifying KVs
     + prevSuppl.middleP + prevSuppl.lateP
+    + sameMonthMiddleP + sameMonthLateP
     + (prevSuppl.holExtraBase||0)   // base pay for holiday hours — taxable
-    // holExtraSuppl EXCLUDED — §68(1) Feiertagszuschlag 100% supplement tax-free
+    // holExtraSuppl EXCLUDED — §68(1) Feiertagszuschlag supplement tax-free
+    // sameMonthHolSuppl EXCLUDED — also §68(1) tax-free
     + leavePay + callinP
     + (s.rufSVBase?rufPay:0);
   var taxable = svTaxable; // keep 'taxable' for backward compat (SV base)
@@ -2040,10 +2086,8 @@ function calcSalary(year,month){
   // NOT sv(lstTaxable) — the SV deducted for LSt must match what was actually paid
   var annualLSTBase = lstTaxable*12 - svM.total*12;
   var lst = calcLohnsteuerAnnual(annualLSTBase) / 12;
-  var gross = svTaxable+rufPay+s.hazard-br;
+  var gross = svTaxable+rufPay+s.hazard-br; // rufPay excluded from svTaxable if !rufSVBase, still in gross
   var net   = gross-svM.total-lst;
-
-  var earned = calcEarnedSupplements(year,month); // this month's deferred (for display)
 
   return {
     base,
@@ -2061,15 +2105,19 @@ function calcSalary(year,month){
     middleDays:prevSuppl.middleDays, lateDays:prevSuppl.lateDays,
     oncallDays:Math.round(rufH+rufWH),
     // Earned this month — deferred to next month (middle/late/holiday 200% total):
-    earnedMiddleP:earned.middleP, earnedLateP:earned.lateP,
-    earnedHolExtra:earned.holExtra, earnedHolH:earned.holH,
-    earnedMiddleDays:earned.middleDays, earnedLateDays:earned.lateDays,
+    earnedMiddleP:currEarned.middleP, earnedLateP:currEarned.lateP,
+    earnedHolExtra:currEarned.holExtra, earnedHolH:currEarned.holH,
+    earnedMiddleDays:currEarned.middleDays, earnedLateDays:currEarned.lateDays,
+    // Same-month supplements (deferSupplements=false KVs):
+    sameMonthMiddleP, sameMonthLateP, sameMonthHolSuppl,
+    // Active KV rules for downstream display:
+    kvRules:rules,
   };
 }
 
 function calcSonderzahlung(base, wbfRate){
   // Austrian §67 Abs.1 EStG taxation: SV is deducted FIRST, then the €620 Freibetrag
-  // and 6% flat rate apply to the SV-reduced amount (validated against real MedAustron payslip).
+  // and 6% flat rate apply to the SV-reduced amount (validated against a real Austrian hospital payslip).
   var svAmount=calcSVMonthly(base, wbfRate).total; // respects AV threshold and cap
   var afterSV=base-svAmount;
   var lst=Math.max(0,afterSV-620)*0.06;
@@ -2168,6 +2216,23 @@ function renderReport(){
   var isSZMonth=(s.szMonth1>=0&&currentMonth===s.szMonth1)||(s.szMonth2>=0&&currentMonth===s.szMonth2);
   var subLabel=MONTH_NAMES[currentMonth]+' '+currentYear+(isSZMonth?' · 🎁 Sonderzahlung month':'');
   document.getElementById('net-month-lbl').textContent=subLabel;
+
+  // KV badge — verified/unverified/none
+  (function(){
+    var badgeEl=document.getElementById('kv-badge');
+    if(!badgeEl) return;
+    var kvEl=document.getElementById('kv-preset');
+    var key=kvEl?kvEl.value:'';
+    var tpl=key?KV_TEMPLATES[key]:null;
+    if(!tpl){
+      badgeEl.innerHTML='<span class="kv-badge-none">⚠ No KV selected — tap to configure</span>';
+      return;
+    }
+    var verified=(key==='medaustron_rt');
+    badgeEl.innerHTML=verified
+      ?'<span class="kv-badge-verified">✓ '+tpl.name+' — validated</span>'
+      :'<span class="kv-badge-unverified">⚠ '+tpl.name+' — estimate, verify your payslip</span>';
+  })();
   // Hourly strip — compute SZ once, derive annual figures from salaryModel
   var baseHourly=r.base/173.33;
   var netHourly=r.net/173.33;
@@ -2851,6 +2916,81 @@ function renderCompare(){
 
 // ═══ MODAL ═══
 var _modalDirty=false;
+// Returns the active KV template's shift times, falling back to the MedAustron defaults.
+function getKVShifts(){
+  var kvEl=document.getElementById('kv-preset');
+  var key=kvEl?kvEl.value:'';
+  var tpl=key?KV_TEMPLATES[key]:null;
+  return (tpl&&tpl.shifts)?tpl.shifts:({
+    early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],
+    night:['22:00','06:00'],long:['07:00','19:00'],
+    oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']
+  });
+}
+
+// Build the preset button grid from the active KV template.
+// Called from openModal() so the grid always reflects the current template.
+function renderModalPresets(rules, kvSh, s){
+  var lang=getLang();
+  var grid=document.getElementById('modal-presets-grid');
+  if(!grid) return;
+  var hasMiddle=rules.hasMiddle!==false;
+  var hasLateNight=rules.hasLateNight!==false&&rules.nightAllowancePct>0;
+  var hasRuf=rules.hasRuf!==false;
+  var hasCallin=rules.hasCallin!==false;
+  var holMode=rules.holidayMode||'200_deferred';
+
+  // Format time range for display, e.g. ['07:00','15:30'] \u2192 '07:00\u201315:30'
+  function tr(key){ return kvSh[key]?kvSh[key].join('\u2013'):''; }
+
+  // Supplement labels
+  var midLabel=s&&s.middleS>0?(lang==='de'?'+\u20ac'+s.middleS.toFixed(2)+' Zuschl.':'+\u20ac'+s.middleS.toFixed(2)+' suppl.'):'';
+  var lateLabel=s&&s.lateS>0?(lang==='de'?'+\u20ac'+s.lateS.toFixed(2)+' Zuschl.':'+\u20ac'+s.lateS.toFixed(2)+' suppl.'):'';
+  var holLabel=holMode==='none'?'':(holMode==='150_same'?'150%':'200%');
+
+  function btn(type,start,end,icon,label,sub){
+    return '<button class="preset-btn" onclick="applyPreset(\''+type+'\',\''+start+'\',\''+end+'\',this)">'+
+      icon+' '+label+'<br><span>'+sub+'</span></button>';
+  }
+
+  var btns=[];
+  // Always shown
+  btns.push(btn('normal',kvSh.early[0],kvSh.early[1],'&#9728;',lang==='de'?'Fr\u00fch':'Early',tr('early')));
+  if(hasMiddle) btns.push(btn('middle',kvSh.middle[0],kvSh.middle[1],'&#127780;',lang==='de'?'Mittel':'Middle',tr('middle')+(midLabel?' '+midLabel:'')));
+  btns.push(btn('late',kvSh.late[0],kvSh.late[1],'&#127769;',lang==='de'?'Sp\u00e4t':'Late',tr('late')+(lateLabel?' '+lateLabel:'')));
+  if(hasLateNight) btns.push(btn('latenight',kvSh.late[0],kvSh.late[1],'&#127769;','8%',tr('late')+' 8%'));
+  btns.push(btn('normal',kvSh.night[0],kvSh.night[1],'&#127761;',lang==='de'?'Nacht':'Night',tr('night')));
+  btns.push(btn('normal',kvSh.long[0],kvSh.long[1],'&#9203;',lang==='de'?'Lang':'Long',tr('long')));
+  if(hasRuf){
+    btns.push(btn('ruf',kvSh.oncall1[0],kvSh.oncall1[1],'&#128241;',lang==='de'?'Ruf 1':'On-call 1',tr('oncall1')));
+    btns.push(btn('ruf',kvSh.oncall2[0],kvSh.oncall2[1],'&#128241;',lang==='de'?'Ruf 2':'On-call 2',tr('oncall2')));
+  }
+  if(hasCallin) btns.push(btn('callin','00:00','01:00','&#128680;','Rufeinsatz',lang==='de'?'Zeit setzen \u2193':'set time \u2193'));
+  btns.push(btn('leave',kvSh.early[0],kvSh.early[1],'&#127958;',lang==='de'?'Urlaub':'Leave',lang==='de'?'Urlaubstag':'day off'));
+  if(holMode!=='none') btns.push(btn('holiday',kvSh.holiday[0],kvSh.holiday[1],'&#127881;',lang==='de'?'Feiertag':'Holiday',holLabel+' '+(lang==='de'?'gearbeitet':'worked')));
+
+  grid.innerHTML=btns.join('');
+}
+
+// Update type dropdown visibility based on active KV rules
+function updateModalTypeOptions(rules){
+  var hasMiddle=rules.hasMiddle!==false;
+  var hasLateNight=rules.hasLateNight!==false&&rules.nightAllowancePct>0;
+  var hasRuf=rules.hasRuf!==false;
+  var hasCallin=rules.hasCallin!==false;
+  var holMode=rules.holidayMode||'200_deferred';
+
+  function setOpt(val,show){
+    var el=document.querySelector('#m-type option[value="'+val+'"]');
+    if(el) el.style.display=show?'':'none';
+  }
+  setOpt('middle',  hasMiddle);
+  setOpt('latenight',hasLateNight);
+  setOpt('ruf',     hasRuf);
+  setOpt('callin',  hasCallin);
+  setOpt('holiday', holMode!=='none');
+}
+
 function openModal(k){
   _modalDirty=false;
   editingDate=k;
@@ -2859,22 +2999,27 @@ function openModal(k){
   var sh=shifts[k],hol=isHol(k);
   var dow=DOW_NAMES[new Date(k+'T12:00:00').getDay()];
   document.getElementById('modal-title').textContent=dow+', '+mName+' '+d+(hol?' — '+getHolName(k):'');
+  var kvRules=getActiveKVRules();
+  var kvShifts=getKVShifts();
+  var s2=getSettings();
+  // Render preset buttons and type options for active KV
+  renderModalPresets(kvRules, kvShifts, s2);
+  updateModalTypeOptions(kvRules);
+  // Late+Night 8% additionally hidden after April (months May–Dec) per historical rule
+  var _month=parseInt(parts[1])-1;
+  var _showLN=_month<=3&&kvRules.hasLateNight!==false&&kvRules.nightAllowancePct>0;
+  var _lnOpt=document.querySelector('#m-type option[value="latenight"]');
+  if(_lnOpt) _lnOpt.style.display=_showLN?'':'none';
+
+  // Default times from active KV template (only when no saved shift)
   document.getElementById('m-type').value=sh?sh.type:(hol?'holiday':'normal');
-  document.getElementById('m-start').value=sh?sh.start:'07:00';
-  document.getElementById('m-end').value=sh?sh.end:'15:30';
+  document.getElementById('m-start').value=sh?sh.start:kvShifts.early[0];
+  document.getElementById('m-end').value=sh?sh.end:kvShifts.early[1];
   document.getElementById('m-note').value=sh&&sh.note?sh.note:'';
   document.getElementById('m-delete').style.display=sh?'':'none';
   document.getElementById('pat-weekday').textContent=dow;
-  document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
+  document.querySelector('.presets-grid') && document.querySelectorAll('.preset-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('modal').classList.add('open');
-  // Hide Late+Night 8% option and preset after April (months May–Dec = index 4–11)
-  var _month = parseInt(parts[1]) - 1; // 0-based month
-  var _showLN = _month <= 3; // only Jan–Apr
-  var _lnOpt = document.querySelector('#m-type option[value="latenight"]');
-  if(_lnOpt) _lnOpt.style.display = _showLN ? '' : 'none';
-  // If a saved shift is latenight but we're past April, keep it readable but warn
-  var _lnPreset = document.querySelector('.preset-btn[onclick*="latenight"]');
-  if(_lnPreset) _lnPreset.style.display = _showLN ? '' : 'none';
   updateDuration();
 }
 function closeModal(force){
@@ -3490,7 +3635,7 @@ function renderUrlaubTracker(){
 function exportICal(){
   var typeLabels={normal:'Early shift',middle:'Middle shift',late:'Late shift',latenight:'Late shift (8%)',holiday:'Holiday shift',leave:'Urlaub',ruf:'Rufbereitschaft',callin:'Rufeinsatz'};
   var s2=getSettings(); // hoisted — same settings for all events
-  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Austrian Shift Planner//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Shifts '+currentYear];
+  var lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Paychecker Austria//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:Paychecker Shifts '+currentYear];
   var keys=Object.keys(shifts).filter(function(k){return k.substring(0,4)===String(currentYear);});
   keys.sort().forEach(function(k){
     var sh=shifts[k];
@@ -4612,7 +4757,7 @@ function renderHeatmap(){
 // ═══ I18N — DE/EN ═══
 var I18N={
   en:{
-    appTitle:'Shift &amp; Salary Planner', appSub:'Austria · click any day to add or edit a shift',
+    appTitle:'Paychecker Austria', appSub:'Austrian salary & shift calculator · click any day to add a shift',
     today:'Today', print:'🖨 Print', icalBtn:'📅 iCal', copyPrevBtn:'📋 Copy prev',
     legEarly:'Early 07–15', legMiddle:'Middle 11:30–20', legLate:'Late 14–22:30',
     legLateNight:'Late+Night 14–22:30', legNightOnly:'+8% only', legHoliday:'Public holiday',
@@ -4623,11 +4768,11 @@ var I18N={
     lblGrossBreakdown:'Gross breakdown', lblWaterfall:'Pay waterfall', lblDeductions:'Deductions (Austrian 2026 rates)',
     lblHoursSummary:'Hours summary', lblBruttoNetto:'Austrian 2026 Brutto → Netto Calculator',
     lblMonthlyBreakdown:'Monthly breakdown', lblAnnualTotals:'Annual totals', lblEffRates:'Effective rates',
-    lblBrackets:'2026 Lohnsteuer brackets', lblSupplImpact:'Supplement &amp; on-call impact',
-    lblPendlerFam:'🚗 Pendlerpauschale &amp; Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Reverse Calculator',
+    lblBrackets:'2026 Lohnsteuer brackets', lblSupplImpact:'Supplement & on-call impact',
+    lblPendlerFam:'🚗 Pendlerpauschale & Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Reverse Calculator',
     lblInflation:'📈 Inflationsanpassung — Real Wage Check', lblSVTracker:'🏥 SV Jahrestracker',
     lblYourSalary:'Your Salary', lblKVPreset:'🏛 Kollektivvertrag (KV) preset', lblFixedSuppl:'Fixed shift supplements',
-    lblSZ:'Sonderzahlungen (13th / 14th month)', lblOnCall:'On-call &amp; Standby',
+    lblSZ:'Sonderzahlungen (13th / 14th month)', lblOnCall:'On-call & Standby',
     lblSVRegional:'Social Insurance — Regional settings', lblBackup:'💾 Backup', lblTemplates:'📋 Shift Templates',
     lblData:'Data', lblMonthComparison:'Month comparison',
     simTitle:'What-if simulator', resetAll:'Reset all', simBaseline:'Current month baseline net',
@@ -4660,7 +4805,7 @@ var I18N={
     modalSThisMonth:'s this month',
     modalMonFri:'Mon–Fri this week',
     modalAllWeekdays:'All weekdays this month',
-    modalDuplicateNext:'→ Save &amp; duplicate to next day',
+    modalDuplicateNext:'→ Save & duplicate to next day',
     modalRemove:'Remove',
     modalCancel:'Cancel',
     modalSave:'Save',
@@ -4718,10 +4863,10 @@ var I18N={
     ghAdd:'Add',
     kvIntro:'Select your collective agreement to auto-fill typical supplement amounts, night threshold, and standby rates. You can still edit everything manually afterwards.',
     kvSelectSector:'— Select your sector —',
-    kvGroupHealth:'Healthcare &amp; Social',
-    kvGroupIndustry:'Industry &amp; Trade',
-    kvGroupRetail:'Retail &amp; Hospitality',
-    kvGroupPublic:'Public &amp; Tech',
+    kvGroupHealth:'Healthcare & Social',
+    kvGroupIndustry:'Industry & Trade',
+    kvGroupRetail:'Retail & Hospitality',
+    kvGroupPublic:'Public & Tech',
     kvGroupOther:'Other',
     kvApplied:'✓ KV preset applied — review and adjust below if needed',
     kvNote:'Values are typical approximations. Always verify with your actual contract or HR.',
@@ -4731,7 +4876,7 @@ var I18N={
     tipMiddleSuppl:'A fixed bonus paid for each middle-shift day worked (e.g. 11:30–20:00). Paid the following month. Check your contract — many employees have €0 here.',
     setLateSuppl:'Late shift supplement (€/day)',
     tipLateSuppl:'A fixed bonus paid for each late-shift day worked (e.g. 14:00–22:30). Paid the following month. Check your contract — many employees have €0 here.',
-    szIntro:'Taxed at flat 6% + SV. Select the month each bonus is paid — often June &amp; December but can vary.',
+    szIntro:'Taxed at flat 6% + SV. Select the month each bonus is paid — often June & December but can vary.',
     sz13th:'13th month (Urlaubsgeld)',
     sz14th:'14th month (Weihnachtsgeld)',
     szWarn:'⚠ Both Sonderzahlung months are set to the same month — one will be ignored.',
@@ -4769,8 +4914,8 @@ var I18N={
     onbBody2:'Nothing is sent to any server. Export a JSON or Excel backup monthly — or use the Advanced sync in Settings to back up securely to your own private GitHub repository.',
     onbBack:'← Back',
     onbNext:'Next →',
-    wizWelcome:'👋 Welcome to Shift &amp; Salary Planner',
-    wizIntro:'A free, private Austrian shift calculator. Your data never leaves your device. Let’s set up the three things we need.',
+    wizWelcome:'👋 Welcome to Paychecker Austria',
+    wizIntro:'A free, private Austrian salary & shift calculator. Your data never leaves your device. Let’s set up the three things we need.',
     wizQ1:'1. Your monthly gross salary (€)',
     wizQ1Hint:'Find this on your payslip (Bruttobezug). You can change it later.',
     wizQ2:'2. Do you receive bonus months?',
@@ -4836,7 +4981,7 @@ var I18N={
     cmpMonthB:'Month B',
     syncHeader:'☁️ Sync between devices',
     syncSubtitle:'Use the same data on your phone and computer — encrypted sync via a private GitHub repo. Tap to set up.',
-    syncSteps:'<strong style="color:#555">Optional.</strong> Sync your data to a private GitHub repository — encrypted on your device before upload.<br><br><strong>Step 1:</strong> Create a private GitHub repo (free).<br><strong>Step 2:</strong> Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">fine-grained PAT ↗</a> with <em>Contents: Read &amp; Write</em> for that repo only.<br><strong>Step 3:</strong> Choose a strong sync password. <strong>Write it down</strong> — without it your data cannot be decrypted.<br><strong>Step 4:</strong> Fill in the fields below and press Push.',
+    syncSteps:'<strong style="color:#555">Optional.</strong> Sync your data to a private GitHub repository — encrypted on your device before upload.<br><br><strong>Step 1:</strong> Create a private GitHub repo (free).<br><strong>Step 2:</strong> Create a <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">fine-grained PAT ↗</a> with <em>Contents: Read & Write</em> for that repo only.<br><strong>Step 3:</strong> Choose a strong sync password. <strong>Write it down</strong> — without it your data cannot be decrypted.<br><strong>Step 4:</strong> Fill in the fields below and press Push.',
     syncPATLabel:'GitHub Personal Access Token (PAT)',
     syncRepoLabel:'Repository <span style="color:#bbb">(owner/repo-name)</span>',
     syncBranchLabel:'Branch',
@@ -4864,7 +5009,7 @@ var I18N={
     csSwipeHint:'📱 Swipe left/right on calendar to change month. Long-press a cell to quick-delete.',
     csClose:'Close',
     lblJobCompare:'💼 Job Offer Comparator',
-    jcIntro:'Compare two gross salaries side by side — your current job vs a new offer, or two offers against each other. Uses the Pendlerpauschale &amp; Familienbonus entered above for both.',
+    jcIntro:'Compare two gross salaries side by side — your current job vs a new offer, or two offers against each other. Uses the Pendlerpauschale & Familienbonus entered above for both.',
     jcJobA:'Job A (current)',
     jcJobB:'Job B (offer)',
     jcGrossPlaceholder:'Monthly gross €',
@@ -4888,7 +5033,7 @@ var I18N={
     lblSupport:'❤️ Support this project',
     supportIntro:'This app is free, private, and ad-free — no account, no tracking. If it saved you time or helped catch a payslip error, you can buy me a coffee.',
     supportBtn:'Buy me a coffee',
-    tabChecklist:'Close',tabRaise:'Raise',
+    kvGroupVerified:'✓ Verified (validated against real payslips)',tabChecklist:'Close',tabRaise:'Raise',
     checklistTitle:'Month-close checklist',checklistReset:'Reset',
     checklistAllDone:'Month closed!',
     checklistFootnote:'Tick every step at month-end. State is saved per month.',
@@ -4898,7 +5043,7 @@ var I18N={
     raiseBreakdown:'Breakdown',raiseEmpty:'Enter your current gross salary above.'
   },
   de:{
-    appTitle:'Dienstplan- &amp; Gehaltsrechner', appSub:'Österreich · auf einen Tag klicken, um eine Schicht hinzuzufügen',
+    appTitle:'Paychecker Austria', appSub:'Österreichischer Gehalts- & Schichtrechner · Tag klicken, Schicht eintragen',
     today:'Heute', print:'🖨 Drucken', icalBtn:'📅 iCal', copyPrevBtn:'📋 Vormonat kopieren',
     legEarly:'Früh 07–15', legMiddle:'Mittel 11:30–20', legLate:'Spät 14–22:30',
     legLateNight:'Spät+Nacht 14–22:30', legNightOnly:'nur +8%', legHoliday:'Feiertag',
@@ -4909,11 +5054,11 @@ var I18N={
     lblGrossBreakdown:'Brutto-Aufschlüsselung', lblWaterfall:'Gehaltsfluss', lblDeductions:'Abzüge (Österreich 2026)',
     lblHoursSummary:'Stundenübersicht', lblBruttoNetto:'Österreich 2026 Brutto → Netto Rechner',
     lblMonthlyBreakdown:'Monatliche Aufschlüsselung', lblAnnualTotals:'Jahressummen', lblEffRates:'Effektive Sätze',
-    lblBrackets:'Lohnsteuerstufen 2026', lblSupplImpact:'Zuschläge &amp; Rufbereitschaft – Auswirkung',
-    lblPendlerFam:'🚗 Pendlerpauschale &amp; Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Rückwärtsrechner',
+    lblBrackets:'Lohnsteuerstufen 2026', lblSupplImpact:'Zuschläge & Rufbereitschaft – Auswirkung',
+    lblPendlerFam:'🚗 Pendlerpauschale & Familienbonus Plus', lblNetto:'🔄 Nettolohnrechner — Rückwärtsrechner',
     lblInflation:'📈 Inflationsanpassung — Realeinkommen-Check', lblSVTracker:'🏥 SV Jahrestracker',
     lblYourSalary:'Ihr Gehalt', lblKVPreset:'🏛 Kollektivvertrag (KV) – Vorlage', lblFixedSuppl:'Fixe Schichtzulagen',
-    lblSZ:'Sonderzahlungen (13./14. Gehalt)', lblOnCall:'Rufbereitschaft &amp; Bereitschaftsdienst',
+    lblSZ:'Sonderzahlungen (13./14. Gehalt)', lblOnCall:'Rufbereitschaft & Bereitschaftsdienst',
     lblSVRegional:'Sozialversicherung — regionale Einstellungen', lblBackup:'💾 Sicherung', lblTemplates:'📋 Schichtvorlagen',
     lblData:'Daten', lblMonthComparison:'Monatsvergleich',
     simTitle:'Was-wäre-wenn-Simulator', resetAll:'Alles zurücksetzen', simBaseline:'Aktueller Monats-Nettobasiswert',
@@ -4946,7 +5091,7 @@ var I18N={
     modalSThisMonth:'e diesen Monat',
     modalMonFri:'Mo–Fr diese Woche',
     modalAllWeekdays:'Alle Werktage diesen Monat',
-    modalDuplicateNext:'→ Speichern &amp; für nächsten Tag übernehmen',
+    modalDuplicateNext:'→ Speichern & für nächsten Tag übernehmen',
     modalRemove:'Entfernen',
     modalCancel:'Abbrechen',
     modalSave:'Speichern',
@@ -5004,10 +5149,10 @@ var I18N={
     ghAdd:'Hinzufügen',
     kvIntro:'Wählen Sie Ihren Kollektivvertrag, um typische Zuschläge, Nachtgrenze und Bereitschaftsentgelt automatisch einzutragen. Sie können alles danach noch anpassen.',
     kvSelectSector:'— Branche wählen —',
-    kvGroupHealth:'Gesundheit &amp; Soziales',
-    kvGroupIndustry:'Industrie &amp; Gewerbe',
-    kvGroupRetail:'Handel &amp; Gastgewerbe',
-    kvGroupPublic:'Öffentlicher Dienst &amp; IT',
+    kvGroupHealth:'Gesundheit & Soziales',
+    kvGroupIndustry:'Industrie & Gewerbe',
+    kvGroupRetail:'Handel & Gastgewerbe',
+    kvGroupPublic:'Öffentlicher Dienst & IT',
     kvGroupOther:'Sonstige',
     kvApplied:'✓ KV-Vorlage angewendet — unten prüfen und ggf. anpassen',
     kvNote:'Die Werte sind typische Näherungswerte. Bitte immer mit dem tatsächlichen Vertrag oder HR abgleichen.',
@@ -5017,7 +5162,7 @@ var I18N={
     tipMiddleSuppl:'Ein fixer Zuschlag pro Mitteldienst (z. B. 11:30–20:00). Wird im Folgemonat ausgezahlt. Prüfen Sie Ihren Vertrag — oft €0.',
     setLateSuppl:'Spätdienst-Zuschlag (€/Tag)',
     tipLateSuppl:'Ein fixer Zuschlag pro Spätdienst (z. B. 14:00–22:30). Wird im Folgemonat ausgezahlt. Prüfen Sie Ihren Vertrag — oft €0.',
-    szIntro:'Versteuert mit pauschal 6% + SV. Wählen Sie den Auszahlungsmonat — meist Juni &amp; Dezember, kann aber variieren.',
+    szIntro:'Versteuert mit pauschal 6% + SV. Wählen Sie den Auszahlungsmonat — meist Juni & Dezember, kann aber variieren.',
     sz13th:'13. Gehalt (Urlaubsgeld)',
     sz14th:'14. Gehalt (Weihnachtsgeld)',
     szWarn:'⚠ Beide Sonderzahlungs-Monate sind gleich — einer wird ignoriert.',
@@ -5055,8 +5200,8 @@ var I18N={
     onbBody2:'Es wird nichts an einen Server gesendet. Exportieren Sie monatlich ein JSON- oder Excel-Backup — oder nutzen Sie den erweiterten Sync in den Einstellungen für eine sichere Sicherung in Ihr eigenes privates GitHub-Repository.',
     onbBack:'← Zurück',
     onbNext:'Weiter →',
-    wizWelcome:'👋 Willkommen beim Dienstplan- &amp; Gehaltsrechner',
-    wizIntro:'Ein kostenloser, privater österreichischer Schichtrechner. Ihre Daten verlassen nie Ihr Gerät. Richten wir die drei wichtigsten Dinge ein.',
+    wizWelcome:'👋 Willkommen bei Paychecker Austria',
+    wizIntro:'Ein kostenloser, privater österreichischer Gehalts- & Schichtrechner. Ihre Daten verlassen nie Ihr Gerät. Richten wir die drei wichtigsten Dinge ein.',
     wizQ1:'1. Ihr monatliches Bruttogehalt (€)',
     wizQ1Hint:'Siehe Lohnzettel (Bruttobezug). Sie können es später ändern.',
     wizQ2:'2. Erhalten Sie Sonderzahlungen?',
@@ -5122,7 +5267,7 @@ var I18N={
     cmpMonthB:'Monat B',
     syncHeader:'☁️ Geräte-Synchronisation',
     syncSubtitle:'Nutzen Sie dieselben Daten auf Handy und Computer — verschlüsselte Synchronisation über ein privates GitHub-Repo. Zum Einrichten antippen.',
-    syncSteps:'<strong style="color:#555">Optional.</strong> Synchronisieren Sie Ihre Daten mit einem privaten GitHub-Repository — vor dem Upload auf Ihrem Gerät verschlüsselt.<br><br><strong>Schritt 1:</strong> Privates GitHub-Repo erstellen (kostenlos).<br><strong>Schritt 2:</strong> <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">Fine-grained PAT ↗</a> mit <em>Contents: Read &amp; Write</em> nur für dieses Repo erstellen.<br><strong>Schritt 3:</strong> Starkes Sync-Passwort wählen. <strong>Notieren Sie es</strong> — ohne es können Ihre Daten nicht entschlüsselt werden.<br><strong>Schritt 4:</strong> Felder unten ausfüllen und Push drücken.',
+    syncSteps:'<strong style="color:#555">Optional.</strong> Synchronisieren Sie Ihre Daten mit einem privaten GitHub-Repository — vor dem Upload auf Ihrem Gerät verschlüsselt.<br><br><strong>Schritt 1:</strong> Privates GitHub-Repo erstellen (kostenlos).<br><strong>Schritt 2:</strong> <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener" style="color:#185fa5">Fine-grained PAT ↗</a> mit <em>Contents: Read & Write</em> nur für dieses Repo erstellen.<br><strong>Schritt 3:</strong> Starkes Sync-Passwort wählen. <strong>Notieren Sie es</strong> — ohne es können Ihre Daten nicht entschlüsselt werden.<br><strong>Schritt 4:</strong> Felder unten ausfüllen und Push drücken.',
     syncPATLabel:'GitHub Personal Access Token (PAT)',
     syncRepoLabel:'Repository <span style="color:#bbb">(Besitzer/Repo-Name)</span>',
     syncBranchLabel:'Branch',
@@ -5150,7 +5295,7 @@ var I18N={
     csSwipeHint:'📱 Im Kalender nach links/rechts wischen, um den Monat zu wechseln. Lange auf eine Zelle drücken zum Schnell-Löschen.',
     csClose:'Schließen',
     lblJobCompare:'💼 Job-Angebot-Vergleich',
-    jcIntro:'Vergleichen Sie zwei Bruttogehälter direkt nebeneinander — Ihren aktuellen Job gegen ein neues Angebot, oder zwei Angebote gegeneinander. Verwendet die oben eingegebene Pendlerpauschale &amp; den Familienbonus für beide.',
+    jcIntro:'Vergleichen Sie zwei Bruttogehälter direkt nebeneinander — Ihren aktuellen Job gegen ein neues Angebot, oder zwei Angebote gegeneinander. Verwendet die oben eingegebene Pendlerpauschale & den Familienbonus für beide.',
     jcJobA:'Job A (aktuell)',
     jcJobB:'Job B (Angebot)',
     jcGrossPlaceholder:'Monatsbrutto €',
@@ -5174,7 +5319,7 @@ var I18N={
     lblSupport:'❤️ Projekt unterstützen',
     supportIntro:'Diese App ist kostenlos, privat und werbefrei — kein Account, kein Tracking. Wenn sie Ihnen Zeit gespart oder einen Lohnzettel-Fehler gefunden hat, können Sie mir einen Kaffee spendieren.',
     supportBtn:'Kaffee spendieren',
-    tabChecklist:'Abschluss',tabRaise:'Gehaltserhöhung',
+    kvGroupVerified:'✓ Verifiziert (gegen echte Lohnzettel validiert)',tabChecklist:'Abschluss',tabRaise:'Gehaltserhöhung',
     checklistTitle:'Monatsabschluss',checklistReset:'Zurücksetzen',
     checklistAllDone:'Monat abgeschlossen!',
     checklistFootnote:'Alle Schritte am Monatsende abhaken. Status wird pro Monat gespeichert.',
@@ -5227,38 +5372,131 @@ function applyLang(lang){
   document.documentElement.lang=lang;
 }
 
-// ═══ KV PRESETS ═══
-var KV_PRESETS={
+// ═══ KV TEMPLATES ═══
+// Each template carries TWO kinds of data:
+//   1. Numeric values (middleS, lateS, thresh, rufRate, wbf) — same as the old KV_PRESETS,
+//      these populate the existing Settings number fields directly.
+//   2. Structural rules (rules{}) — these describe HOW the calc engine should behave for
+//      this KV: whether supplements are paid same-month or deferred to next month, whether
+//      a holiday worked pays 200% (deferred) vs some other split, whether there's an unpaid
+//      break to deduct, and whether shift-based night/late-night tax-free §68 logic applies
+//      at all. Only 'medaustron_rt' (KH Radiologietechnologie) has been validated cent-for-cent against a real payslip
+//      (see calcSalary/calcEarnedSupplements comments). All others are best-effort estimates
+//      from public KV text and should be treated as approximations — verify against your own
+//      Abrechnung and use the feedback link if something's off.
+//
+// rules{} fields and what they currently drive (see calcSalary/calcEarnedSupplements):
+//   deferSupplements   bool  — true: middle/late supplements paid the FOLLOWING month
+//                              (validated KH-RT behavior). false: paid same month.
+//   holidayMode        str   — '200_deferred' (worked holiday = 200% total, fully paid next
+//                              month, validated), '150_same' (150% same month, common KV
+//                              default), 'none' (no special holiday-worked premium modeled)
+//   breakDeductionMin  num   — minutes deducted from shifts ≥6h clock time (30 = standard
+//                              Austrian rule, 0 = no deduction modeled)
+//   nightAllowancePct  num   — §68 tax-free night allowance as a fraction of hourly wage
+//                              (0.08 = 8%, standard KH shift-worker rate; 0 = not modeled)
+//   callinNormalRate   num   — multiplier applied to call-in hours on a normal day
+//                              (1.0 = normal full rate, standard for KH shift workers)
+var KV_TEMPLATES={
+  medaustron_rt:{name:'Krankenanstalten – Radiologietechnologie',middleS:35.50,lateS:50,thresh:20,rufRate:4.94,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:00'],oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0,hasRuf:true,hasLateNight:true,hasMiddle:true,hasCallin:true},
+    note:'Validated cent-for-cent against real Austrian hospital payslips (Radiologietechnologie). The reference template.'},
   // Healthcare
-  gesundheit_kh:{name:'Krankenanstalten',middleS:40,lateS:55,thresh:20,rufRate:5.20,wbf:0.5,note:'Typical Vienna/NÖ hospital KV. Verify with your Dienstgeber.'},
-  gesundheit_pflege:{name:'BAGS Pflege',middleS:35,lateS:50,thresh:20,rufRate:4.50,wbf:0.5,note:'Soziale Dienste (BAGS). Supplements vary by employer.'},
-  rotes_kreuz:{name:'Rotes Kreuz',middleS:38,lateS:52,thresh:20,rufRate:4.80,wbf:0.5,note:'Österreichisches Rotes Kreuz KV.'},
+  gesundheit_kh:{name:'Krankenanstalten',middleS:40,lateS:55,thresh:20,rufRate:5.20,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:00'],oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0,hasRuf:true,hasLateNight:true,hasMiddle:true,hasCallin:true},
+    note:'Typical Vienna/NÖ hospital KV — unverified estimate. Verify with your Dienstgeber.'},
+  gesundheit_pflege:{name:'BAGS Pflege',middleS:35,lateS:50,thresh:20,rufRate:4.50,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:00'],oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0,hasRuf:true,hasLateNight:true,hasMiddle:true,hasCallin:true},
+    note:'Soziale Dienste (BAGS) — unverified estimate. Supplements vary by employer.'},
+  rotes_kreuz:{name:'Rotes Kreuz',middleS:38,lateS:52,thresh:20,rufRate:4.80,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:00'],oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0,hasRuf:true,hasLateNight:true,hasMiddle:true,hasCallin:true},
+    note:'Österreichisches Rotes Kreuz KV — unverified estimate.'},
   // Industry
-  metall:{name:'Metalltechnische Industrie',middleS:0,lateS:60,thresh:20,rufRate:0,wbf:0.5,note:'Late shift supplement ~€60/d. No standard middle shift supplement. Verify with works council.'},
-  elektro:{name:'Elektroindustrie',middleS:0,lateS:55,thresh:20,rufRate:0,wbf:0.5,note:'Supplements per shift agreement. Verify with your Betriebsrat.'},
-  chemie:{name:'Chemische Industrie',middleS:30,lateS:55,thresh:20,rufRate:0,wbf:0.5,note:'Typical values. Chemical industry KV supplements vary widely.'},
+  metall:{name:'Metalltechnische Industrie',middleS:0,lateS:60,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['06:00','14:30'],middle:['14:00','22:30'],late:['22:00','06:00'],night:['22:00','06:00'],long:['06:00','18:30'],oncall1:['06:00','10:00'],oncall2:['14:00','18:00'],holiday:['06:00','14:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Late shift supplement ~€60/d, paid same month — unverified estimate. Verify with works council.'},
+  elektro:{name:'Elektroindustrie',middleS:0,lateS:55,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['06:00','14:30'],middle:['14:00','22:30'],late:['22:00','06:00'],night:['22:00','06:00'],long:['06:00','18:30'],oncall1:['06:00','10:00'],oncall2:['14:00','18:00'],holiday:['06:00','14:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Supplements per shift agreement — unverified estimate. Verify with your Betriebsrat.'},
+  chemie:{name:'Chemische Industrie',middleS:30,lateS:55,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['06:00','14:30'],middle:['14:00','22:30'],late:['22:00','06:00'],night:['22:00','06:00'],long:['06:00','18:30'],oncall1:['06:00','10:00'],oncall2:['14:00','18:00'],holiday:['06:00','14:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Typical values — unverified estimate. Chemical industry KV supplements vary widely.'},
   // Retail/Hospitality
-  handel:{name:'Handel',middleS:0,lateS:0,thresh:19,rufRate:0,wbf:0.5,note:'Handel KV has no standard shift supplements. Late-evening bonus may apply after 19:00.'},
-  gastgewerbe:{name:'Gastgewerbe',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,note:'Gastgewerbe KV: night supplement 20:00–06:00. No fixed middle/late supplements.'},
+  handel:{name:'Handel',middleS:0,lateS:0,thresh:19,rufRate:0,wbf:0.5,
+    shifts:{early:['08:00','16:30'],middle:['11:00','19:30'],late:['13:00','21:30'],night:['20:00','04:00'],long:['08:00','20:30'],oncall1:['08:00','12:00'],oncall2:['14:00','18:00'],holiday:['08:00','16:30']},
+    rules:{deferSupplements:false,holidayMode:'none',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Handel KV has no standard shift supplements — unverified estimate. Late-evening bonus may apply after 19:00.'},
+  gastgewerbe:{name:'Gastgewerbe',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:00','19:30'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:30'],oncall1:['07:00','11:00'],oncall2:['15:00','19:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Gastgewerbe KV: night supplement 20:00–06:00 — unverified estimate. No fixed middle/late supplements.'},
   // Public/Tech
-  oeffentlich:{name:'Öffentlicher Dienst (Bund)',middleS:35,lateS:50,thresh:20,rufRate:3.91,wbf:0.5,note:'Bundesbedienstete VBG/BDG. Supplements set by Erlass. Verify with your Dienststelle.'},
-  it:{name:'IT/EDV-Dienstleistungen',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,note:'IT-KV: standard office hours. No shift supplements unless agreed individually.'},
+  oeffentlich:{name:'Öffentlicher Dienst (Bund)',middleS:35,lateS:50,thresh:20,rufRate:3.91,wbf:0.5,
+    shifts:{early:['07:00','15:30'],middle:['11:30','20:00'],late:['14:00','22:30'],night:['22:00','06:00'],long:['07:00','19:00'],oncall1:['06:30','11:00'],oncall2:['12:00','20:00'],holiday:['07:00','15:30']},
+    rules:{deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0,hasRuf:true,hasLateNight:true,hasMiddle:true,hasCallin:true},
+    note:'Bundesbedienstete VBG/BDG — unverified estimate. Supplements set by Erlass. Verify with your Dienststelle.'},
+  it:{name:'IT/EDV-Dienstleistungen',middleS:0,lateS:0,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['09:00','17:30'],middle:['10:00','18:30'],late:['12:00','20:30'],night:['20:00','04:00'],long:['08:00','18:30'],oncall1:['08:00','12:00'],oncall2:['13:00','17:00'],holiday:['09:00','17:30']},
+    rules:{deferSupplements:false,holidayMode:'none',breakDeductionMin:0,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'IT-KV: standard office hours — unverified estimate. No shift supplements unless agreed individually.'},
   // Other
-  bewachung:{name:'Bewachungsgewerbe',middleS:0,lateS:55,thresh:20,rufRate:4.00,wbf:0.5,note:'Security KV: night/late supplements apply. Verify exact amounts with employer.'},
-  transport:{name:'Transport &amp; Verkehr',middleS:0,lateS:45,thresh:20,rufRate:0,wbf:0.5,note:'Transport KV: late supplement typical. Varies by sub-sector (road/rail/aviation).'},
+  bewachung:{name:'Bewachungsgewerbe',middleS:0,lateS:55,thresh:20,rufRate:4.00,wbf:0.5,
+    shifts:{early:['06:00','14:30'],middle:['14:00','22:30'],late:['22:00','06:00'],night:['22:00','06:00'],long:['06:00','18:30'],oncall1:['06:00','10:00'],oncall2:['18:00','22:00'],holiday:['06:00','14:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:true,hasLateNight:false,hasMiddle:false,hasCallin:true},
+    note:'Security KV: night/late supplements apply — unverified estimate. Verify exact amounts with employer.'},
+  transport:{name:'Transport & Verkehr',middleS:0,lateS:45,thresh:20,rufRate:0,wbf:0.5,
+    shifts:{early:['06:00','14:30'],middle:['14:00','22:30'],late:['22:00','06:00'],night:['22:00','06:00'],long:['06:00','18:30'],oncall1:['06:00','10:00'],oncall2:['14:00','18:00'],holiday:['06:00','14:30']},
+    rules:{deferSupplements:false,holidayMode:'150_same',breakDeductionMin:30,nightAllowancePct:0,callinNormalRate:1.0,hasRuf:false,hasLateNight:false,hasMiddle:false,hasCallin:false},
+    note:'Transport KV: late supplement typical — unverified estimate. Varies by sub-sector (road/rail/aviation).'},
 };
+// Backward-compat alias — existing code/tests may still reference KV_PRESETS by name.
+var KV_PRESETS=KV_TEMPLATES;
+
+// Default structural rules used when no KV template is selected, or for fields a
+// template doesn't override. Mirrors the validated KH-Radiologietechnologie behavior, since that
+// is the engine's original, cent-verified baseline — picking a different template
+// only changes behavior where that template's rules explicitly differ.
+var DEFAULT_KV_RULES={deferSupplements:true,holidayMode:'200_deferred',breakDeductionMin:30,nightAllowancePct:0.08,callinNormalRate:1.0};
+
+// Returns the structural rules for the currently selected KV template (Settings →
+// kv-preset), falling back to DEFAULT_KV_RULES if none is selected or recognized.
+// This is the single read-path the calc engine should use — never read KV_TEMPLATES
+// directly from calcSalary/calcEarnedSupplements, always go through this function so
+// the "no template selected" case stays correct.
+function getActiveKVRules(){
+  var el=document.getElementById('kv-preset');
+  var key=el?el.value:'';
+  var tpl=key?KV_TEMPLATES[key]:null;
+  if(!tpl||!tpl.rules) return DEFAULT_KV_RULES;
+  // Shallow-merge so a template only needs to specify fields it overrides.
+  var merged={};
+  for(var k in DEFAULT_KV_RULES) merged[k]=DEFAULT_KV_RULES[k];
+  for(var k2 in tpl.rules) merged[k2]=tpl.rules[k2];
+  return merged;
+}
 
 function applyKVPreset(){
   var key=document.getElementById('kv-preset').value;
   var note=document.getElementById('kv-applied');
   if(!key){if(note)note.style.display='none';return;}
-  var kv=KV_PRESETS[key];if(!kv)return;
+  var kv=KV_TEMPLATES[key];if(!kv)return;
   document.getElementById('middle-suppl').value=kv.middleS.toFixed(2);
   document.getElementById('late-suppl').value=kv.lateS.toFixed(2);
   document.getElementById('thresh').value=String(kv.thresh);
   if(kv.rufRate>0) document.getElementById('ruf-rate').value=kv.rufRate.toFixed(2);
   document.getElementById('wbf-rate').value=kv.wbf.toFixed(1);
-  if(note){note.textContent='✓ '+kv.name+' applied — '+kv.note;note.style.display='block';}
+  if(note){
+    var verified=key==='medaustron_rt';
+    note.textContent=(verified?'✓ ':'⚠ ')+kv.name+' applied — '+kv.note;
+    note.style.display='block';
+  }
   saveSettings();renderAll();
 }
 
